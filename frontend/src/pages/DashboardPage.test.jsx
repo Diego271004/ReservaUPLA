@@ -76,6 +76,14 @@ describe('Dashboard: indicadores', () => {
     )
   })
 
+  it('la tarjeta «Total de reservas» aclara que incluye las canceladas (el total no suma las otras tres)', async () => {
+    mostrar()
+    const indicadores = await screen.findByRole('region', { name: 'Indicadores' })
+    const total = within(indicadores).getByText('Total de reservas').closest('article')
+    expect(total).toHaveTextContent('Incluye canceladas')
+    expect(within(indicadores).getAllByText('Incluye canceladas')).toHaveLength(1)
+  })
+
   it('en un empate de «ambiente más utilizado» salen todos los empatados', async () => {
     obtenerDashboard.mockResolvedValue(
       exito(

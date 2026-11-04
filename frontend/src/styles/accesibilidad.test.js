@@ -186,4 +186,18 @@ describe('Dashboard, Reservas y Mi ambiente', () => {
       /padding: var\(--espacio-2\)(;|$)/,
     )
   })
+
+  it('el botón «Filtros» solo se ve en móvil y el panel plegado solo se oculta en móvil (en escritorio los filtros siempre están a la vista)', () => {
+    const filtros = css('components/FiltrosDeReservas/FiltrosDeReservas.module.css')
+    expect(regla(filtros, '.alternar')).toContain('display: none')
+    expect(regla(filtros, '.alternar', '@media (max-width: 767px)')).toContain('display: block')
+    expect(regla(filtros, '.cerrado', '@media (max-width: 767px)')).toContain('display: none')
+    expect(filtros.slice(0, filtros.indexOf('@media'))).not.toMatch(/\.cerrado/)
+  })
+
+  it('«Ver detalle», «Rechazar» y «Aprobar» del Dashboard no parten su texto', () => {
+    expect(regla(css('pages/DashboardPage.module.css'), '.acciones > *')).toContain(
+      'white-space: nowrap',
+    )
+  })
 })

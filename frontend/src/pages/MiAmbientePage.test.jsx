@@ -95,6 +95,14 @@ describe('Mi ambiente', () => {
     expect(screen.queryByText(TEXTOS.indicadorMasUtilizado)).not.toBeInTheDocument()
   })
 
+  it('el total de su ambiente también aclara que incluye canceladas', async () => {
+    mostrar()
+    const indicadores = await screen.findByRole('region', { name: 'Indicadores' })
+    expect(within(indicadores).getByText('Total de reservas').closest('article')).toHaveTextContent(
+      'Incluye canceladas',
+    )
+  })
+
   it('«Uso del ambiente»: la tabla con fecha, horario, solicitante y estado con insignia', async () => {
     mostrar()
     const tabla = await screen.findByRole('table', { name: TEXTOS.usoDelAmbiente })

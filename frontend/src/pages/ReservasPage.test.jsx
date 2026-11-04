@@ -226,6 +226,84 @@ describe('Reservas: los filtros', () => {
   })
 })
 
+describe('Reservas: filtros plegables en móvil', () => {
+  const botonFiltros = () => screen.getByRole('button', { name: /^Filtros/ })
+  const panel = () => document.getElementById(botonFiltros().getAttribute('aria-controls'))
+
+  it('hay un botón «Filtros» del Button compartido, plegado al empezar, con aria-expanded y aria-controls', async () => {
+    mostrar()
+    await screen.findByRole('table')
+    expect(botonFiltros()).toHaveTextContent(/^Filtros$/)
+    expect(botonFiltros()).toHaveAttribute('aria-expanded', 'false')
+    expect(panel()).toContainElement(control('Estado'))
+    expect(panel().className).toMatch(/cerrado/)
+  })
+
+  it('al pulsarlo despliega los filtros y al volver a pulsarlo los pliega', async () => {
+    mostrar()
+    await screen.findByRole('table')
+    await userEvent.click(botonFiltros())
+    expect(botonFiltros()).toHaveAttribute('aria-expanded', 'true')
+    expect(panel().className).not.toMatch(/cerrado/)
+    await userEvent.click(botonFiltros())
+    expect(botonFiltros()).toHaveAttribute('aria-expanded', 'false')
+    expect(panel().className).toMatch(/cerrado/)
+  })
+
+  it.each([
+    ['', 'Filtros'],
+    ['?estado=Pendiente', 'Filtros (1)'],
+    ['?estado=Pendiente&desde=2026-11-05', 'Filtros (2)'],
+    ['?estado=Pendiente&ambienteId=1&desde=2026-11-05&hasta=2026-11-30', 'Filtros (4)'],
+  ])(
+    'con la dirección %j el botón dice «%s» (cuenta solo los filtros aplicados)',
+    async (consulta, texto) => {
+      mostrar(`/reservas${consulta}`)
+      await screen.findByRole('table')
+      expect(botonFiltros()).toHaveAccessibleName(texto)
+    },
+  )
+
+  it('lo que se escribe sin aplicar no cambia el número del botón', async () => {
+    mostrar()
+    await screen.findByRole('table')
+    await userEvent.click(botonFiltros())
+    await userEvent.selectOptions(control('Estado'), 'Aprobada')
+    expect(botonFiltros()).toHaveAccessibleName('Filtros')
+  })
+
+  it('al aplicar los filtros el panel vuelve a plegarse y el botón cuenta los aplicados', async () => {
+    mostrar()
+    await screen.findByRole('table')
+    await userEvent.click(botonFiltros())
+    await userEvent.selectOptions(control('Estado'), 'Aprobada')
+    await userEvent.click(screen.getByRole('button', { name: 'Aplicar filtros' }))
+    await waitFor(() => expect(botonFiltros()).toHaveAccessibleName('Filtros (1)'))
+    expect(botonFiltros()).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('con un error de fecha el panel sigue desplegado para corregirlo', async () => {
+    mostrar()
+    await screen.findByRole('table')
+    await userEvent.click(botonFiltros())
+    await userEvent.type(control('Fecha desde'), '0511')
+    await userEvent.click(screen.getByRole('button', { name: 'Aplicar filtros' }))
+    expect(screen.getByText(MENSAJES.fechaFormatoInvalido)).toBeInTheDocument()
+    expect(botonFiltros()).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('solo con teclado: Tab llega al botón antes que a los campos y Enter y Espacio lo alternan', async () => {
+    mostrar()
+    await screen.findByRole('table')
+    await userEvent.tab()
+    expect(botonFiltros()).toHaveFocus()
+    await userEvent.keyboard('{Enter}')
+    expect(botonFiltros()).toHaveAttribute('aria-expanded', 'true')
+    await userEvent.keyboard(' ')
+    expect(botonFiltros()).toHaveAttribute('aria-expanded', 'false')
+  })
+})
+
 describe('Reservas: páginas', () => {
   it('con 23 reservas hay 3 páginas; en la primera «Anterior» está deshabilitado', async () => {
     listarReservas.mockResolvedValue(exito(pagina([reserva(1)], 23, 1)))
@@ -293,6 +371,7 @@ describe('Reservas: solo con teclado', () => {
     mostrar()
     await screen.findByRole('table')
     const orden = [
+      screen.getByRole('button', { name: /^Filtros/ }),
       control('Estado'),
       control('Ambiente'),
       control('Fecha desde'),

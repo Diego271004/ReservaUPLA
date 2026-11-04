@@ -199,6 +199,7 @@ export const TEXTOS = Object.freeze({
   sinPendientes: 'No hay solicitudes pendientes.',
   verTodas: 'Ver todas',
   indicadorTotal: 'Total de reservas',
+  incluyeCanceladas: 'Incluye canceladas',
   indicadorPendientes: 'Reservas pendientes',
   indicadorAprobadas: 'Reservas aprobadas',
   indicadorRechazadas: 'Reservas rechazadas',

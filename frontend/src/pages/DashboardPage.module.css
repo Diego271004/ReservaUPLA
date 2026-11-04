@@ -10,6 +10,11 @@
   justify-content: flex-end;
 }
 
+/* Ningún botón parte su texto en dos líneas: la tabla le cede el ancho. */
+.acciones > * {
+  white-space: nowrap;
+}
+
 .pie {
   display: flex;
   flex-wrap: wrap;
