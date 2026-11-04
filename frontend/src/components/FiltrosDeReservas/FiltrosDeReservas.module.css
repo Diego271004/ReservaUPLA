@@ -1,0 +1,28 @@
+.filtros {
+  padding: var(--espacio-3);
+  margin-bottom: var(--espacio-3);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0 var(--espacio-2); /* cada campo ya trae su margen inferior */
+}
+
+.acciones {
+  display: flex;
+  gap: var(--espacio-1);
+  justify-content: flex-end;
+}
+
+@media (max-width: 767px) {
+  .acciones {
+    flex-direction: column-reverse; /* el primario arriba, como en los formularios */
+  }
+
+  .acciones > * {
+    width: 100%;
+  }
+}

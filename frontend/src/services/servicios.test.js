@@ -10,7 +10,10 @@ import {
   crearReserva,
   crearUsuario,
   listarAmbientes,
+  listarReservas,
   listarUsuarios,
+  obtenerDashboard,
+  obtenerMiAmbiente,
   obtenerReserva,
   rechazarReserva,
 } from './recursosService.js'
@@ -301,6 +304,28 @@ describe('recursosService: rutas y métodos', () => {
     ['aprobarReserva', () => aprobarReserva(7), '/api/reservas/7/aprobar', 'POST'],
     ['rechazarReserva', () => rechazarReserva(7), '/api/reservas/7/rechazar', 'POST'],
     ['cancelarReserva', () => cancelarReserva(7), '/api/reservas/7/cancelar', 'POST'],
+    ['listarReservas sin filtros', () => listarReservas({}), '/api/reservas', 'GET'],
+    [
+      'listarReservas con todos los filtros y la página',
+      () =>
+        listarReservas({
+          estado: 'Pendiente',
+          ambienteId: '3',
+          desde: '05/11/2026',
+          hasta: '30/11/2026',
+          pagina: 2,
+        }),
+      '/api/reservas?estado=Pendiente&ambienteId=3&desde=2026-11-05&hasta=2026-11-30&pagina=2',
+      'GET',
+    ],
+    ['obtenerDashboard', () => obtenerDashboard(), '/api/dashboard', 'GET'],
+    ['obtenerMiAmbiente sin elegir', () => obtenerMiAmbiente({}), '/api/mi-ambiente', 'GET'],
+    [
+      'obtenerMiAmbiente eligiendo ambiente y página',
+      () => obtenerMiAmbiente({ ambienteId: '4', pagina: 3 }),
+      '/api/mi-ambiente?ambienteId=4&pagina=3',
+      'GET',
+    ],
     [
       'consultarDisponibilidad',
       () =>

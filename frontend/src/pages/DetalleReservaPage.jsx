@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import DetalleReserva from '../components/DetalleReserva/DetalleReserva.jsx'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
 import Button from '../components/ui/Button.jsx'
@@ -6,43 +6,16 @@ import ModalConfirmacion from '../components/ui/ModalConfirmacion.jsx'
 import { TEXTOS } from '../constants/messages.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { ESTADOS_PAGINA, useDetalleReserva } from '../hooks/useDetalleReserva.js'
-import { isoAFecha } from '../utils/fechas.js'
+import { MODALES, resumenDe } from '../utils/modalesDeReserva.js'
 import { accionesDeReserva, textoDeEvento } from '../utils/reservas.js'
 import estilos from './DetalleReservaPage.module.css'
 
-// Qué pide cada modal de confirmación (pantallas 05b, 05d y 05e).
-const MODALES = {
-  aprobar: {
-    titulo: TEXTOS.tituloModalAprobar,
-    confirmar: TEXTOS.confirmarAprobar,
-    variante: 'primario',
-  },
-  rechazar: {
-    titulo: TEXTOS.tituloModalRechazar,
-    confirmar: TEXTOS.confirmarRechazar,
-    variante: 'rechazo',
-    irreversible: true, // Rechazada es un estado final (RN-06)
-  },
-  cancelar: {
-    titulo: TEXTOS.tituloModalCancelar,
-    confirmar: TEXTOS.confirmarCancelar,
-    variante: 'primario',
-    irreversible: true, // Cancelada es un estado final (RN-06)
-  },
-}
-
 const VARIANTE_DE_BOTON = { cancelar: 'secundario', rechazar: 'rechazar', aprobar: 'primario' }
-
-function resumenDe(reserva) {
-  return [
-    `Ambiente: ${reserva.ambienteNombre}`,
-    `Solicitante: ${reserva.solicitanteNombre}`,
-    `Horario: ${isoAFecha(reserva.fecha)}, ${reserva.horaInicio} – ${reserva.horaFin}`,
-  ]
-}
 
 export default function DetalleReservaPage() {
   const { id } = useParams()
+  // «Volver a Reservas» regresa a la lista de donde se vino, con sus filtros y su página.
+  const volverA = useLocation().state?.volverA ?? '/reservas'
   const { sesion } = useAuth()
   const vm = useDetalleReserva(id)
 
@@ -52,7 +25,7 @@ export default function DetalleReservaPage() {
     return (
       <>
         <h1>{TEXTOS.reservaNoEncontrada}</h1>
-        <Link to="/reservas">Volver a Reservas</Link>
+        <Link to={volverA}>Volver a Reservas</Link>
       </>
     )
   }
@@ -76,6 +49,7 @@ export default function DetalleReservaPage() {
     <>
       <DetalleReserva
         reserva={reserva}
+        volverA={volverA}
         historial={historial.map((evento) => ({ id: evento.id, texto: textoDeEvento(evento) }))}
         alerta={
           <>

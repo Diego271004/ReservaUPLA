@@ -2,12 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { MENSAJES, TEXTOS } from '../constants/messages.js'
 import { RESULTADO } from '../services/llamarApi.js'
 import { mensajeDeError } from '../services/mensajesDeResultado.js'
-import {
-  aprobarReserva,
-  cancelarReserva,
-  obtenerReserva,
-  rechazarReserva,
-} from '../services/recursosService.js'
+import { obtenerReserva } from '../services/recursosService.js'
+import { ACCIONES } from './accionesDeReserva.js'
 import { useAccion } from './useAccion.js'
 
 export const ESTADOS_PAGINA = Object.freeze({
@@ -16,12 +12,6 @@ export const ESTADOS_PAGINA = Object.freeze({
   noEncontrado: 'noEncontrado',
   error: 'error',
 })
-
-const ACCIONES = {
-  aprobar: { servicio: aprobarReserva, exito: MENSAJES.reservaAprobada },
-  rechazar: { servicio: rechazarReserva, exito: MENSAJES.reservaRechazada },
-  cancelar: { servicio: cancelarReserva, exito: MENSAJES.reservaCancelada },
-}
 
 /**
  * Estado del detalle de una reserva: la carga, el modal de confirmación abierto y lo que deja cada acción. El estado

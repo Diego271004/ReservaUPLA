@@ -150,6 +150,21 @@ describe('SelectInput', () => {
   ]
   const base = { id: 'tipo', nombre: 'tipo', etiqueta: 'Tipo', valor: '', opciones }
 
+  it('con otro texto vacío (por ejemplo «Todos») lo usa en la primera opción', () => {
+    render(<SelectInput {...base} textoVacio="Todos" onChange={() => {}} />)
+    expect(screen.getByLabelText('Tipo')).toHaveDisplayValue('Todos')
+  })
+
+  it('con textoVacio nulo no hay opción vacía: siempre hay una elegida', () => {
+    render(<SelectInput {...base} valor="2" textoVacio={null} onChange={() => {}} />)
+    expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual([
+      'Laboratorio',
+      'Auditorio',
+      'Sala (no disponible)',
+    ])
+    expect(screen.getByLabelText('Tipo')).toHaveDisplayValue('Auditorio')
+  })
+
   it('vacío: muestra "Selecciona…" y las opciones de la lista', () => {
     render(<SelectInput {...base} onChange={() => {}} />)
     const lista = screen.getByLabelText('Tipo')

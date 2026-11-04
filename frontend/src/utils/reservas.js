@@ -57,3 +57,11 @@ export function accionesDeReserva(actor, reserva) {
 
   return { acciones: [], aviso: null }
 }
+
+/** El tipo de insignia de cada estado de una reserva (Reservas, Mi ambiente y el detalle la comparten). */
+export const TIPO_INSIGNIA_DE_ESTADO = Object.freeze({
+  Pendiente: 'pendiente',
+  Aprobada: 'aprobada',
+  Rechazada: 'rechazada',
+  Cancelada: 'cancelada',
+})

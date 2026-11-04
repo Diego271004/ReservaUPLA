@@ -59,6 +59,9 @@ export const MENSAJES = Object.freeze({
   fechaVacia: 'Ingresa la fecha de la reserva.',
   fechaFormatoInvalido: 'Ingresa la fecha con el formato dd/mm/aaaa.',
   fechaPasada: 'No puedes reservar para una fecha anterior a hoy.',
+  estadoFiltroInvalido: 'Elige un estado de la lista.',
+  rangoDeFechasInvalido: 'La fecha final no puede ser anterior a la inicial.',
+  paginaInvalida: 'La página debe ser 1 o mayor.',
   horaInicioVacia: 'Selecciona la hora de inicio.',
   horaFinVacia: 'Selecciona la hora de fin.',
   horaFueraDeHorario: 'El horario permitido es de 07:00 a 22:00.',
@@ -81,6 +84,11 @@ export const MENSAJES = Object.freeze({
 })
 
 /** Mensajes que se construyen con un dato (no viajan por la API). */
+/** «Mostrando 5 de 7» (el pie de la tabla de pendientes del Dashboard). */
+export const textoMostrando = (mostradas, total) => `Mostrando ${mostradas} de ${total}`
+
+export const textoPagina = (numero) => `Página ${numero}`
+
 export const mensajeDominioNoInstitucional = (dominio) =>
   `Usa tu correo institucional (termina en @${dominio}).`
 
@@ -166,6 +174,44 @@ export const TEXTOS = Object.freeze({
   tituloModalCancelar: '¿Cancelar esta reserva?',
   confirmarCancelar: 'Sí, cancelar reserva',
   advertenciaIrreversible: 'Esta acción no se puede deshacer.',
+
+  // Salida de datos: Reservas, Dashboard y Mi ambiente
+  tituloReservas: 'Reservas',
+  tituloDashboard: 'Dashboard',
+  tituloMiAmbiente: 'Mi ambiente',
+  etiquetaFiltroEstado: 'Estado',
+  etiquetaFiltroAmbiente: 'Ambiente',
+  etiquetaFechaDesde: 'Fecha desde',
+  etiquetaFechaHasta: 'Fecha hasta',
+  todos: 'Todos',
+  filtros: 'Filtros',
+  aplicarFiltros: 'Aplicar filtros',
+  ayudaFechaFiltro: 'Formato dd/mm/aaaa. Vacía, no filtra.',
+  limpiar: 'Limpiar',
+  limpiarFiltros: 'Limpiar filtros',
+  anterior: 'Anterior',
+  siguiente: 'Siguiente',
+  paginacion: 'Paginación',
+  sinReservas: 'Todavía no hay reservas.',
+  sinReservasConFiltros: 'No hay reservas con esos filtros.',
+  cargandoReservas: 'Cargando las reservas…',
+  solicitudesPendientes: 'Solicitudes pendientes de aprobación',
+  sinPendientes: 'No hay solicitudes pendientes.',
+  verTodas: 'Ver todas',
+  indicadorTotal: 'Total de reservas',
+  indicadorPendientes: 'Reservas pendientes',
+  indicadorAprobadas: 'Reservas aprobadas',
+  indicadorRechazadas: 'Reservas rechazadas',
+  indicadorMasUtilizado: 'Ambiente más utilizado',
+  usoDelAmbiente: 'Uso del ambiente',
+  sinAmbienteAsignado:
+    'Todavía no tienes un ambiente a cargo. Cuando se te asigne uno, aparecerá aquí.',
+  columnaFecha: 'Fecha',
+  columnaHorario: 'Horario',
+  columnaAmbiente: 'Ambiente',
+  columnaSolicitante: 'Solicitante',
+  columnaEstado: 'Estado',
+  columnaAcciones: 'Acciones',
 
   // Pantallas y errores de ruta
   pantallaEnConstruccion: 'Pantalla en construcción',

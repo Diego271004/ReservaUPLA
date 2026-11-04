@@ -7,8 +7,9 @@ import AmbientesPage from './pages/AmbientesPage.jsx'
 import DetalleReservaPage from './pages/DetalleReservaPage.jsx'
 import { NoEncontradaPage } from './pages/ErrorRutaPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
-import NuevaReservaPage from './pages/NuevaReservaPage.jsx'
 import PendientePage from './pages/PendientePage.jsx'
+import NuevaReservaPage from './pages/NuevaReservaPage.jsx'
+import ReservasPage from './pages/ReservasPage.jsx'
 import UsuarioFormPage from './pages/UsuarioFormPage.jsx'
 import UsuariosPage from './pages/UsuariosPage.jsx'
 import RutaProtegida from './routes/RutaProtegida.jsx'
@@ -40,7 +41,7 @@ export default function App() {
             <Route path="/reservas/nueva" element={<NuevaReservaPage />} />
           </Route>
           <Route element={<RutaProtegida roles={[administrador, solicitante, responsable]} />}>
-            <Route path="/reservas" element={<PendientePage />} />
+            <Route path="/reservas" element={<ReservasPage />} />
             <Route path="/reservas/:id" element={<DetalleReservaPage />} />
           </Route>
           <Route element={<RutaProtegida roles={[responsable]} />}>
