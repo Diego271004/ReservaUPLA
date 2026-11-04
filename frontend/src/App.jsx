@@ -4,6 +4,7 @@ import { ROLES, RUTA_INICIAL_POR_ROL } from './constants/navegacion.js'
 import { useAuth } from './context/AuthContext.jsx'
 import AmbienteFormPage from './pages/AmbienteFormPage.jsx'
 import AmbientesPage from './pages/AmbientesPage.jsx'
+import DetalleReservaPage from './pages/DetalleReservaPage.jsx'
 import { NoEncontradaPage } from './pages/ErrorRutaPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import NuevaReservaPage from './pages/NuevaReservaPage.jsx'
@@ -40,6 +41,7 @@ export default function App() {
           </Route>
           <Route element={<RutaProtegida roles={[administrador, solicitante, responsable]} />}>
             <Route path="/reservas" element={<PendientePage />} />
+            <Route path="/reservas/:id" element={<DetalleReservaPage />} />
           </Route>
           <Route element={<RutaProtegida roles={[responsable]} />}>
             <Route path="/mi-ambiente" element={<PendientePage />} />

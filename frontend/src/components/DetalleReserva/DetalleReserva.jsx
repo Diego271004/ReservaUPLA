@@ -58,7 +58,11 @@ export default function DetalleReserva({ reserva, historial = [], alerta, accion
             ))}
           </ul>
         )}
-        {acciones && <div className={estilos.acciones}>{acciones}</div>}
+        {acciones && (
+          <div className={estilos.acciones} data-testid="acciones-reserva">
+            {acciones}
+          </div>
+        )}
       </div>
     </section>
   )

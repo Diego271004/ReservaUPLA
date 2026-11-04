@@ -63,12 +63,23 @@ describe('contraseñas', () => {
     expect(validarContrasenaLogin('   ')).toBeNull()
   })
 
-  it('inicial: vacía, larga (límite de BCrypt) y válida, sin reglas de complejidad', () => {
+  it('inicial: vacía y demasiado larga (límite de BCrypt)', () => {
     expect(validarContrasenaInicial('')).toBe(MENSAJES.contrasenaInicialVacia)
-    expect(validarContrasenaInicial('a'.repeat(73))).toBe(MENSAJES.contrasenaInicialDemasiadoLarga)
-    expect(validarContrasenaInicial('a'.repeat(72))).toBeNull()
-    expect(validarContrasenaInicial('1')).toBeNull()
+    expect(validarContrasenaInicial('a'.repeat(72) + '1')).toBe(
+      MENSAJES.contrasenaInicialDemasiadoLarga,
+    )
+    expect(validarContrasenaInicial('a'.repeat(71) + '1')).toBeNull()
   })
+
+  it.each(['Ab1', 'Abcde1f', '12345678', 'abcdefgh', '!!!!!!!!'])(
+    'inicial (U2): "%s" no cumple 8 a 72 caracteres con una letra y un número',
+    (valor) => expect(validarContrasenaInicial(valor)).toBe(MENSAJES.contrasenaInicialRequisitos),
+  )
+
+  it.each(['Abcdefg1', '12345678a', 'clave segura 2026', 'Prueba#2026Upla'])(
+    'inicial (U2): "%s" cumple la política',
+    (valor) => expect(validarContrasenaInicial(valor)).toBeNull(),
+  )
 })
 
 describe('campos del usuario', () => {

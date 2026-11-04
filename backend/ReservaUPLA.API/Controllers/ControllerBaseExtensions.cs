@@ -1,7 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using ReservaUPLA.API.Contracts;
 using ReservaUPLA.Application.Common;
+using ReservaUPLA.Application.DTOs;
 using ReservaUPLA.Domain.Enums;
 using ReservaUPLA.Infrastructure.Security;
 
@@ -38,13 +40,21 @@ public static class ControllerBaseExtensions
         return new BadRequestObjectResult(problema) { ContentTypes = { "application/problem+json" } };
     }
 
-    /// <summary>Traduce el resultado de un caso de uso: éxito según <paramref name="exito"/>, o 400 con los errores por campo.</summary>
+    public static ActorDto ObtenerActor(this ClaimsPrincipal usuario) => new(usuario.ObtenerUsuarioId(), usuario.ObtenerRol());
+
+    /// <summary>
+    /// Traduce el resultado de un caso de uso: éxito según <paramref name="exito"/>, 400 con los errores por campo,
+    /// 403, 404 (ProblemDetails sin cuerpo propio) o 409 con el mensaje de la regla de negocio.
+    /// </summary>
     public static IActionResult Traducir<T>(
         this ControllerBase controlador, ResultadoOperacion<T> resultado, Func<T, IActionResult> exito) =>
         resultado.Estado switch
         {
             EstadoOperacion.Exitoso => exito(resultado.Valor!),
             EstadoOperacion.DatosInvalidos => DatosInvalidos(resultado.Errores),
+            EstadoOperacion.NoEncontrado => controlador.NotFound(),
+            EstadoOperacion.SinPermiso => controlador.StatusCode(StatusCodes.Status403Forbidden),
+            EstadoOperacion.Conflicto => controlador.Conflict(new MensajeResponse(resultado.Mensaje!)),
             _ => throw new InvalidOperationException($"Estado de operación no contemplado: {resultado.Estado}"),
         };
 }

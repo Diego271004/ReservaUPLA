@@ -14,6 +14,7 @@ const CAPACIDAD_MAXIMA = 5000
 export const LIMITES = Object.freeze({
   correo: 254,
   contrasenaLogin: 128,
+  contrasenaInicialMinima: 8,
   contrasenaInicial: 72,
   nombreCompleto: 120,
   nombreAmbiente: 120,
@@ -45,11 +46,14 @@ export function validarContrasenaLogin(valor) {
   return null
 }
 
-// Sin reglas de complejidad: la política de la contraseña inicial queda pendiente (hallazgo U2).
+// Política de la contraseña inicial (cierra el hallazgo U2): de 8 a 72 caracteres, con al menos una letra y un número.
+// Igual que CrearUsuarioValidator del backend.
 export function validarContrasenaInicial(valor) {
   if ((valor ?? '') === '') return MENSAJES.contrasenaInicialVacia
   if (valor.length > LIMITES.contrasenaInicial) return MENSAJES.contrasenaInicialDemasiadoLarga
-  return null
+  const cumple =
+    valor.length >= LIMITES.contrasenaInicialMinima && /\p{L}/u.test(valor) && /\p{Nd}/u.test(valor)
+  return cumple ? null : MENSAJES.contrasenaInicialRequisitos
 }
 
 export function validarNombreCompleto(valor) {

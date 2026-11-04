@@ -87,3 +87,26 @@ export async function capturar(pagina, destino, nombre, ancho) {
 }
 
 export const registrarResultado = (nombre, desborda) => resultados.push({ nombre, desborda })
+
+/** Llama a la API directamente (sin pasar por la interfaz): útil para comprobar lo que la interfaz no permite hacer. */
+export async function api(ruta, { metodo = 'GET', token, cuerpo } = {}) {
+  const respuesta = await fetch(`${API}${ruta}`, {
+    method: metodo,
+    headers: {
+      Accept: 'application/json',
+      ...(cuerpo === undefined ? {} : { 'Content-Type': 'application/json' }),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo),
+  })
+  const texto = await respuesta.text()
+  let data = null
+  try {
+    data = texto ? JSON.parse(texto) : null
+  } catch {
+    data = texto
+  }
+  return { status: respuesta.status, data }
+}
+
+export const tokenDe = (sesionTexto) => JSON.parse(sesionTexto).token

@@ -34,6 +34,8 @@ export const MENSAJES = Object.freeze({
   rolInvalido: 'Selecciona un rol de la lista.',
   contrasenaInicialVacia: 'Ingresa la contraseña inicial.',
   contrasenaInicialDemasiadoLarga: 'La contraseña no puede superar los 72 caracteres.',
+  contrasenaInicialRequisitos:
+    'La contraseña debe tener entre 8 y 72 caracteres, con al menos una letra y un número.',
   usuarioRegistrado: 'Usuario registrado.',
 
   // Ambientes
@@ -63,6 +65,18 @@ export const MENSAJES = Object.freeze({
   motivoVacio: 'Ingresa el motivo de la reserva.',
   motivoDemasiadoLargo: 'El motivo no puede superar los 300 caracteres.',
   reservaRegistrada: 'Solicitud registrada. Quedó Pendiente de aprobación.',
+
+  // Reservas: disponibilidad y reglas de negocio (RN-01, RN-05, RN-06)
+  disponible: 'Disponible: no hay reservas aprobadas en ese horario',
+  ambienteEnMantenimiento: 'Ese ambiente está en mantenimiento y no admite reservas nuevas.',
+  conflictoDeHorarioSinDetalle:
+    'Ese ambiente ya tiene una reserva aprobada en ese horario. Elige otro horario u otro ambiente.',
+  reservaAprobada: 'Reserva aprobada.',
+  reservaRechazada: 'Reserva rechazada.',
+  reservaCancelada: 'Reserva cancelada.',
+  reservaRechazadaNoSeModifica: 'Una reserva rechazada no se puede modificar.',
+  reservaCanceladaNoSeModifica: 'Una reserva cancelada no se puede modificar.',
+  soloPendienteSeApruebaORechaza: 'Solo una reserva Pendiente se puede aprobar o rechazar.',
 })
 
 /** Mensajes que se construyen con un dato (no viajan por la API). */
@@ -106,6 +120,7 @@ export const TEXTOS = Object.freeze({
   etiquetaContrasenaInicial: 'Contraseña inicial',
   activo: 'Activo',
   inactivo: 'Inactivo',
+  ayudaContrasenaInicial: 'Entre 8 y 72 caracteres, con al menos una letra y un número.',
 
   // Ambientes
   tituloAmbientes: 'Ambientes',
@@ -130,6 +145,23 @@ export const TEXTOS = Object.freeze({
   registrarSolicitud: 'Registrar solicitud',
   ambienteEnMantenimiento: 'En mantenimiento (no disponible)',
   personas: 'personas',
+  consultandoDisponibilidad: 'Comprobando disponibilidad…',
+  verDetalle: 'Ver detalle',
+
+  // Detalle de la reserva y sus acciones
+  cargandoReserva: 'Cargando la reserva…',
+  reservaNoEncontrada: 'No encontramos esa reserva.',
+  reintentar: 'Reintentar',
+  aprobar: 'Aprobar',
+  rechazar: 'Rechazar',
+  cancelarReserva: 'Cancelar reserva',
+  cancelarSolicitud: 'Cancelar solicitud',
+  tituloModalAprobar: '¿Aprobar esta reserva?',
+  confirmarAprobar: 'Sí, aprobar',
+  tituloModalRechazar: '¿Rechazar esta reserva?',
+  confirmarRechazar: 'Sí, rechazar',
+  tituloModalCancelar: '¿Cancelar esta reserva?',
+  confirmarCancelar: 'Sí, cancelar reserva',
 
   // Pantallas y errores de ruta
   pantallaEnConstruccion: 'Pantalla en construcción',

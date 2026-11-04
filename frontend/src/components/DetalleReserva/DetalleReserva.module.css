@@ -56,6 +56,11 @@
   }
 
   .acciones {
-    flex-direction: column;
+    flex-direction: column-reverse; /* el primario arriba y los botones apilados a ancho completo */
+  }
+
+  .acciones > *,
+  .acciones button {
+    width: 100%;
   }
 }

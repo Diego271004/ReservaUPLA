@@ -47,10 +47,13 @@ public sealed class ResultadoAutenticacion
 public enum EstadoOperacion
 {
     Exitoso,
-    DatosInvalidos
+    DatosInvalidos, // 400: errores por campo
+    NoEncontrado, // 404
+    SinPermiso, // 403
+    Conflicto // 409: regla de negocio (RN-01, RN-06); lleva el mensaje para el usuario
 }
 
-/// <summary>Resultado de un caso de uso que crea o consulta datos; los errores se agrupan por campo.</summary>
+/// <summary>Resultado de un caso de uso. La API solo lo traduce a HTTP; las decisiones de negocio ya están tomadas aquí.</summary>
 public sealed class ResultadoOperacion<T>
 {
     private static readonly IReadOnlyDictionary<string, string[]> SinErrores = new Dictionary<string, string[]>();
@@ -58,19 +61,29 @@ public sealed class ResultadoOperacion<T>
     public EstadoOperacion Estado { get; }
     public T? Valor { get; }
     public IReadOnlyDictionary<string, string[]> Errores { get; }
+    public string? Mensaje { get; }
 
-    private ResultadoOperacion(EstadoOperacion estado, T? valor, IReadOnlyDictionary<string, string[]> errores)
+    private ResultadoOperacion(
+        EstadoOperacion estado, T? valor, IReadOnlyDictionary<string, string[]> errores, string? mensaje)
     {
         Estado = estado;
         Valor = valor;
         Errores = errores;
+        Mensaje = mensaje;
     }
 
-    public static ResultadoOperacion<T> Exitoso(T valor) => new(EstadoOperacion.Exitoso, valor, SinErrores);
+    public static ResultadoOperacion<T> Exitoso(T valor) => new(EstadoOperacion.Exitoso, valor, SinErrores, null);
 
     public static ResultadoOperacion<T> DatosInvalidos(IReadOnlyDictionary<string, string[]> errores) =>
-        new(EstadoOperacion.DatosInvalidos, default, errores);
+        new(EstadoOperacion.DatosInvalidos, default, errores, null);
 
     public static ResultadoOperacion<T> DatosInvalidos(string campo, string mensaje) =>
         DatosInvalidos(new Dictionary<string, string[]> { [campo] = [mensaje] });
+
+    public static ResultadoOperacion<T> NoEncontrado() => new(EstadoOperacion.NoEncontrado, default, SinErrores, null);
+
+    public static ResultadoOperacion<T> SinPermiso() => new(EstadoOperacion.SinPermiso, default, SinErrores, null);
+
+    public static ResultadoOperacion<T> Conflicto(string mensaje) =>
+        new(EstadoOperacion.Conflicto, default, SinErrores, mensaje);
 }

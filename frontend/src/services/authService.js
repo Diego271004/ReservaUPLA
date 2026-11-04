@@ -12,12 +12,12 @@ export async function login(correo, contrasena, { signal } = {}) {
   if (resultado.tipo === RESULTADO.noAutorizado) return { tipo: 'credencialesInvalidas' }
 
   if (resultado.tipo === RESULTADO.exito) {
-    const { token, nombreCompleto, rol, expiraEn } = resultado.data ?? {}
-    const completa = [token, nombreCompleto, rol, expiraEn].every(
-      (dato) => typeof dato === 'string',
-    )
+    const { token, usuarioId, nombreCompleto, rol, expiraEn } = resultado.data ?? {}
+    const completa =
+      Number.isInteger(usuarioId) &&
+      [token, nombreCompleto, rol, expiraEn].every((dato) => typeof dato === 'string')
     return completa
-      ? { tipo: RESULTADO.exito, data: { token, nombreCompleto, rol, expiraEn } }
+      ? { tipo: RESULTADO.exito, data: { token, usuarioId, nombreCompleto, rol, expiraEn } }
       : { tipo: RESULTADO.errorServidor }
   }
 

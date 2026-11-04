@@ -1,0 +1,69 @@
+
+== Inicio de sesión de Ana (Solicitante), Carla (Administrador) y Mario (Responsable)
+   OK  tres sesiones iniciadas
+   OK  reservas de partida: A = #2 (05/11 10:00-12:00, Pendiente), B = #3 (05/11 11:00-13:00, Pendiente)
+
+== Escritorio · Ana: aviso de disponibilidad en Nueva reserva
+   OK  01-nueva-reserva-disponible-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  04: aviso verde "Disponible: no hay reservas aprobadas en ese horario"
+   OK  02-nueva-reserva-conflicto-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  04e: aviso rojo con la hora ocupada: "Ese ambiente ya tiene una reserva aprobada de 10:00 a 12:00. Elige otro horario u otro ambiente."
+   OK  al registrar con conflicto el servidor responde 409 y el formulario queda libre con sus datos
+   OK  04f: "Sala de Reuniones A · En mantenimiento (no disponible)" está deshabilitada en la lista
+   OK  03-nueva-reserva-mantenimiento-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+
+== Escritorio · Ana registra una reserva libre y abre su detalle
+   OK  04-nueva-reserva-cierre-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  "Ver detalle" lleva a /reservas/7
+   OK  05f RN-05: la Solicitante NO ve Aprobar ni Rechazar
+   OK  05-detalle-solicitante-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+
+== Escritorio · Ana cancela su propia reserva (modal)
+   OK  06-modal-cancelar-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  RN-06: tras cancelar, la acción queda deshabilitada y con el aviso informativo
+   OK  07-detalle-cancelada-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+
+== Escritorio · Carla aprueba la reserva A (no cruza con ninguna aprobada)
+   OK  08-detalle-admin-pendiente-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  09-modal-aprobar-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  10-detalle-aprobada-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  05g: "Reserva aprobada." y el historial muestra el evento: Reserva aprobada por Carla Rojas, 04/11/2026 00:12
+
+== Escritorio · Carla intenta aprobar la reserva B, que se cruza con la A (RN-01)
+   OK  la reserva B sigue Pendiente tras el conflicto
+   OK  11-detalle-conflicto-al-aprobar-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+
+== Escritorio · Carla rechaza la reserva B (modal rojo) y queda sin acciones (RN-06)
+   OK  12-modal-rechazar-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  05c: Aprobar, Rechazar y Cancelar reserva quedan deshabilitados con el aviso informativo
+   OK  13-detalle-rechazada-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+
+== Escritorio · Mario (Responsable) solo consulta
+   OK  RN-05: la Responsable no ve ninguna acción
+   OK  14-detalle-responsable-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+
+== Escritorio · Carla: contraseña inicial con requisitos (U2)
+   OK  15-usuario-contrasena-requisitos-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  U2: la ayuda "Entre 8 y 72 caracteres, con al menos una letra y un número." y el error si no cumple
+
+== API directa: RN-05 y ambiente en mantenimiento
+   OK  la Solicitante intenta aprobar por la API → HTTP 403
+   OK  reservar en "Sala de Reuniones A" (en mantenimiento) por la API → HTTP 400: Ese ambiente está en mantenimiento y no admite reservas nuevas.
+   OK  aprobar una reserva Rechazada por la API → HTTP 409: Una reserva rechazada no se puede modificar.
+   OK  aprobar una reserva que no existe → HTTP 404
+
+== 375 px · reservas de apoyo y capturas
+   OK  reserva de apoyo X = #8 (Pendiente)
+   OK  01-nueva-reserva-disponible-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+   OK  02-nueva-reserva-conflicto-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+   OK  05-detalle-solicitante-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+   OK  06-modal-cancelar-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+   OK  08-detalle-admin-pendiente-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+   OK  12-modal-rechazar-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+   OK  10-detalle-aprobada-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+   OK  13-detalle-rechazada-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+   OK  15-usuario-contrasena-requisitos-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+
+Identificadores para comprobar en la base: A=#2 (aprobada), B=#3 (rechazada), propia de Ana=#7 (cancelada), apoyo X=#8 (pendiente)
+
+Resumen: ninguna pantalla con scroll horizontal

@@ -2,36 +2,46 @@ using FluentValidation;
 using ReservaUPLA.Application.Common;
 using ReservaUPLA.Application.DTOs;
 using ReservaUPLA.Application.Interfaces;
+using ReservaUPLA.Application.Reglas;
 using ReservaUPLA.Domain.Entities;
 using ReservaUPLA.Domain.Enums;
+using ReservaUPLA.Domain.Exceptions;
 
 namespace ReservaUPLA.Application.Services;
 
-/// <summary>
-/// En la Fase 5 solo crea y lista. Aprobar, rechazar y cancelar llegan en la Fase 9; las reglas que
-/// consultan datos (RN-01, ambiente en mantenimiento) se enchufan en la Fase 6 como <see cref="IReglaReserva"/>.
-/// </summary>
+/// <summary>Crea, consulta y cambia el estado de las reservas aplicando RN-01 a RN-06.</summary>
 public sealed class ReservaService : IReservaService
 {
-    private readonly IValidator<CrearReservaDto> _validator;
+    private readonly IValidator<CrearReservaDto> _validador;
+    private readonly IValidator<ConsultarDisponibilidadDto> _validadorDisponibilidad;
     private readonly IReservaRepository _reservas;
     private readonly IAmbienteRepository _ambientes;
     private readonly IUsuarioRepository _usuarios;
     private readonly IEnumerable<IReglaReserva> _reglas;
+    private readonly ComprobadorDeHorario _comprobador;
+    private readonly TimeProvider _reloj;
 
     public ReservaService(
-        IValidator<CrearReservaDto> validator,
+        IValidator<CrearReservaDto> validador,
+        IValidator<ConsultarDisponibilidadDto> validadorDisponibilidad,
         IReservaRepository reservas,
         IAmbienteRepository ambientes,
         IUsuarioRepository usuarios,
-        IEnumerable<IReglaReserva> reglas)
+        IEnumerable<IReglaReserva> reglas,
+        ComprobadorDeHorario comprobador,
+        TimeProvider reloj)
     {
-        _validator = validator;
+        _validador = validador;
+        _validadorDisponibilidad = validadorDisponibilidad;
         _reservas = reservas;
         _ambientes = ambientes;
         _usuarios = usuarios;
         _reglas = reglas;
+        _comprobador = comprobador;
+        _reloj = reloj;
     }
+
+    // ================================================================ Crear
 
     public async Task<ResultadoOperacion<ReservaDto>> CrearAsync(
         CrearReservaDto dto, int usuarioId, CancellationToken cancellationToken)
@@ -40,7 +50,7 @@ public sealed class ReservaService : IReservaService
 
         var solicitud = dto with { Motivo = dto.Motivo?.Trim() };
 
-        var validacion = await _validator.ValidateAsync(solicitud, cancellationToken);
+        var validacion = await _validador.ValidateAsync(solicitud, cancellationToken);
         if (!validacion.IsValid)
         {
             return ResultadoOperacion<ReservaDto>.DatosInvalidos(validacion.Errors.AgruparPorCampo());
@@ -53,29 +63,24 @@ public sealed class ReservaService : IReservaService
                 CamposFormulario.AmbienteId, MensajesValidacion.AmbienteInexistente);
         }
 
-        HorarioReserva.TryFecha(solicitud.Fecha, out var fecha);
-        HorarioReserva.TryHora(solicitud.HoraInicio, out var horaInicio);
-        HorarioReserva.TryHora(solicitud.HoraFin, out var horaFin);
-        var reserva = new Reserva
-        {
-            Fecha = fecha,
-            HoraInicio = horaInicio,
-            HoraFin = horaFin,
-            Motivo = solicitud.Motivo!,
-            Estado = EstadoReserva.Pendiente,
-            UsuarioId = usuarioId,
-            AmbienteId = ambiente.Id,
-        };
+        var reserva = ConstruirReserva(solicitud.Fecha, solicitud.HoraInicio, solicitud.HoraFin, solicitud.Motivo!, usuarioId, ambiente.Id);
 
-        foreach (var regla in _reglas)
+        if (await PrimeraViolacionAsync(reserva, ambiente, cancellationToken) is { } violacion)
         {
-            if (await regla.EvaluarAsync(reserva, cancellationToken) is { } error)
-            {
-                return ResultadoOperacion<ReservaDto>.DatosInvalidos(error.Key, error.Value);
-            }
+            return violacion.EsConflicto
+                ? ResultadoOperacion<ReservaDto>.Conflicto(violacion.Mensaje)
+                : ResultadoOperacion<ReservaDto>.DatosInvalidos(violacion.Campo!, violacion.Mensaje);
         }
 
-        await _reservas.CrearAsync(reserva, cancellationToken);
+        try
+        {
+            await _reservas.AgregarAsync(reserva, cancellationToken);
+        }
+        catch (ConflictoDeHorarioException conflicto)
+        {
+            // Otra aprobación se coló entre la comprobación y el guardado: la base es la última barrera de RN-01.
+            return ResultadoOperacion<ReservaDto>.Conflicto(await MensajeDeConflictoAsync(reserva, conflicto, cancellationToken));
+        }
 
         var solicitante = await _usuarios.ObtenerPorIdAsync(usuarioId, cancellationToken);
         return ResultadoOperacion<ReservaDto>.Exitoso(
@@ -93,5 +98,191 @@ public sealed class ReservaService : IReservaService
         };
 
         return _reservas.ListarAsync(filtro, cancellationToken);
+    }
+
+    // ================================================================ Consultar
+
+    public async Task<ResultadoOperacion<ReservaDetalleDto>> ObtenerAsync(
+        int id, ActorDto actor, CancellationToken cancellationToken)
+    {
+        var reserva = await _reservas.ObtenerConHistorialAsync(id, cancellationToken);
+        if (reserva is null)
+        {
+            return ResultadoOperacion<ReservaDetalleDto>.NoEncontrado();
+        }
+
+        var ambiente = await _ambientes.ObtenerPorIdAsync(reserva.AmbienteId, cancellationToken);
+        // Quien no puede ver la reserva recibe lo mismo que si no existiera: no se revela su existencia.
+        return PuedeVer(reserva, ambiente, actor)
+            ? ResultadoOperacion<ReservaDetalleDto>.Exitoso(await ArmarDetalleAsync(reserva, ambiente!, cancellationToken))
+            : ResultadoOperacion<ReservaDetalleDto>.NoEncontrado();
+    }
+
+    public async Task<ResultadoOperacion<DisponibilidadDto>> ConsultarDisponibilidadAsync(
+        ConsultarDisponibilidadDto dto, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(dto);
+
+        var validacion = await _validadorDisponibilidad.ValidateAsync(dto, cancellationToken);
+        if (!validacion.IsValid)
+        {
+            return ResultadoOperacion<DisponibilidadDto>.DatosInvalidos(validacion.Errors.AgruparPorCampo());
+        }
+
+        var ambiente = await _ambientes.ObtenerPorIdAsync(dto.AmbienteId!.Value, cancellationToken);
+        if (ambiente is null)
+        {
+            return ResultadoOperacion<DisponibilidadDto>.DatosInvalidos(
+                CamposFormulario.AmbienteId, MensajesValidacion.AmbienteInexistente);
+        }
+
+        // Una reserva solo para evaluar las mismas reglas que al registrar; no se guarda.
+        var prueba = ConstruirReserva(dto.Fecha, dto.HoraInicio, dto.HoraFin, string.Empty, 0, ambiente.Id);
+        var violacion = await PrimeraViolacionAsync(prueba, ambiente, cancellationToken);
+
+        return ResultadoOperacion<DisponibilidadDto>.Exitoso(
+            violacion is null
+                ? new DisponibilidadDto(true, MensajesValidacion.Disponible)
+                : new DisponibilidadDto(false, violacion.Mensaje));
+    }
+
+    // ================================================================ Cambiar de estado
+
+    public async Task<ResultadoOperacion<ReservaDetalleDto>> AprobarAsync(int id, ActorDto actor, CancellationToken cancellationToken)
+    {
+        if (actor.Rol != RolUsuario.Administrador) // RN-05
+        {
+            return ResultadoOperacion<ReservaDetalleDto>.SinPermiso();
+        }
+
+        var reserva = await _reservas.ObtenerConHistorialAsync(id, cancellationToken);
+        if (reserva is null)
+        {
+            return ResultadoOperacion<ReservaDetalleDto>.NoEncontrado();
+        }
+
+        // RN-01 se vuelve a comprobar al aprobar: desde que se pidió pudo aprobarse otra reserva que se cruza.
+        if (reserva.Estado == EstadoReserva.Pendiente
+            && await _comprobador.MensajeDeConflictoAsync(reserva, cancellationToken) is { } mensaje)
+        {
+            return ResultadoOperacion<ReservaDetalleDto>.Conflicto(mensaje);
+        }
+
+        return await CambiarEstadoAsync(reserva, r => r.Aprobar(actor.UsuarioId, _reloj.GetUtcNow()), cancellationToken);
+    }
+
+    public async Task<ResultadoOperacion<ReservaDetalleDto>> RechazarAsync(int id, ActorDto actor, CancellationToken cancellationToken)
+    {
+        if (actor.Rol != RolUsuario.Administrador) // RN-05
+        {
+            return ResultadoOperacion<ReservaDetalleDto>.SinPermiso();
+        }
+
+        var reserva = await _reservas.ObtenerConHistorialAsync(id, cancellationToken);
+        return reserva is null
+            ? ResultadoOperacion<ReservaDetalleDto>.NoEncontrado()
+            : await CambiarEstadoAsync(reserva, r => r.Rechazar(actor.UsuarioId, _reloj.GetUtcNow()), cancellationToken);
+    }
+
+    public async Task<ResultadoOperacion<ReservaDetalleDto>> CancelarAsync(int id, ActorDto actor, CancellationToken cancellationToken)
+    {
+        if (actor.Rol == RolUsuario.Responsable)
+        {
+            return ResultadoOperacion<ReservaDetalleDto>.SinPermiso();
+        }
+
+        var reserva = await _reservas.ObtenerConHistorialAsync(id, cancellationToken);
+        if (reserva is null)
+        {
+            return ResultadoOperacion<ReservaDetalleDto>.NoEncontrado();
+        }
+
+        // Cancela el solicitante dueño de la reserva o el Administrador.
+        if (actor.Rol == RolUsuario.Solicitante && reserva.UsuarioId != actor.UsuarioId)
+        {
+            return ResultadoOperacion<ReservaDetalleDto>.SinPermiso();
+        }
+
+        return await CambiarEstadoAsync(reserva, r => r.Cancelar(actor.UsuarioId, _reloj.GetUtcNow()), cancellationToken);
+    }
+
+    // ================================================================ Apoyo
+
+    private async Task<ResultadoOperacion<ReservaDetalleDto>> CambiarEstadoAsync(
+        Reserva reserva, Action<Reserva> transicion, CancellationToken cancellationToken)
+    {
+        try
+        {
+            transicion(reserva); // RN-06: el dominio rechaza lo que sale de un estado final
+        }
+        catch (DomainException error)
+        {
+            return ResultadoOperacion<ReservaDetalleDto>.Conflicto(error.Message);
+        }
+
+        try
+        {
+            await _reservas.GuardarAsync(reserva, cancellationToken);
+        }
+        catch (ConflictoDeHorarioException conflicto)
+        {
+            // RN-01 en la base: dos aprobaciones simultáneas que se cruzan; la segunda recibe el mismo mensaje de conflicto.
+            return ResultadoOperacion<ReservaDetalleDto>.Conflicto(await MensajeDeConflictoAsync(reserva, conflicto, cancellationToken));
+        }
+
+        var ambiente = await _ambientes.ObtenerPorIdAsync(reserva.AmbienteId, cancellationToken);
+        return ResultadoOperacion<ReservaDetalleDto>.Exitoso(await ArmarDetalleAsync(reserva, ambiente!, cancellationToken));
+    }
+
+    private async Task<ViolacionDeRegla?> PrimeraViolacionAsync(
+        Reserva reserva, Ambiente ambiente, CancellationToken cancellationToken)
+    {
+        foreach (var regla in _reglas)
+        {
+            if (await regla.EvaluarAsync(reserva, ambiente, cancellationToken) is { } violacion)
+            {
+                return violacion;
+            }
+        }
+
+        return null;
+    }
+
+    private async Task<string> MensajeDeConflictoAsync(
+        Reserva reserva, ConflictoDeHorarioException conflicto, CancellationToken cancellationToken) =>
+        await _comprobador.MensajeDeConflictoAsync(reserva, cancellationToken) ?? conflicto.Message;
+
+    private Reserva ConstruirReserva(
+        string? fecha, string? horaInicio, string? horaFin, string motivo, int usuarioId, int ambienteId)
+    {
+        HorarioReserva.TryFecha(fecha, out var fechaReserva);
+        HorarioReserva.TryHora(horaInicio, out var inicio);
+        HorarioReserva.TryHora(horaFin, out var fin);
+        return Reserva.Crear(fechaReserva, inicio, fin, motivo, usuarioId, ambienteId, _reloj.GetUtcNow());
+    }
+
+    private static bool PuedeVer(Reserva reserva, Ambiente? ambiente, ActorDto actor) => actor.Rol switch
+    {
+        RolUsuario.Administrador => true,
+        RolUsuario.Solicitante => reserva.UsuarioId == actor.UsuarioId,
+        RolUsuario.Responsable => ambiente?.ResponsableId == actor.UsuarioId,
+        _ => false,
+    };
+
+    private async Task<ReservaDetalleDto> ArmarDetalleAsync(Reserva reserva, Ambiente ambiente, CancellationToken cancellationToken)
+    {
+        var idsDePersonas = reserva.Historial.Select(evento => evento.UsuarioId).Append(reserva.UsuarioId);
+        var nombres = (await _usuarios.ObtenerPorIdsAsync(idsDePersonas, cancellationToken))
+            .ToDictionary(usuario => usuario.Id, usuario => usuario.NombreCompleto);
+        string NombreDe(int usuarioId) => nombres.GetValueOrDefault(usuarioId, string.Empty);
+
+        var historial = reserva.Historial
+            .OrderBy(evento => evento.Fecha)
+            .ThenBy(evento => evento.Id)
+            .Select(evento => new EventoHistorialDto(
+                evento.Id, evento.EstadoAnterior?.ToString(), evento.EstadoNuevo.ToString(), NombreDe(evento.UsuarioId), evento.Fecha))
+            .ToList();
+
+        return new ReservaDetalleDto(reserva.ADto(ambiente.Nombre, NombreDe(reserva.UsuarioId)), historial);
     }
 }

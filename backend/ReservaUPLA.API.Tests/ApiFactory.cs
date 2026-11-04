@@ -47,6 +47,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
         Responsable = Usuarios.Agregar("mario.huaman@upla.edu.pe", RolUsuario.Responsable, hash: hash);
         Inactivo = Usuarios.Agregar("luis.quispe@upla.edu.pe", RolUsuario.Solicitante, activo: false, hash: hash);
         Ambientes.Agregar("Laboratorio de Cómputo 2", Responsable.Id);
+        Ambientes.Agregar("Sala de Reuniones A", Responsable.Id, EstadoAmbiente.EnMantenimiento);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

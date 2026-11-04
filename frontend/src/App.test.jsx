@@ -3,15 +3,20 @@ import { cleanup, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MENSAJES } from './constants/messages.js'
 import { RESULTADO } from './services/llamarApi.js'
-import { listarAmbientes, listarUsuarios } from './services/recursosService.js'
+import { listarAmbientes, listarUsuarios, obtenerReserva } from './services/recursosService.js'
 import { SESIONES, renderApp } from './test/utils.jsx'
 
 vi.mock('./services/recursosService.js', () => ({
+  aprobarReserva: vi.fn(),
+  cancelarReserva: vi.fn(),
+  consultarDisponibilidad: vi.fn(),
   crearAmbiente: vi.fn(),
   crearReserva: vi.fn(),
   crearUsuario: vi.fn(),
   listarAmbientes: vi.fn(),
   listarUsuarios: vi.fn(),
+  obtenerReserva: vi.fn(),
+  rechazarReserva: vi.fn(),
 }))
 
 const usuarios = [
@@ -130,6 +135,41 @@ describe('rutas protegidas por rol', () => {
     cleanup()
     await renderApp('/mi-ambiente', SESIONES.responsable)
     expect(screen.getByRole('heading', { name: 'Pantalla en construcción' })).toBeInTheDocument()
+  })
+
+  it.each(['administrador', 'solicitante', 'responsable'])(
+    'el detalle de una reserva (/reservas/7) es accesible para el rol %s',
+    async (rol) => {
+      obtenerReserva.mockResolvedValue({
+        tipo: RESULTADO.exito,
+        data: {
+          reserva: {
+            id: 7,
+            ambienteId: 1,
+            ambienteNombre: 'Laboratorio de Cómputo 2',
+            usuarioId: 2,
+            solicitanteNombre: 'Ana Torres',
+            fecha: '2026-11-05',
+            horaInicio: '10:00',
+            horaFin: '12:00',
+            motivo: 'Práctica',
+            estado: 'Pendiente',
+          },
+          historial: [],
+        },
+      })
+      await renderApp('/reservas/7', SESIONES[rol])
+      expect(
+        await screen.findByRole('heading', { name: 'Detalle de la reserva' }),
+      ).toBeInTheDocument()
+      expect(obtenerReserva).toHaveBeenCalledWith('7')
+    },
+  )
+
+  it('sin sesión, /reservas/7 lleva al login', async () => {
+    await renderApp('/reservas/7')
+    expect(ubicacion()).toHaveTextContent('/login')
+    expect(obtenerReserva).not.toHaveBeenCalled()
   })
 
   it('una ruta que no existe muestra "No encontramos esa página."', async () => {

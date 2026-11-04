@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using ReservaUPLA.Application.Common;
 using ReservaUPLA.Application.DTOs;
 using ReservaUPLA.Application.Interfaces;
@@ -17,8 +18,10 @@ public sealed class ReservaRepository : IReservaRepository
         _contexto = contexto;
     }
 
-    public Task<Reserva?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken) =>
-        _contexto.Reservas.AsNoTracking().FirstOrDefaultAsync(reserva => reserva.Id == id, cancellationToken);
+    public Task<Reserva?> ObtenerConHistorialAsync(int id, CancellationToken cancellationToken) =>
+        _contexto.Reservas
+            .Include(reserva => reserva.Historial)
+            .FirstOrDefaultAsync(reserva => reserva.Id == id, cancellationToken);
 
     public async Task<IReadOnlyList<ReservaDto>> ListarAsync(FiltroReservas filtro, CancellationToken cancellationToken)
     {
@@ -48,32 +51,56 @@ public sealed class ReservaRepository : IReservaRepository
             .ToList();
     }
 
-    public Task<bool> ExisteAprobadaQueSeCruzaAsync(
-        int ambienteId, DateOnly fecha, TimeOnly horaInicio, TimeOnly horaFin, CancellationToken cancellationToken) =>
-        _contexto.Reservas.AnyAsync(
-            reserva => reserva.AmbienteId == ambienteId
+    // Dos rangos se cruzan si cada uno empieza antes de que termine el otro (extremos que se tocan no cuentan).
+    public Task<Reserva?> BuscarAprobadaQueSeCruzaAsync(
+        int ambienteId, DateOnly fecha, TimeOnly horaInicio, TimeOnly horaFin, int? excluirReservaId, CancellationToken cancellationToken) =>
+        _contexto.Reservas
+            .AsNoTracking()
+            .Where(reserva => reserva.AmbienteId == ambienteId
                 && reserva.Fecha == fecha
                 && reserva.Estado == EstadoReserva.Aprobada
                 && reserva.HoraInicio < horaFin
-                && reserva.HoraFin > horaInicio,
-            cancellationToken);
+                && reserva.HoraFin > horaInicio
+                && (excluirReservaId == null || reserva.Id != excluirReservaId))
+            .OrderBy(reserva => reserva.HoraInicio)
+            .FirstOrDefaultAsync(cancellationToken);
 
-    public async Task CrearAsync(Reserva reserva, CancellationToken cancellationToken)
+    public async Task AgregarAsync(Reserva reserva, CancellationToken cancellationToken)
     {
-        await using var transaccion = await _contexto.Database.BeginTransactionAsync(cancellationToken);
-
         _contexto.Reservas.Add(reserva);
-        await _contexto.SaveChangesAsync(cancellationToken);
+        await GuardarCambiosAsync(cancellationToken);
+    }
 
-        _contexto.HistorialReservas.Add(new HistorialReserva
+    public Task GuardarAsync(Reserva reserva, CancellationToken cancellationToken) => GuardarCambiosAsync(cancellationToken);
+
+    // La reserva y sus eventos de historial se guardan en una sola operación (una transacción).
+    // La base es la última barrera de RN-01 y se traduce, no se deja subir como 500:
+    //  - 23P01 (exclusion_violation): la restricción de exclusión rechazó el cruce de dos reservas Aprobadas.
+    //  - 40P01 (deadlock_detected): dos aprobaciones simultáneas de reservas que se cruzan se esperan entre sí al comprobar
+    //    esa restricción y PostgreSQL aborta una; para quien la pidió es el mismo conflicto (la otra ya la ganó).
+    private async Task GuardarCambiosAsync(CancellationToken cancellationToken)
+    {
+        try
         {
-            ReservaId = reserva.Id,
-            EstadoAnterior = null,
-            EstadoNuevo = reserva.Estado,
-            UsuarioId = reserva.UsuarioId,
-        });
-        await _contexto.SaveChangesAsync(cancellationToken);
+            await _contexto.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex) when (EsConflictoDeHorario(ex))
+        {
+            throw new ConflictoDeHorarioException(ex);
+        }
+    }
 
-        await transaccion.CommitAsync(cancellationToken);
+    // EF puede envolver el error de PostgreSQL en DbUpdateException y esta en InvalidOperationException (fallo transitorio).
+    private static bool EsConflictoDeHorario(Exception ex)
+    {
+        for (Exception? actual = ex; actual is not null; actual = actual.InnerException)
+        {
+            if (actual is PostgresException { SqlState: PostgresErrorCodes.ExclusionViolation or PostgresErrorCodes.DeadlockDetected })
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

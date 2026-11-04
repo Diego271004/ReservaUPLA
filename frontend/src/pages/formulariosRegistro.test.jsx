@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MENSAJES } from '../constants/messages.js'
 import { RESULTADO } from '../services/llamarApi.js'
 import {
+  consultarDisponibilidad,
   crearAmbiente,
   crearReserva,
   crearUsuario,
@@ -16,11 +17,16 @@ import NuevaReservaPage from './NuevaReservaPage.jsx'
 import UsuarioFormPage from './UsuarioFormPage.jsx'
 
 vi.mock('../services/recursosService.js', () => ({
+  aprobarReserva: vi.fn(),
+  cancelarReserva: vi.fn(),
+  consultarDisponibilidad: vi.fn(),
   crearAmbiente: vi.fn(),
   crearReserva: vi.fn(),
   crearUsuario: vi.fn(),
   listarAmbientes: vi.fn(),
   listarUsuarios: vi.fn(),
+  obtenerReserva: vi.fn(),
+  rechazarReserva: vi.fn(),
 }))
 
 const exito = (data) => ({ tipo: RESULTADO.exito, data })
@@ -28,6 +34,9 @@ const pendiente = () => new Promise(() => {})
 
 beforeEach(() => {
   vi.resetAllMocks()
+  consultarDisponibilidad.mockResolvedValue(
+    exito({ disponible: true, mensaje: MENSAJES.disponible }),
+  )
   listarUsuarios.mockResolvedValue(
     exito([
       { id: 3, nombreCompleto: 'Mario Huamán', activo: true },
@@ -72,14 +81,16 @@ describe('Registrar usuario', () => {
     await userEvent.type(ingresar('Contraseña inicial'), 'Clave#123')
   }
 
-  it('muestra el título, los campos del diseño, la ayuda del correo, el interruptor activo y sin requisitos de contraseña (U2)', () => {
+  it('muestra el título, los campos del diseño, la ayuda del correo, el interruptor activo y los requisitos de la contraseña (U2)', () => {
     mostrar()
     expect(screen.getByRole('heading', { name: 'Registrar usuario' })).toBeInTheDocument()
     expect(ingresar('Correo institucional')).toHaveAccessibleDescription(
       'Ejemplo: nombre.apellido@upla.edu.pe',
     )
     expect(screen.getByRole('switch', { name: 'Activo' })).toBeChecked()
-    expect(ingresar('Contraseña inicial')).not.toHaveAccessibleDescription()
+    expect(ingresar('Contraseña inicial')).toHaveAccessibleDescription(
+      'Entre 8 y 72 caracteres, con al menos una letra y un número.',
+    )
     expect(ingresar('Rol')).toHaveDisplayValue('Selecciona…')
   })
 
@@ -124,6 +135,42 @@ describe('Registrar usuario', () => {
     await userEvent.paste('a'.repeat(73))
     await userEvent.tab()
     expect(screen.getByText(MENSAJES.contrasenaInicialDemasiadoLarga)).toBeInTheDocument()
+  })
+
+  it.each(['Ab1', '12345678', 'abcdefgh'])(
+    'U2: la contraseña inicial "%s" no cumple los requisitos y lo dice bajo el campo',
+    async (clave) => {
+      mostrar()
+      await userEvent.type(ingresar('Contraseña inicial'), clave)
+      await userEvent.tab()
+      expect(screen.getByText(MENSAJES.contrasenaInicialRequisitos)).toBeInTheDocument()
+      expect(ingresar('Contraseña inicial')).toHaveAttribute('aria-invalid', 'true')
+    },
+  )
+
+  it('U2: una contraseña inicial que cumple no muestra error y se envía', async () => {
+    crearUsuario.mockResolvedValue(exito({ id: 9 }))
+    mostrar()
+    await userEvent.type(ingresar('Nombre completo'), 'Rosa Chávez')
+    await userEvent.type(ingresar('Correo institucional'), 'rosa.chavez@upla.edu.pe')
+    await userEvent.selectOptions(ingresar('Rol'), 'Responsable')
+    await userEvent.type(ingresar('Contraseña inicial'), 'Abcdefg1')
+    await userEvent.tab()
+    expect(screen.queryByText(MENSAJES.contrasenaInicialRequisitos)).not.toBeInTheDocument()
+    await userEvent.click(boton('Guardar usuario'))
+    expect(crearUsuario).toHaveBeenCalledTimes(1)
+  })
+
+  it('U2: si el backend rechaza la contraseña, su mensaje aparece bajo el campo', async () => {
+    crearUsuario.mockResolvedValue({
+      tipo: RESULTADO.datosInvalidos,
+      errores: { contrasena: MENSAJES.contrasenaInicialRequisitos },
+    })
+    mostrar()
+    await llenarValido()
+    await userEvent.click(boton('Guardar usuario'))
+    expect(await screen.findByText(MENSAJES.contrasenaInicialRequisitos)).toBeInTheDocument()
+    expect(ingresar('Contraseña inicial')).toHaveFocus()
   })
 
   it('campos válidos: sin errores y envía los datos normalizados', async () => {
@@ -648,5 +695,132 @@ describe('Nueva reserva', () => {
     expect(boton('Registrar solicitud')).toHaveFocus()
     await userEvent.keyboard('{Enter}')
     await waitFor(() => expect(crearReserva).toHaveBeenCalledTimes(1))
+  })
+
+  // ------------------------------------------------------------------ Fase 6: disponibilidad (04, 04e, 04f)
+
+  const CONFLICTO =
+    'Ese ambiente ya tiene una reserva aprobada de 10:00 a 12:00. Elige otro horario u otro ambiente.'
+
+  async function elegirHorario(ambiente = '1', inicio = '10:00', fin = '12:00') {
+    await userEvent.selectOptions(
+      ingresar('Ambiente'),
+      await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ }),
+    )
+    if (ambiente !== '1') await userEvent.selectOptions(ingresar('Ambiente'), ambiente)
+    await userEvent.clear(ingresar('Fecha'))
+    await userEvent.type(ingresar('Fecha'), '05112026')
+    await userEvent.selectOptions(ingresar('Hora de inicio'), inicio)
+    await userEvent.selectOptions(ingresar('Hora de fin'), fin)
+  }
+
+  it('04: con ambiente, fecha y horas completas consulta la disponibilidad y muestra el aviso verde', async () => {
+    mostrar()
+    await elegirHorario()
+    const aviso = await screen.findByText(MENSAJES.disponible)
+    expect(aviso.closest('[role="status"]')).toBeInTheDocument()
+    expect(consultarDisponibilidad).toHaveBeenLastCalledWith({
+      ambienteId: 1,
+      fecha: '2026-11-05',
+      horaInicio: '10:00',
+      horaFin: '12:00',
+    })
+  })
+
+  it('04e: si el ambiente está ocupado muestra el aviso rojo con la hora que dice el servidor', async () => {
+    consultarDisponibilidad.mockResolvedValue(exito({ disponible: false, mensaje: CONFLICTO }))
+    mostrar()
+    await elegirHorario()
+    const aviso = await screen.findByText(CONFLICTO)
+    expect(aviso.closest('[role="alert"]')).toBeInTheDocument()
+    expect(screen.queryByText(MENSAJES.disponible)).not.toBeInTheDocument()
+  })
+
+  it('no consulta mientras falten datos (solo con el ambiente elegido)', async () => {
+    mostrar()
+    await userEvent.selectOptions(
+      ingresar('Ambiente'),
+      await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ }),
+    )
+    await new Promise((resolver) => setTimeout(resolver, 450))
+    expect(consultarDisponibilidad).not.toHaveBeenCalled()
+  })
+
+  it('no consulta si la hora de fin no es posterior (el error ya se ve en el formulario)', async () => {
+    mostrar()
+    await userEvent.selectOptions(
+      ingresar('Ambiente'),
+      await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ }),
+    )
+    await userEvent.selectOptions(ingresar('Hora de inicio'), '10:00')
+    await userEvent.selectOptions(ingresar('Hora de fin'), '10:30')
+    await userEvent.selectOptions(ingresar('Hora de inicio'), '10:30') // el fin deja de ser válido y se vacía
+    await new Promise((resolver) => setTimeout(resolver, 450))
+    expect(consultarDisponibilidad).not.toHaveBeenCalled()
+  })
+
+  it('vuelve a consultar al cambiar un dato y reemplaza el aviso anterior', async () => {
+    consultarDisponibilidad
+      .mockResolvedValueOnce(exito({ disponible: false, mensaje: CONFLICTO }))
+      .mockResolvedValueOnce(exito({ disponible: true, mensaje: MENSAJES.disponible }))
+    mostrar()
+    await elegirHorario()
+    expect(await screen.findByText(CONFLICTO)).toBeInTheDocument()
+    await userEvent.selectOptions(ingresar('Hora de inicio'), '13:00')
+    await userEvent.selectOptions(ingresar('Hora de fin'), '14:00')
+    expect(await screen.findByText(MENSAJES.disponible)).toBeInTheDocument()
+    expect(screen.queryByText(CONFLICTO)).not.toBeInTheDocument()
+  })
+
+  it('mientras consulta muestra "Comprobando disponibilidad…"', async () => {
+    consultarDisponibilidad.mockReturnValue(pendiente())
+    mostrar()
+    await elegirHorario()
+    expect(await screen.findByText('Comprobando disponibilidad…')).toBeInTheDocument()
+  })
+
+  it('si la consulta falla (sin red) no muestra aviso ni impide registrar', async () => {
+    consultarDisponibilidad.mockResolvedValue({ tipo: RESULTADO.errorConexion })
+    crearReserva.mockResolvedValue(exito(reservaCreada))
+    mostrar()
+    await llenarValido()
+    await waitFor(() => expect(consultarDisponibilidad).toHaveBeenCalled())
+    expect(screen.queryByText(MENSAJES.disponible)).not.toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    await userEvent.click(boton('Registrar solicitud'))
+    expect(crearReserva).toHaveBeenCalledTimes(1)
+  })
+
+  it('RN-01: aunque el aviso diga ocupado, registrar deja decidir al servidor y un 409 muestra su mensaje', async () => {
+    consultarDisponibilidad.mockResolvedValue(exito({ disponible: false, mensaje: CONFLICTO }))
+    crearReserva.mockResolvedValue({ tipo: RESULTADO.conflicto, mensaje: CONFLICTO })
+    mostrar()
+    await llenarValido()
+    await userEvent.click(boton('Registrar solicitud'))
+    await waitFor(() => expect(crearReserva).toHaveBeenCalledTimes(1))
+    expect((await screen.findAllByText(CONFLICTO)).length).toBeGreaterThan(0)
+    expect(ingresar('Motivo')).toHaveValue('Práctica de programación')
+    expect(boton('Registrar solicitud')).not.toHaveAttribute('aria-busy')
+  })
+
+  it('04f: el error del servidor sobre el ambiente en mantenimiento aparece bajo el campo Ambiente', async () => {
+    crearReserva.mockResolvedValue({
+      tipo: RESULTADO.datosInvalidos,
+      errores: { ambienteId: MENSAJES.ambienteEnMantenimiento },
+    })
+    mostrar()
+    await llenarValido()
+    await userEvent.click(boton('Registrar solicitud'))
+    expect(await screen.findByText(MENSAJES.ambienteEnMantenimiento)).toBeInTheDocument()
+    expect(ingresar('Ambiente')).toHaveFocus()
+  })
+
+  it('04c: el cierre ofrece "Ver detalle", que lleva a la reserva recién creada', async () => {
+    crearReserva.mockResolvedValue(exito(reservaCreada))
+    mostrar()
+    await llenarValido()
+    await userEvent.click(boton('Registrar solicitud'))
+    await userEvent.click(await screen.findByRole('button', { name: 'Ver detalle' }))
+    expect(screen.getByTestId('ubicacion')).toHaveTextContent('/reservas/7')
   })
 })

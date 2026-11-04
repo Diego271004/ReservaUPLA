@@ -17,6 +17,9 @@ public class SeguridadTests
         public Task<Usuario?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken) =>
             throw new InvalidOperationException("detalle interno");
 
+        public Task<IReadOnlyList<Usuario>> ObtenerPorIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken) =>
+            throw new InvalidOperationException("detalle interno");
+
         public Task<IReadOnlyList<Usuario>> ListarAsync(RolUsuario? rol, CancellationToken cancellationToken) =>
             throw new InvalidOperationException("detalle interno");
 

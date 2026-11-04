@@ -1,0 +1,31 @@
+Estados e historial tras ejecutar tools/e2e/fase6.mjs (base real). Sin claves.
+
+ id |         ambiente         |   fecha    | hora_inicio | hora_fin |  estado   | solicitante 
+----+--------------------------+------------+-------------+----------+-----------+-------------
+  2 | Laboratorio de Cómputo 2 | 2026-11-05 | 10:00:00    | 12:00:00 | Aprobada  | Ana Torres
+  3 | Laboratorio de Cómputo 2 | 2026-11-05 | 11:00:00    | 13:00:00 | Rechazada | Ana Torres
+  7 | Laboratorio de Cómputo 2 | 2026-11-05 | 14:00:00    | 16:00:00 | Cancelada | Ana Torres
+  8 | Auditorio Principal      | 2026-12-01 | 09:00:00    | 10:00:00 | Pendiente | Ana Torres
+(4 rows)
+
+ reserva_id |    de     |     a     |  hecho_por  |      rol      
+------------+-----------+-----------+-------------+---------------
+          2 | (nuevo)   | Pendiente | Ana Torres  | Solicitante
+          2 | Pendiente | Aprobada  | Carla Rojas | Administrador
+          3 | (nuevo)   | Pendiente | Ana Torres  | Solicitante
+          3 | Pendiente | Rechazada | Carla Rojas | Administrador
+          7 | (nuevo)   | Pendiente | Ana Torres  | Solicitante
+          7 | Pendiente | Cancelada | Ana Torres  | Solicitante
+          8 | (nuevo)   | Pendiente | Ana Torres  | Solicitante
+(7 rows)
+
+ aprobadas_en_laboratorio_el_05_11 
+-----------------------------------
+                                 1
+(1 row)
+
+ reservas_en_el_ambiente_en_mantenimiento 
+------------------------------------------
+                                        0
+(1 row)
+

@@ -4,6 +4,7 @@ import { crearReserva, listarAmbientes } from '../services/recursosService.js'
 import { HORAS, fechaAIso, horasPosterioresA, hoy } from '../utils/fechas.js'
 import { validarReserva } from '../utils/validators.js'
 import { useCarga } from './useCarga.js'
+import { useDisponibilidad } from './useDisponibilidad.js'
 import { useFormulario } from './useFormulario.js'
 
 const valoresIniciales = () => ({
@@ -68,6 +69,8 @@ export function useReservaForm() {
     alExito,
   })
 
+  const disponibilidad = useDisponibilidad(formulario.valores, reservaCreada === null)
+
   const { reiniciar } = formulario
   const registrarOtra = useCallback(() => {
     setReservaCreada(null)
@@ -81,6 +84,7 @@ export function useReservaForm() {
     errorAmbientes: ambientes.error,
     horasInicio: HORAS,
     horasFin: horasPosterioresA(formulario.valores.horaInicio),
+    disponibilidad,
     reservaCreada,
     registrarOtra,
     cancelar: () => formulario.reiniciar(valoresIniciales()),

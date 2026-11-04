@@ -70,6 +70,42 @@ public class UsuarioServiceTests
         Assert.Equal(MensajesValidacion.ContrasenaInicialDemasiadoLarga, resultado.Errores[CamposFormulario.Contrasena][0]);
     }
 
+    [Theory]
+    [InlineData("Ab1")] // menos de 8 caracteres
+    [InlineData("Abcde1f")] // 7 caracteres
+    [InlineData("12345678")] // sin letras
+    [InlineData("abcdefgh")] // sin números
+    [InlineData("!!!!!!!!")] // ni letras ni números
+    public async Task U2_la_contrasena_inicial_exige_8_caracteres_con_al_menos_una_letra_y_un_numero(string contrasena)
+    {
+        var resultado = await Crear(Valido() with { Contrasena = contrasena });
+
+        Assert.Equal(EstadoOperacion.DatosInvalidos, resultado.Estado);
+        Assert.Equal(MensajesValidacion.ContrasenaInicialRequisitos, resultado.Errores[CamposFormulario.Contrasena][0]);
+        Assert.Empty(_usuarios.Usuarios);
+    }
+
+    [Theory]
+    [InlineData("Abcdefg1")] // justo 8
+    [InlineData("12345678a")]
+    [InlineData("clave segura 2026")] // los espacios están permitidos
+    public async Task U2_una_contrasena_inicial_que_cumple_se_acepta(string contrasena)
+    {
+        var resultado = await Crear(Valido() with { Contrasena = contrasena });
+
+        Assert.Equal(EstadoOperacion.Exitoso, resultado.Estado);
+    }
+
+    [Fact]
+    public async Task U2_el_limite_superior_es_72_caracteres()
+    {
+        var justo = await Crear(Valido() with { Contrasena = new string('a', 71) + "1" });
+        var pasado = await Crear(Valido() with { Correo = "otro@upla.edu.pe", Contrasena = new string('a', 72) + "1" });
+
+        Assert.Equal(EstadoOperacion.Exitoso, justo.Estado);
+        Assert.Equal(MensajesValidacion.ContrasenaInicialDemasiadoLarga, pasado.Errores[CamposFormulario.Contrasena][0]);
+    }
+
     [Fact]
     public async Task Correo_ya_registrado_se_rechaza_aunque_cambien_mayusculas_y_espacios()
     {

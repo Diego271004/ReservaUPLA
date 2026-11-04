@@ -4,14 +4,15 @@ import { AuthProvider } from '../context/AuthContext.jsx'
 import { SESION_STORAGE_KEY } from '../services/sesionStorage.js'
 
 export const SESIONES = {
-  administrador: sesion('Carla Rojas', 'Administrador'),
-  solicitante: sesion('Ana Torres', 'Solicitante'),
-  responsable: sesion('Mario Huamán', 'Responsable'),
+  administrador: sesion(1, 'Carla Rojas', 'Administrador'),
+  solicitante: sesion(2, 'Ana Torres', 'Solicitante'),
+  responsable: sesion(3, 'Mario Huamán', 'Responsable'),
 }
 
-function sesion(nombreCompleto, rol) {
+function sesion(usuarioId, nombreCompleto, rol) {
   return {
     token: `token-de-${rol}`,
+    usuarioId,
     nombreCompleto,
     rol,
     expiraEn: new Date(Date.now() + 60 * 60 * 1000).toISOString(),

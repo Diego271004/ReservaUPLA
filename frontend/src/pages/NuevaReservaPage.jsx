@@ -7,12 +7,25 @@ import SelectInput from '../components/ui/SelectInput.jsx'
 import TextInput from '../components/ui/TextInput.jsx'
 import TimeInput from '../components/ui/TimeInput.jsx'
 import { MENSAJES, TEXTOS } from '../constants/messages.js'
+import { ESTADOS_DISPONIBILIDAD } from '../hooks/useDisponibilidad.js'
 import { useReservaForm } from '../hooks/useReservaForm.js'
 import { isoAFecha } from '../utils/fechas.js'
+import { useNavigate } from 'react-router-dom'
 import estilos from './NuevaReservaPage.module.css'
+
+// Aviso inmediato (pantallas 04 y 04e): verde si está libre, rojo con la hora ocupada si no.
+function AvisoDisponibilidad({ aviso }) {
+  if (!aviso) return null
+  if (aviso.estado === ESTADOS_DISPONIBILIDAD.consultando) {
+    return <AlertMessage tipo="info">{TEXTOS.consultandoDisponibilidad}</AlertMessage>
+  }
+  const tipo = aviso.estado === ESTADOS_DISPONIBILIDAD.disponible ? 'exito' : 'error'
+  return <AlertMessage tipo={tipo}>{aviso.mensaje}</AlertMessage>
+}
 
 export default function NuevaReservaPage() {
   const form = useReservaForm()
+  const navigate = useNavigate()
   const { valores, errores, enviando, reservaCreada } = form
 
   // Cierre del proceso (S4): confirma que se registró y propone el siguiente paso.
@@ -45,6 +58,9 @@ export default function NuevaReservaPage() {
             </div>
           </dl>
           <div className={estilos.acciones}>
+            <Button variante="secundario" onClick={() => navigate(`/reservas/${reservaCreada.id}`)}>
+              {TEXTOS.verDetalle}
+            </Button>
             <Button onClick={form.registrarOtra}>{TEXTOS.tituloNuevaReserva}</Button>
           </div>
         </section>
@@ -124,6 +140,7 @@ export default function NuevaReservaPage() {
         multilinea
         inputRef={form.refDe('motivo')}
       />
+      <AvisoDisponibilidad aviso={form.disponibilidad} />
     </FormularioTarjeta>
   )
 }

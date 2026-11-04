@@ -5,16 +5,23 @@ namespace ReservaUPLA.Application.Interfaces;
 
 public interface IReservaRepository
 {
-    Task<Reserva?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken);
+    /// <summary>La reserva con su historial, lista para cambiar de estado y guardarse (seguimiento activo).</summary>
+    Task<Reserva?> ObtenerConHistorialAsync(int id, CancellationToken cancellationToken);
+
     Task<IReadOnlyList<ReservaDto>> ListarAsync(FiltroReservas filtro, CancellationToken cancellationToken);
 
-    /// <summary>Hay una reserva Aprobada del ambiente que se cruza con el rango (RN-01). La usa la Fase 6.</summary>
-    Task<bool> ExisteAprobadaQueSeCruzaAsync(
-        int ambienteId, DateOnly fecha, TimeOnly horaInicio, TimeOnly horaFin, CancellationToken cancellationToken);
-
     /// <summary>
-    /// Guarda la reserva y su primer evento de historial (estado Pendiente, hecho por el solicitante)
-    /// en una sola transacción. Completa el Id de la reserva.
+    /// La reserva Aprobada del ambiente que se cruza con el rango (RN-01), o null. `excluirReservaId` deja fuera a la
+    /// propia reserva cuando se está aprobando.
     /// </summary>
-    Task CrearAsync(Reserva reserva, CancellationToken cancellationToken);
+    Task<Reserva?> BuscarAprobadaQueSeCruzaAsync(
+        int ambienteId, DateOnly fecha, TimeOnly horaInicio, TimeOnly horaFin, int? excluirReservaId, CancellationToken cancellationToken);
+
+    /// <summary>Guarda una reserva nueva con su historial en una sola operación. Completa el Id.</summary>
+    /// <exception cref="Common.ConflictoDeHorarioException">La base rechazó el cruce (RN-01).</exception>
+    Task AgregarAsync(Reserva reserva, CancellationToken cancellationToken);
+
+    /// <summary>Guarda los cambios de una reserva (el estado nuevo y sus eventos de historial, juntos).</summary>
+    /// <exception cref="Common.ConflictoDeHorarioException">La base rechazó el cruce (RN-01).</exception>
+    Task GuardarAsync(Reserva reserva, CancellationToken cancellationToken);
 }
