@@ -21,42 +21,10 @@ namespace ReservaUPLA.API.Tests;
 /// Aprobada (comprobación del servicio) y otras ambas pasan esa comprobación y decide la restricción de exclusión (23P01).
 /// Se omite si no hay base de datos de pruebas (ver BaseDeDatosDePruebas).
 /// </summary>
+[Collection("BaseReal")]
 public class ConcurrenciaAprobacionTests
 {
     private const int Repeticiones = 25;
-
-    private sealed class ApiConBaseReal : WebApplicationFactory<Program>
-    {
-        private readonly string _claveJwt = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            builder.UseEnvironment("Testing"); // sin los user-secrets del equipo
-            builder.UseSetting("ConnectionStrings:ReservaUPLADB", VariablesDeBaseDeDatos.ObtenerApp()!);
-            builder.UseSetting("Jwt:Key", _claveJwt);
-            builder.UseSetting("Jwt:Issuer", "ReservaUPLA.API");
-            builder.UseSetting("Jwt:Audience", "ReservaUPLA.Frontend");
-            builder.UseSetting("Jwt:MinutosExpiracion", "60");
-            builder.UseSetting("Autenticacion:DominioInstitucional", "upla.edu.pe");
-            builder.UseSetting("Cors:OrigenesPermitidos:0", "http://localhost:5180");
-            builder.ConfigureLogging(registro => { registro.ClearProviders(); });
-        }
-
-        public HttpClient ClienteDeAdministrador(int administradorId)
-        {
-            var administrador = new Usuario
-            {
-                Id = administradorId,
-                Correo = "carla.rojas@upla.edu.pe",
-                NombreCompleto = "Carla Rojas",
-                Rol = RolUsuario.Administrador,
-            };
-            var (token, _) = Services.GetRequiredService<ITokenGenerator>().Generar(administrador);
-            var cliente = CreateClient();
-            cliente.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            return cliente;
-        }
-    }
 
     [FactConBaseDeDatos]
     public async Task RN01_dos_aprobaciones_simultaneas_que_se_cruzan_dan_un_200_y_un_409_y_una_sola_Aprobada()
