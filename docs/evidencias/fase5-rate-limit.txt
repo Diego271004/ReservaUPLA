@@ -1,0 +1,10 @@
+Seis intentos de login seguidos contra http://localhost:5264 (API recién arrancada)
+1) Carla Rojas, clave correcta                      HTTP 200  token JWT emitido (rol Administrador)
+2) Ana Torres, clave correcta                       HTTP 200  token JWT emitido (rol Solicitante)
+3) Mario Huaman, clave correcta                     HTTP 200  token JWT emitido (rol Responsable)
+4) Carla Rojas, contrasena ERRONEA                  HTTP 401  "El correo o la contraseña no son correctos. Revisa ambos datos e inténtalo de nuevo."
+5) Luis Quispe (INACTIVO), clave correcta           HTTP 401  "El correo o la contraseña no son correctos. Revisa ambos datos e inténtalo de nuevo."
+6) sexto intento seguido (clave correcta)           HTTP 429  "Has realizado demasiados intentos. Espera 1 minuto y vuelve a intentarlo."
+Cabeceras de la respuesta bloqueada:
+HTTP/1.1 429 Too Many Requests
+Retry-After: 60

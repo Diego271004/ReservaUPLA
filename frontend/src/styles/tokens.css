@@ -31,3 +31,15 @@
   --espacio-3: 1.5rem;
   --espacio-4: 2rem;
 }
+
+/* Fondos de los estados (avisos e insignias). El color del texto es siempre el color de estado. */
+:root {
+  --fondo-error: #fdf2f2;
+  --fondo-exito: #effaf3;
+  --fondo-aviso: #fef8e7;
+  --fondo-info: #eef4fd;
+  --fondo-neutro: #eceef1;
+  --color-neutro: #4f4f4f;
+  --color-deshabilitado: #6b7280;
+  --fondo-deshabilitado: #eceef1;
+}

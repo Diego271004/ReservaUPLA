@@ -1,0 +1,6 @@
+.icono {
+  width: 18px;
+  height: 18px;
+  margin-right: var(--espacio-1);
+  color: var(--color-texto);
+}

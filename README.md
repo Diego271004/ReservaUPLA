@@ -54,6 +54,7 @@ psql @psql -d ReservaUPLADB -f database/07_pruebas_reglas.sql
 ```
 
 - `00` borra la base y el rol; vuelve a empezar desde cero.
+- Cada script empieza con `\encoding UTF8`: sin eso, psql en Windows lee los scripts con la página de códigos de la consola y las tildes quedan guardadas dos veces codificadas ("HuamÃ¡n"). `06_verificacion.sql` falla si detecta ese problema.
 - `07_pruebas_reglas.sql` comprueba RN-01, RN-03 y RN-04 y no deja datos (termina en `ROLLBACK`).
 - Si PostgreSQL pide clave en cada comando, define `PGPASSWORD` como arriba (solo en esa sesión de terminal).
 
@@ -79,7 +80,16 @@ npm install
 npm run dev
 ```
 
-El frontend reenvía `/api` a `http://localhost:5263`. Si la API usa otra dirección, define `VITE_API_URL` antes de `npm run dev`. La página inicial muestra el resultado de `GET /api/salud`.
+Abre `http://localhost:5180` (puerto fijo: si estuviera ocupado, Vite avisa con un error en lugar de cambiar de puerto; CORS solo permite ese origen, configurable en `Cors:OrigenesPermitidos`). El frontend reenvía `/api` a `http://localhost:5263`; si la API usa otra dirección, define `VITE_API_URL` antes de `npm run dev`.
+
+### Qué hay en la Fase 5
+- **Login** (`/login`): errores bajo cada campo, aviso de Bloq Mayús, Mostrar/Ocultar contraseña, "Verificando credenciales…" con "Cancelar" y ayuda de Soporte TI. Máximo 5 intentos por minuto y por IP (el sexto recibe 429).
+- **Administrador:** Ambientes (`/ambientes`, `/ambientes/nuevo`), Usuarios (`/usuarios`, `/usuarios/nuevo`) y Nueva reserva.
+- **Solicitante:** Nueva reserva (`/reservas/nueva`).
+- Dashboard, Reservas y Mi ambiente muestran "Pantalla en construcción" hasta las fases siguientes. Aprobar, rechazar y cancelar llegan en la Fase 9.
+- La sesión (token) vive en `sessionStorage`: se borra al cerrar la pestaña o con "Cerrar sesión".
+- Endpoints: `POST /api/auth/login`, `GET /api/auth/me`, `GET|POST /api/usuarios` (Administrador), `GET /api/ambientes` (cualquier sesión) y `POST /api/ambientes` (Administrador), `GET|POST /api/reservas` (crear: Administrador y Solicitante; cada rol lista lo suyo), `GET /api/salud`.
+- Los mensajes de error son los mismos en `MensajesValidacion.cs` y en `frontend/src/constants/messages.js`; una prueba del frontend lo comprueba.
 
 ## Datos de prueba
 Los scripts crean tres usuarios con el mismo correo institucional de ejemplo (`@upla.edu.pe`, por confirmar). La contraseña de los tres es la que se pasó en `password_prueba`; con los valores de desarrollo de este equipo:
@@ -90,11 +100,34 @@ Los scripts crean tres usuarios con el mismo correo institucional de ejemplo (`@
 | Ana Torres | ana.torres@upla.edu.pe | Solicitante | `Prueba#2026Upla` |
 | Mario Huamán | mario.huaman@upla.edu.pe | Responsable | `Prueba#2026Upla` |
 
-Son datos de desarrollo: no se usan fuera de este equipo. Ambientes: "Laboratorio de Cómputo 2", "Auditorio Principal" y "Sala de Reuniones A" (en mantenimiento). Hay seis reservas de ejemplo en noviembre de 2026.
+Son datos de desarrollo: no se usan fuera de este equipo. Ambientes: "Laboratorio de Cómputo 2", "Auditorio Principal" y "Sala de Reuniones A" (en mantenimiento). Hay seis reservas de ejemplo en noviembre de 2026. Los datos de prueba no incluyen un usuario inactivo: se crea uno desde Usuarios con el interruptor apagado.
 
 ## Pruebas
 ```bash
 cd backend  && dotnet build ReservaUPLA.sln && dotnet test ReservaUPLA.sln && dotnet format ReservaUPLA.sln --verify-no-changes
 cd frontend && npm run build && npm run lint && npm run test
 ```
-Reglas de la base de datos: `database/07_pruebas_reglas.sql` (ver arriba).
+- `ReservaUPLA.Application.Tests`: servicios, validadores y arquitectura, con repositorios falsos (sin base de datos).
+- `ReservaUPLA.Infrastructure.Tests`: BCrypt (incluye un hash `$2a$` de pgcrypto) y el token JWT.
+- `ReservaUPLA.API.Tests`: login (400, 401, 200, 429), autorización por rol (401 y 403), ProblemDetails, CORS y errores sin detalles internos; la API se levanta en memoria con repositorios falsos.
+- `frontend`: Vitest y React Testing Library; una prueba por campo, botón, mensaje, modal y estado, y la navegación solo con teclado de cada formulario.
+- Reglas de la base de datos: `database/07_pruebas_reglas.sql` (ver arriba).
+
+### Pruebas de extremo a extremo (`tools/e2e/`)
+Manejan la interfaz real con Edge o Chrome sin ventana (Playwright) contra la API y la base reales, y guardan capturas a 1280 px y a 375 px en `docs/evidencias/`. Comprueban que ninguna pantalla tiene scroll horizontal. Las contraseñas llegan por variables de entorno; no están en ningún archivo.
+
+```bash
+# 1. Una vez: instalar la dependencia (solo playwright-core; no descarga navegadores)
+cd tools/e2e && npm install && cd ../..
+
+# 2. Base limpia (los guiones crean datos: ambiente, usuario y reservas)
+PGPASSWORD="<clave de postgres>" CLAVE_PRUEBA="<clave de los usuarios de prueba>" bash tools/e2e/recrear-bd.sh
+
+# 3. API y frontend en marcha (ver "Ejecutar"): API en :5263 y frontend en :5180
+
+# 4. Ejecutar (desde tools/e2e)
+cd tools/e2e && CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run fase5
+```
+- Si no encuentra Edge ni Chrome, indica el ejecutable con `E2E_NAVEGADOR`. Otras variables: `E2E_BASE_URL` (por defecto `http://localhost:5180`) y `E2E_API_URL`.
+- El login permite 5 intentos por minuto por IP: los guiones inician sesión una vez por rol y reutilizan la sesión en las capturas móviles.
+- `tools/e2e/rate-limit.sh` repite los seis intentos seguidos de login (el sexto debe ser 429) contra una API recién arrancada; su resultado está en `docs/evidencias/fase5-rate-limit.txt`.

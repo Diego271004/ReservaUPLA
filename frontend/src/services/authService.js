@@ -1,0 +1,25 @@
+import { RESULTADO, llamarApi } from './llamarApi.js'
+
+/** POST /api/auth/login. Un 401 aquí significa credenciales inválidas (no hay sesión que expirar). */
+export async function login(correo, contrasena, { signal } = {}) {
+  const resultado = await llamarApi('/auth/login', {
+    method: 'POST',
+    body: { correo, contrasena },
+    conSesion: false,
+    signal,
+  })
+
+  if (resultado.tipo === RESULTADO.noAutorizado) return { tipo: 'credencialesInvalidas' }
+
+  if (resultado.tipo === RESULTADO.exito) {
+    const { token, nombreCompleto, rol, expiraEn } = resultado.data ?? {}
+    const completa = [token, nombreCompleto, rol, expiraEn].every(
+      (dato) => typeof dato === 'string',
+    )
+    return completa
+      ? { tipo: RESULTADO.exito, data: { token, nombreCompleto, rol, expiraEn } }
+      : { tipo: RESULTADO.errorServidor }
+  }
+
+  return resultado
+}

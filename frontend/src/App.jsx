@@ -1,14 +1,51 @@
-import { Route, Routes } from 'react-router-dom'
-import Layout from './components/Layout/Layout'
-import InicioPage from './pages/InicioPage'
-import PendientePage from './pages/PendientePage'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import Layout from './components/Layout/Layout.jsx'
+import { ROLES, RUTA_INICIAL_POR_ROL } from './constants/navegacion.js'
+import { useAuth } from './context/AuthContext.jsx'
+import AmbienteFormPage from './pages/AmbienteFormPage.jsx'
+import AmbientesPage from './pages/AmbientesPage.jsx'
+import { NoEncontradaPage } from './pages/ErrorRutaPage.jsx'
+import LoginPage from './pages/LoginPage.jsx'
+import NuevaReservaPage from './pages/NuevaReservaPage.jsx'
+import PendientePage from './pages/PendientePage.jsx'
+import UsuarioFormPage from './pages/UsuarioFormPage.jsx'
+import UsuariosPage from './pages/UsuariosPage.jsx'
+import RutaProtegida from './routes/RutaProtegida.jsx'
+
+const { administrador, solicitante, responsable } = ROLES
+
+function Inicio() {
+  const { sesion } = useAuth()
+  return (
+    <Navigate to={sesion ? (RUTA_INICIAL_POR_ROL[sesion.rol] ?? '/login') : '/login'} replace />
+  )
+}
 
 export default function App() {
   return (
     <Routes>
-      <Route element={<Layout />}>
-        <Route index element={<InicioPage />} />
-        <Route path="*" element={<PendientePage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route index element={<Inicio />} />
+      <Route element={<RutaProtegida />}>
+        <Route element={<Layout />}>
+          <Route element={<RutaProtegida roles={[administrador]} />}>
+            <Route path="/dashboard" element={<PendientePage />} />
+            <Route path="/ambientes" element={<AmbientesPage />} />
+            <Route path="/ambientes/nuevo" element={<AmbienteFormPage />} />
+            <Route path="/usuarios" element={<UsuariosPage />} />
+            <Route path="/usuarios/nuevo" element={<UsuarioFormPage />} />
+          </Route>
+          <Route element={<RutaProtegida roles={[administrador, solicitante]} />}>
+            <Route path="/reservas/nueva" element={<NuevaReservaPage />} />
+          </Route>
+          <Route element={<RutaProtegida roles={[administrador, solicitante, responsable]} />}>
+            <Route path="/reservas" element={<PendientePage />} />
+          </Route>
+          <Route element={<RutaProtegida roles={[responsable]} />}>
+            <Route path="/mi-ambiente" element={<PendientePage />} />
+          </Route>
+          <Route path="*" element={<NoEncontradaPage />} />
+        </Route>
       </Route>
     </Routes>
   )

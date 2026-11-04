@@ -4,6 +4,10 @@
 -- Comando:
 --   psql -h localhost -p 5432 -U postgres -d ReservaUPLADB -v ON_ERROR_STOP=1 -f database/07_pruebas_reglas.sql
 
+-- Los scripts están en UTF-8: se fija la codificación del cliente para que psql no use la de la consola (en Windows,
+-- sin esto, "á" se guardaba como "Ã¡").
+\encoding UTF8
+
 BEGIN;
 
 INSERT INTO usuarios (nombre_completo, correo, rol, contrasena_hash)

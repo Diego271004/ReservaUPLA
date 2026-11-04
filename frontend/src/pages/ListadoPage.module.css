@@ -1,0 +1,16 @@
+.encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-2);
+}
+
+.encabezado > button {
+  white-space: nowrap;
+}
+
+.encabezado h1 {
+  margin: 0;
+}
