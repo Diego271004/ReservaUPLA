@@ -7,6 +7,8 @@ export const RESULTADO = Object.freeze({
   datosInvalidos: 'datosInvalidos', // 400: errores por campo
   noAutorizado: 'noAutorizado', // 401
   sinPermiso: 'sinPermiso', // 403
+  noEncontrado: 'noEncontrado', // 404
+  conflicto: 'conflicto', // 409: regla de negocio (RN-01, RN-06); trae el mensaje para el usuario
   demasiadosIntentos: 'demasiadosIntentos', // 429
   errorConexion: 'errorConexion', // no hubo respuesta: red caída o timeout
   errorServidor: 'errorServidor', // hubo respuesta, pero 5xx o fuera de contrato
@@ -37,6 +39,12 @@ function traducir({ ok, status, data }) {
   }
   if (status === 401) return { tipo: RESULTADO.noAutorizado }
   if (status === 403) return { tipo: RESULTADO.sinPermiso }
+  if (status === 404) return { tipo: RESULTADO.noEncontrado }
+  if (status === 409) {
+    return typeof data?.mensaje === 'string'
+      ? { tipo: RESULTADO.conflicto, mensaje: data.mensaje }
+      : { tipo: RESULTADO.errorServidor }
+  }
   if (status === 429) return { tipo: RESULTADO.demasiadosIntentos }
   return { tipo: RESULTADO.errorServidor }
 }

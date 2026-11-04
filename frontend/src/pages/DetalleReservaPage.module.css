@@ -1,0 +1,11 @@
+/* "Cancelar reserva" va separada del grupo Rechazar / Aprobar: se queda a la izquierda y el resto al extremo derecho. */
+.separada {
+  margin-right: auto;
+}
+
+@media (max-width: 767px) {
+  .separada {
+    margin-right: 0;
+    margin-top: var(--espacio-1);
+  }
+}

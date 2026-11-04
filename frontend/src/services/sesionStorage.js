@@ -17,6 +17,7 @@ export function leerSesion(ahora = Date.now()) {
     const sesion = JSON.parse(texto)
     const valida =
       typeof sesion?.token === 'string' &&
+      Number.isInteger(sesion.usuarioId) &&
       typeof sesion.nombreCompleto === 'string' &&
       typeof sesion.rol === 'string' &&
       Date.parse(sesion.expiraEn) > ahora

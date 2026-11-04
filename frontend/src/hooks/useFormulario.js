@@ -139,11 +139,17 @@ export function useFormulario({
           terminar()
           setAlerta({ tipo: 'error', mensaje: MENSAJES.sinPermiso })
           return
+        case RESULTADO.conflicto:
+          // Una regla de negocio (RN-01) rechazó los datos: el servidor dice por qué y se muestra tal cual.
+          terminar()
+          setAlerta({ tipo: 'error', mensaje: resultado.mensaje })
+          return
         case RESULTADO.demasiadosIntentos:
           terminar()
           setAlerta({ tipo: 'error', mensaje: MENSAJES.demasiadosIntentos })
           return
         case RESULTADO.errorServidor:
+        case RESULTADO.noEncontrado:
           terminar()
           setAlerta({ tipo: 'error', mensaje: MENSAJES.errorServidor })
           return
