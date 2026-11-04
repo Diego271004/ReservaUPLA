@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { MENSAJES } from '../constants/messages.js'
 import { RESULTADO } from '../services/llamarApi.js'
+import { alertaDeResultado } from '../services/mensajesDeResultado.js'
 import { tieneErrores } from '../utils/validators.js'
+import { useAccion } from './useAccion.js'
 
 /**
  * Comportamiento común de todos los formularios (lo que se repite vive aquí, no en cada hook):
@@ -27,12 +29,11 @@ export function useFormulario({
 }) {
   const [valores, setValores] = useState(valoresIniciales)
   const [errores, setErrores] = useState({})
-  const [enviando, setEnviando] = useState(false)
-  const [alerta, setAlerta] = useState(null) // { tipo: 'error' | 'exito', mensaje }
+  // Estado ejecutando / alerta compartido con el resto de acciones de la aplicación.
+  const { ejecutando: enviando, alerta, setAlerta, enCurso, iniciar, terminar } = useAccion()
   const [solicitudFoco, setSolicitudFoco] = useState(null)
 
   const refs = useRef({})
-  const enviandoRef = useRef(false) // guardia síncrona contra doble envío
   const montadoRef = useRef(false)
   const controladorRef = useRef(null)
   const valoresRef = useRef(valores)
@@ -68,11 +69,6 @@ export function useFormulario({
   const campoConError = (erroresActuales) =>
     Object.keys(valoresRef.current).find((campo) => erroresActuales[campo])
 
-  const terminar = useCallback(() => {
-    enviandoRef.current = false
-    setEnviando(false)
-  }, [])
-
   const handleChange = useCallback(
     (evento) => {
       const { name, value, type, checked } = evento.target
@@ -100,10 +96,10 @@ export function useFormulario({
   const handleBlur = useCallback(
     (evento) => {
       const { name } = evento.target
-      if (enviandoRef.current) return
+      if (enCurso()) return
       setErrores((previos) => ({ ...previos, [name]: validar(valoresRef.current)[name] ?? null }))
     },
-    [validar],
+    [enCurso, validar],
   )
 
   const aplicarResultado = useCallback(
@@ -128,43 +124,18 @@ export function useFormulario({
           else setAlerta({ tipo: 'error', mensaje: MENSAJES.errorServidor })
           return
         }
-        case RESULTADO.cancelado:
-          terminar()
-          return
-        case RESULTADO.noAutorizado:
-          // La sesión ya se cerró y el router lleva al login; solo se libera el formulario.
-          terminar()
-          return
-        case RESULTADO.sinPermiso:
-          terminar()
-          setAlerta({ tipo: 'error', mensaje: MENSAJES.sinPermiso })
-          return
-        case RESULTADO.conflicto:
-          // Una regla de negocio (RN-01) rechazó los datos: el servidor dice por qué y se muestra tal cual.
-          terminar()
-          setAlerta({ tipo: 'error', mensaje: resultado.mensaje })
-          return
-        case RESULTADO.demasiadosIntentos:
-          terminar()
-          setAlerta({ tipo: 'error', mensaje: MENSAJES.demasiadosIntentos })
-          return
-        case RESULTADO.errorServidor:
-        case RESULTADO.noEncontrado:
-          terminar()
-          setAlerta({ tipo: 'error', mensaje: MENSAJES.errorServidor })
-          return
         default:
-          terminar()
-          setAlerta({ tipo: 'error', mensaje: MENSAJES.errorConexion })
+          // 403, 409, 429, 5xx y sin red: un solo lugar los traduce a su mensaje (mensajesDeResultado.js).
+          terminar(alertaDeResultado(resultado))
       }
     },
-    [alExito, enfocar, manejarResultado, terminar],
+    [alExito, enfocar, manejarResultado, setAlerta, terminar],
   )
 
   const handleSubmit = useCallback(
     async (evento) => {
       evento?.preventDefault()
-      if (enviandoRef.current) return
+      if (enCurso()) return
 
       const actuales = valoresRef.current
       const erroresFormulario = validar(actuales)
@@ -175,16 +146,14 @@ export function useFormulario({
         return // no se envía con errores
       }
 
-      enviandoRef.current = true
-      setEnviando(true)
-      setAlerta(null)
+      if (!iniciar()) return
       controladorRef.current = new AbortController()
 
       const resultado = await enviar(actuales, { signal: controladorRef.current.signal })
       if (!montadoRef.current) return
       aplicarResultado(resultado, actuales)
     },
-    [aplicarResultado, enviar, enfocar, validar],
+    [aplicarResultado, enCurso, enviar, enfocar, iniciar, setAlerta, validar],
   )
 
   const cancelarEnvio = useCallback(() => controladorRef.current?.abort(), [])
@@ -195,7 +164,31 @@ export function useFormulario({
       setErrores({})
       setAlerta(null)
     },
-    [valoresIniciales],
+    [setAlerta, valoresIniciales],
+  )
+
+  // Las props que todo campo del formulario necesita (id, valor, error, eventos y foco). Los componentes de campo las
+  // reciben tal cual: ninguna pantalla vuelve a escribir esta lista. Texto y fecha se bloquean como "solo lectura" durante
+  // el envío (conservan el foco); las listas, como deshabilitadas.
+  const propsDeCampo = useCallback(
+    (nombre) => ({
+      id: nombre,
+      nombre,
+      valor: valores[nombre],
+      error: errores[nombre],
+      onChange: handleChange,
+      onBlur: handleBlur,
+      inputRef: refDe(nombre),
+    }),
+    [errores, handleBlur, handleChange, refDe, valores],
+  )
+  const campoDeTexto = useCallback(
+    (nombre) => ({ ...propsDeCampo(nombre), soloLectura: enviando }),
+    [enviando, propsDeCampo],
+  )
+  const campoDeLista = useCallback(
+    (nombre) => ({ ...propsDeCampo(nombre), deshabilitado: enviando }),
+    [enviando, propsDeCampo],
   )
 
   return useMemo(
@@ -213,12 +206,15 @@ export function useFormulario({
       handleSubmit,
       cancelarEnvio,
       reiniciar,
+      campoDeTexto,
+      campoDeLista,
     }),
     [
       valores,
       errores,
       enviando,
       alerta,
+      setAlerta,
       refDe,
       enfocar,
       handleChange,
@@ -226,6 +222,8 @@ export function useFormulario({
       handleSubmit,
       cancelarEnvio,
       reiniciar,
+      campoDeTexto,
+      campoDeLista,
     ],
   )
 }

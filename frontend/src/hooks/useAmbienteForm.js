@@ -1,11 +1,10 @@
 import { useCallback, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { MENSAJES } from '../constants/messages.js'
 import { ROLES } from '../constants/navegacion.js'
 import { crearAmbiente, listarUsuarios } from '../services/recursosService.js'
 import { validarAmbiente } from '../utils/validators.js'
 import { useCarga } from './useCarga.js'
-import { useFormulario } from './useFormulario.js'
+import { useFormularioDeRegistro } from './useFormularioDeRegistro.js'
 
 export const RUTA_AMBIENTES = '/ambientes'
 const VALORES_INICIALES = {
@@ -21,7 +20,6 @@ const VALORES_INICIALES = {
 const cargarResponsables = () => listarUsuarios(ROLES.responsable)
 
 export function useAmbienteForm() {
-  const navigate = useNavigate()
   const responsables = useCarga(cargarResponsables)
 
   const opcionesResponsable = useMemo(
@@ -48,22 +46,13 @@ export function useAmbienteForm() {
     [],
   )
 
-  const alExito = useCallback(
-    () => navigate(RUTA_AMBIENTES, { state: { exito: MENSAJES.ambienteRegistrado } }),
-    [navigate],
-  )
-
-  const formulario = useFormulario({
+  const formulario = useFormularioDeRegistro({
     valoresIniciales: VALORES_INICIALES,
     validar: validarAmbiente,
     enviar,
-    alExito,
+    rutaListado: RUTA_AMBIENTES,
+    mensajeExito: MENSAJES.ambienteRegistrado,
   })
 
-  return {
-    ...formulario,
-    opcionesResponsable,
-    errorResponsables: responsables.error,
-    cancelar: () => navigate(RUTA_AMBIENTES),
-  }
+  return { ...formulario, opcionesResponsable, errorResponsables: responsables.error }
 }

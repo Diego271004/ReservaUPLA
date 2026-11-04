@@ -26,7 +26,7 @@ function AvisoDisponibilidad({ aviso }) {
 export default function NuevaReservaPage() {
   const form = useReservaForm()
   const navigate = useNavigate()
-  const { valores, errores, enviando, reservaCreada } = form
+  const { enviando, reservaCreada } = form
 
   // Cierre del proceso (S4): confirma que se registró y propone el siguiente paso.
   if (reservaCreada) {
@@ -79,67 +79,25 @@ export default function NuevaReservaPage() {
     >
       {form.errorAmbientes && <AlertMessage tipo="error">{form.errorAmbientes}</AlertMessage>}
       <SelectInput
-        id="ambienteId"
-        nombre="ambienteId"
+        {...form.campoDeLista('ambienteId')}
         etiqueta={TEXTOS.etiquetaAmbiente}
-        valor={valores.ambienteId}
         opciones={form.opcionesAmbiente}
-        error={errores.ambienteId}
-        onChange={form.handleChange}
-        onBlur={form.handleBlur}
-        deshabilitado={enviando}
-        inputRef={form.refDe('ambienteId')}
       />
-      <DateInput
-        id="fecha"
-        nombre="fecha"
-        etiqueta={TEXTOS.etiquetaFecha}
-        valor={valores.fecha}
-        error={errores.fecha}
-        onChange={form.handleChange}
-        onBlur={form.handleBlur}
-        soloLectura={enviando}
-        inputRef={form.refDe('fecha')}
-      />
+      <DateInput {...form.campoDeTexto('fecha')} etiqueta={TEXTOS.etiquetaFecha} />
       <div className={estilos.horas}>
         <TimeInput
-          id="horaInicio"
-          nombre="horaInicio"
+          {...form.campoDeLista('horaInicio')}
           etiqueta={TEXTOS.etiquetaHoraInicio}
           horas={form.horasInicio}
-          valor={valores.horaInicio}
-          error={errores.horaInicio}
-          onChange={form.handleChange}
-          onBlur={form.handleBlur}
-          deshabilitado={enviando}
-          inputRef={form.refDe('horaInicio')}
         />
         <TimeInput
-          id="horaFin"
-          nombre="horaFin"
+          {...form.campoDeLista('horaFin')}
           etiqueta={TEXTOS.etiquetaHoraFin}
           horas={form.horasFin}
-          valor={valores.horaFin}
-          error={errores.horaFin}
-          onChange={form.handleChange}
-          onBlur={form.handleBlur}
-          deshabilitado={enviando}
-          inputRef={form.refDe('horaFin')}
         />
       </div>
       <p className={estilos.ayudaHorario}>{TEXTOS.ayudaHorario}</p>
-      <TextInput
-        id="motivo"
-        nombre="motivo"
-        etiqueta={TEXTOS.etiquetaMotivo}
-        valor={valores.motivo}
-        error={errores.motivo}
-        onChange={form.handleChange}
-        onBlur={form.handleBlur}
-        soloLectura={enviando}
-        multilinea
-        inputRef={form.refDe('motivo')}
-      />
+      <TextInput {...form.campoDeTexto('motivo')} etiqueta={TEXTOS.etiquetaMotivo} multilinea />
       <AvisoDisponibilidad aviso={form.disponibilidad} />
     </FormularioTarjeta>
   )

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { MENSAJES } from '../constants/messages.js'
 import { RESULTADO } from '../services/llamarApi.js'
+import { mensajeDeError } from '../services/mensajesDeResultado.js'
 
 /**
  * Carga una lista al abrir la pantalla. Devuelve { datos, cargando, error, recargar }.
@@ -14,12 +15,9 @@ export function useCarga(cargar) {
     const resultado = await cargar()
     if (resultado.tipo === RESULTADO.exito) {
       setEstado({ datos: resultado.data ?? [], cargando: false, error: null })
-    } else if (resultado.tipo === RESULTADO.sinPermiso) {
-      setEstado({ datos: [], cargando: false, error: MENSAJES.sinPermiso })
-    } else if (resultado.tipo === RESULTADO.errorConexion) {
-      setEstado({ datos: [], cargando: false, error: MENSAJES.errorConexion })
     } else {
-      setEstado({ datos: [], cargando: false, error: MENSAJES.errorServidor })
+      const error = mensajeDeError(resultado) ?? MENSAJES.errorServidor
+      setEstado({ datos: [], cargando: false, error })
     }
   }, [cargar])
 

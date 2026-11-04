@@ -1,16 +1,13 @@
 import { useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { MENSAJES } from '../constants/messages.js'
 import { crearUsuario } from '../services/recursosService.js'
 import { normalizarCorreo, validarUsuario } from '../utils/validators.js'
-import { useFormulario } from './useFormulario.js'
+import { useFormularioDeRegistro } from './useFormularioDeRegistro.js'
 
 export const RUTA_USUARIOS = '/usuarios'
 const VALORES_INICIALES = { nombreCompleto: '', correo: '', rol: '', activo: true, contrasena: '' }
 
 export function useUsuarioForm() {
-  const navigate = useNavigate()
-
   const enviar = useCallback(
     (valores, { signal }) =>
       crearUsuario(
@@ -26,17 +23,11 @@ export function useUsuarioForm() {
     [],
   )
 
-  const alExito = useCallback(
-    () => navigate(RUTA_USUARIOS, { state: { exito: MENSAJES.usuarioRegistrado } }),
-    [navigate],
-  )
-
-  const formulario = useFormulario({
+  return useFormularioDeRegistro({
     valoresIniciales: VALORES_INICIALES,
     validar: validarUsuario,
     enviar,
-    alExito,
+    rutaListado: RUTA_USUARIOS,
+    mensajeExito: MENSAJES.usuarioRegistrado,
   })
-
-  return { ...formulario, cancelar: () => navigate(RUTA_USUARIOS) }
 }
