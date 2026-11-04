@@ -34,21 +34,11 @@ public sealed class AuthController : ControllerBase
     [ProducesResponseType(typeof(MensajeResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MensajeResponse), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Login(
-        [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] LoginRequestDto? dto,
+        [CuerpoOpcional] LoginRequestDto? dto,
         CancellationToken cancellationToken)
     {
-        // Cuerpo vacío o JSON mal formado se tratan como campos ausentes: el usuario recibe los mensajes del validador.
-        var solicitud = ModelState.IsValid && dto is not null ? dto : new LoginRequestDto(null, null);
-
-        var resultado = await _authService.IniciarSesionAsync(solicitud, cancellationToken);
-
-        return resultado.Estado switch
-        {
-            EstadoAutenticacion.Exitoso => Ok(resultado.Respuesta),
-            EstadoAutenticacion.DatosInvalidos => ControllerBaseExtensions.DatosInvalidos(resultado.Errores),
-            EstadoAutenticacion.CredencialesInvalidas => Unauthorized(new MensajeResponse(resultado.Mensaje!)),
-            _ => throw new UnreachableException($"Estado de autenticación no contemplado: {resultado.Estado}"),
-        };
+        var solicitud = this.CuerpoOVacio(dto, new LoginRequestDto(null, null));
+        return this.Traducir(await _authService.IniciarSesionAsync(solicitud, cancellationToken));
     }
 
     [HttpGet("me")]

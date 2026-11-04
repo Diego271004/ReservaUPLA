@@ -27,11 +27,10 @@ public sealed class AmbientesController : ControllerBase
     [ProducesResponseType(typeof(AmbienteDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     public async Task<IActionResult> Crear(
-        [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] CrearAmbienteDto? dto,
+        [CuerpoOpcional] CrearAmbienteDto? dto,
         CancellationToken cancellationToken)
     {
-        var solicitud = ModelState.IsValid && dto is not null ? dto : new CrearAmbienteDto(null, null, null, null, null, null);
-        var resultado = await _ambientes.CrearAsync(solicitud, cancellationToken);
-        return this.Traducir(resultado, ambiente => StatusCode(StatusCodes.Status201Created, ambiente));
+        var solicitud = this.CuerpoOVacio(dto, new CrearAmbienteDto(null, null, null, null, null, null));
+        return this.Creado(await _ambientes.CrearAsync(solicitud, cancellationToken));
     }
 }

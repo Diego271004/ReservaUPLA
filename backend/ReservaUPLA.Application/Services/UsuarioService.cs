@@ -34,10 +34,9 @@ public sealed class UsuarioService : IUsuarioService
             Correo = CorreoHelper.Normalizar(dto.Correo),
         };
 
-        var validacion = await _validator.ValidateAsync(solicitud, cancellationToken);
-        if (!validacion.IsValid)
+        if (ResultadoOperacion<UsuarioDto>.SiNoEsValido(await _validator.ValidateAsync(solicitud, cancellationToken)) is { } invalido)
         {
-            return ResultadoOperacion<UsuarioDto>.DatosInvalidos(validacion.Errors.AgruparPorCampo());
+            return invalido;
         }
 
         if (await _usuarios.ObtenerPorCorreoAsync(solicitud.Correo!, cancellationToken) is not null)
