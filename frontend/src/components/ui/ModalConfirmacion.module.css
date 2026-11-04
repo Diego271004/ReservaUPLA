@@ -27,6 +27,12 @@
   color: var(--color-texto-suave);
 }
 
+.advertencia {
+  margin: 0 0 var(--espacio-2);
+  font-weight: 600;
+  color: var(--color-error);
+}
+
 .resumen p {
   margin: 4px 0;
 }

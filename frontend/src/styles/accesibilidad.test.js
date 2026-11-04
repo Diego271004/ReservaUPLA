@@ -140,3 +140,31 @@ describe('objetivos táctiles de 44 px', () => {
     )
   })
 })
+
+// ---------------------------------------------------------------- Separación de los botones del cierre de una reserva
+describe('cierre de Nueva reserva', () => {
+  it('los botones no quedan pegados', () => {
+    expect(regla(css('pages/NuevaReservaPage.module.css'), '.acciones')).toContain(
+      'gap: var(--espacio-1)',
+    )
+  })
+})
+
+// ---------------------------------------------------------------- Listados en móvil
+describe('listados en móvil', () => {
+  it('cada registro se separa del siguiente con una banda visible, no con una línea de 1 px', () => {
+    expect(css('components/ui/TableList.module.css')).toMatch(
+      /\.tabla tr \{[^}]*border-bottom: 8px solid var\(--color-fondo\)/,
+    )
+  })
+
+  it('el botón del encabezado de un listado puede partir su texto en lugar de salirse de la pantalla', () => {
+    expect(css('pages/ListadoPage.module.css')).not.toMatch(/white-space:\s*nowrap/)
+  })
+
+  it('el interruptor Activo pasa su texto a otra línea cuando no cabe', () => {
+    expect(regla(css('components/ui/InterruptorActivo.module.css'), '.grupo')).toContain(
+      'flex-wrap: wrap',
+    )
+  })
+})

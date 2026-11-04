@@ -59,8 +59,13 @@
     width: 100%;
   }
 
+  /* Cada registro es una tarjeta: la banda del color de la página lo separa del siguiente (una línea de 1 px no bastaba). */
   .tabla tr {
-    border-bottom: 1px solid var(--color-borde);
+    border-bottom: 8px solid var(--color-fondo);
+  }
+
+  .tabla tr:last-child {
+    border-bottom: 0;
   }
 
   .tabla td {

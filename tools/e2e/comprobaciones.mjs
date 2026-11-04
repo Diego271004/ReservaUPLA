@@ -25,10 +25,11 @@ export async function sinPalabrasPartidas(pagina, nombre) {
   else ok(`${nombre}: ninguna palabra de las tablas se parte a mitad`)
 }
 
-/** La separación entre campos consecutivos del formulario es la misma (±2 px). */
+/** La separación entre campos consecutivos del formulario es la misma (±2 px), contando la ayuda de cada campo como parte de él. */
 export async function separacionUniforme(pagina, ids, nombre) {
   const huecos = await pagina.evaluate((lista) => {
-    const caja = (id) => document.getElementById(id).getBoundingClientRect()
+    // Se mide desde el final del campo completo (control, ayuda y error): la ayuda es parte del campo, no un hueco.
+    const caja = (id) => (document.getElementById(id).closest('[class*="_campo_"]') ?? document.getElementById(id)).getBoundingClientRect()
     const etiqueta = (id) => document.querySelector(`label[for="${id}"]`).getBoundingClientRect()
     return lista.slice(0, -1).map((id, i) => Math.round(etiqueta(lista[i + 1]).top - caja(id).bottom))
   }, ids)

@@ -21,11 +21,13 @@ const MODALES = {
     titulo: TEXTOS.tituloModalRechazar,
     confirmar: TEXTOS.confirmarRechazar,
     variante: 'rechazo',
+    irreversible: true, // Rechazada es un estado final (RN-06)
   },
   cancelar: {
     titulo: TEXTOS.tituloModalCancelar,
     confirmar: TEXTOS.confirmarCancelar,
     variante: 'primario',
+    irreversible: true, // Cancelada es un estado final (RN-06)
   },
 }
 
@@ -106,6 +108,7 @@ export default function DetalleReservaPage() {
         abierto={modal !== null}
         titulo={modal?.titulo ?? ''}
         resumen={resumenDe(reserva)}
+        advertencia={modal?.irreversible ? TEXTOS.advertenciaIrreversible : undefined}
         textoConfirmar={modal?.confirmar ?? ''}
         variante={modal?.variante}
         cargando={vm.ejecutando}

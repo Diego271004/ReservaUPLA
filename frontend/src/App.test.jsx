@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MENSAJES } from './constants/messages.js'
+import { MENSAJES, TEXTOS } from './constants/messages.js'
 import { RESULTADO } from './services/llamarApi.js'
 import { listarAmbientes, listarUsuarios, obtenerReserva } from './services/recursosService.js'
 import { SESIONES, renderApp } from './test/utils.jsx'
@@ -135,6 +135,8 @@ describe('rutas protegidas por rol', () => {
     cleanup()
     await renderApp('/mi-ambiente', SESIONES.responsable)
     expect(screen.getByRole('heading', { name: 'Pantalla en construcción' })).toBeInTheDocument()
+    expect(screen.getByText(TEXTOS.textoEnConstruccion)).toBeInTheDocument()
+    expect(TEXTOS.textoEnConstruccion).not.toMatch(/fase/i) // lenguaje del usuario, no del proyecto
   })
 
   it.each(['administrador', 'solicitante', 'responsable'])(

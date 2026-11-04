@@ -1,5 +1,5 @@
 Compilando la API una vez…
-(node:43336) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(node:37872) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 
 ====================================================================================================
@@ -53,7 +53,7 @@ Fase 5 · entrada de datos (login, ambientes, usuarios, nueva reserva)
 
 == 375 px · Solicitante
    OK  04-nueva-reserva-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
-   OK  nueva reserva (375 px): separación uniforme entre campos (25, 25, 25 px)
+   OK  nueva reserva (375 px): separación uniforme entre campos (24, 24, 24 px)
    OK  05-nueva-reserva-errores-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
    OK  10-nueva-reserva-cierre-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
 
@@ -93,7 +93,7 @@ Fase 6 · validaciones (disponibilidad, aprobar, conflicto, rechazar, cancelar)
    OK  08-detalle-admin-pendiente-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
    OK  09-modal-aprobar-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
    OK  10-detalle-aprobada-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
-   OK  05g: "Reserva aprobada." y el historial muestra el evento: Reserva aprobada por Carla Rojas, 04/11/2026 10:56
+   OK  05g: "Reserva aprobada." y el historial muestra el evento: Reserva aprobada por Carla Rojas, 04/11/2026 11:42
 
 == Escritorio · Carla intenta aprobar la reserva B, que se cruza con la A (RN-01)
    OK  la reserva B sigue Pendiente tras el conflicto
@@ -189,7 +189,7 @@ Fase 7 · ayuda del ambiente y RN-07
 Resultado: todo correcto
 
 ====================================================================================================
-RESUMEN (79 s, 2026-11-04)
+RESUMEN (91 s, 2026-11-04)
 ====================================================================================================
   OK     Fase 5 · entrada de datos (login, ambientes, usuarios, nueva reserva)
   OK     Fase 6 · validaciones (disponibilidad, aprobar, conflicto, rechazar, cancelar)

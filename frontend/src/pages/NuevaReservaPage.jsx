@@ -61,7 +61,7 @@ export default function NuevaReservaPage() {
             <Button variante="secundario" onClick={() => navigate(`/reservas/${reservaCreada.id}`)}>
               {TEXTOS.verDetalle}
             </Button>
-            <Button onClick={form.registrarOtra}>{TEXTOS.tituloNuevaReserva}</Button>
+            <Button onClick={form.registrarOtra}>{TEXTOS.registrarOtra}</Button>
           </div>
         </section>
       </>
@@ -84,7 +84,11 @@ export default function NuevaReservaPage() {
         opciones={form.opcionesAmbiente}
         ayuda={form.ayudaAmbiente}
       />
-      <DateInput {...form.campoDeTexto('fecha')} etiqueta={TEXTOS.etiquetaFecha} />
+      <DateInput
+        {...form.campoDeTexto('fecha')}
+        etiqueta={TEXTOS.etiquetaFecha}
+        ayuda={TEXTOS.ayudaFecha}
+      />
       <div className={estilos.horas}>
         <TimeInput
           {...form.campoDeLista('horaInicio')}
@@ -98,8 +102,8 @@ export default function NuevaReservaPage() {
         />
       </div>
       <p className={estilos.ayudaHorario}>{TEXTOS.ayudaHorario}</p>
-      <TextInput {...form.campoDeTexto('motivo')} etiqueta={TEXTOS.etiquetaMotivo} multilinea />
       <AvisoDisponibilidad aviso={form.disponibilidad} />
+      <TextInput {...form.campoDeTexto('motivo')} etiqueta={TEXTOS.etiquetaMotivo} multilinea />
     </FormularioTarjeta>
   )
 }
