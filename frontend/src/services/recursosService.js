@@ -1,3 +1,4 @@
+import { consultaDeFiltros } from '../utils/filtrosDeReservas.js'
 import { llamarApi } from './llamarApi.js'
 
 // Usuarios (solo Administrador)
@@ -14,6 +15,25 @@ export const crearAmbiente = (ambiente, { signal } = {}) =>
   llamarApi('/ambientes', { method: 'POST', body: ambiente, signal })
 
 // Reservas
+/**
+ * La lista de Reservas de quien consulta (cada rol ve lo suyo), con filtros y página.
+ * `filtros`: { estado, ambienteId, desde, hasta (dd/mm/aaaa), pagina }. Devuelve { elementos, total, pagina, tamano }.
+ */
+export const listarReservas = (filtros = {}) => {
+  const consulta = consultaDeFiltros(filtros).toString()
+  return llamarApi(consulta ? `/reservas?${consulta}` : '/reservas')
+}
+
+// Dashboard (solo Administrador) y Mi ambiente (solo Responsable)
+export const obtenerDashboard = () => llamarApi('/dashboard')
+
+export const obtenerMiAmbiente = ({ ambienteId, pagina } = {}) => {
+  const consulta = new URLSearchParams()
+  if (ambienteId) consulta.set('ambienteId', String(ambienteId))
+  if (pagina > 1) consulta.set('pagina', String(pagina))
+  return llamarApi(consulta.size > 0 ? `/mi-ambiente?${consulta}` : '/mi-ambiente')
+}
+
 export const obtenerReserva = (id) => llamarApi(`/reservas/${id}`)
 
 /** Aviso inmediato de disponibilidad. { ambienteId, fecha (aaaa-mm-dd), horaInicio, horaFin } */

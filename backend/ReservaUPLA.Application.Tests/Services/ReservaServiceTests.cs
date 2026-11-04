@@ -253,15 +253,4 @@ public class ReservaServiceTests
         Assert.Equal("Horario ocupado.", resultado.Errores[CamposFormulario.HoraInicio][0]);
         Assert.Empty(_escenario.Reservas.Reservas);
     }
-
-    [Theory]
-    [InlineData(RolUsuario.Administrador, null, null)]
-    [InlineData(RolUsuario.Solicitante, 7, null)]
-    [InlineData(RolUsuario.Responsable, null, 7)]
-    public async Task Listar_aplica_el_filtro_del_rol(RolUsuario rol, int? usuarioEsperado, int? responsableEsperado)
-    {
-        await _escenario.CrearServicio().ListarAsync(7, rol, CancellationToken.None);
-
-        Assert.Equal(new FiltroReservas(usuarioEsperado, responsableEsperado), _escenario.Reservas.UltimoFiltro);
-    }
 }

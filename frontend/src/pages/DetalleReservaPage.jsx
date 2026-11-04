@@ -1,48 +1,20 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import DetalleReserva from '../components/DetalleReserva/DetalleReserva.jsx'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
 import Button from '../components/ui/Button.jsx'
-import ModalConfirmacion from '../components/ui/ModalConfirmacion.jsx'
+import ModalDeReserva from '../components/ModalDeReserva/ModalDeReserva.jsx'
 import { TEXTOS } from '../constants/messages.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { ESTADOS_PAGINA, useDetalleReserva } from '../hooks/useDetalleReserva.js'
-import { isoAFecha } from '../utils/fechas.js'
 import { accionesDeReserva, textoDeEvento } from '../utils/reservas.js'
 import estilos from './DetalleReservaPage.module.css'
 
-// Qué pide cada modal de confirmación (pantallas 05b, 05d y 05e).
-const MODALES = {
-  aprobar: {
-    titulo: TEXTOS.tituloModalAprobar,
-    confirmar: TEXTOS.confirmarAprobar,
-    variante: 'primario',
-  },
-  rechazar: {
-    titulo: TEXTOS.tituloModalRechazar,
-    confirmar: TEXTOS.confirmarRechazar,
-    variante: 'rechazo',
-    irreversible: true, // Rechazada es un estado final (RN-06)
-  },
-  cancelar: {
-    titulo: TEXTOS.tituloModalCancelar,
-    confirmar: TEXTOS.confirmarCancelar,
-    variante: 'primario',
-    irreversible: true, // Cancelada es un estado final (RN-06)
-  },
-}
-
 const VARIANTE_DE_BOTON = { cancelar: 'secundario', rechazar: 'rechazar', aprobar: 'primario' }
-
-function resumenDe(reserva) {
-  return [
-    `Ambiente: ${reserva.ambienteNombre}`,
-    `Solicitante: ${reserva.solicitanteNombre}`,
-    `Horario: ${isoAFecha(reserva.fecha)}, ${reserva.horaInicio} – ${reserva.horaFin}`,
-  ]
-}
 
 export default function DetalleReservaPage() {
   const { id } = useParams()
+  // «Volver a Reservas» regresa a la lista de donde se vino, con sus filtros y su página.
+  const volverA = useLocation().state?.volverA ?? '/reservas'
   const { sesion } = useAuth()
   const vm = useDetalleReserva(id)
 
@@ -52,7 +24,7 @@ export default function DetalleReservaPage() {
     return (
       <>
         <h1>{TEXTOS.reservaNoEncontrada}</h1>
-        <Link to="/reservas">Volver a Reservas</Link>
+        <Link to={volverA}>Volver a Reservas</Link>
       </>
     )
   }
@@ -70,12 +42,12 @@ export default function DetalleReservaPage() {
 
   const { reserva, historial } = vm.detalle
   const { acciones, aviso } = accionesDeReserva(sesion, reserva)
-  const modal = vm.modal ? MODALES[vm.modal] : null
 
   return (
     <>
       <DetalleReserva
         reserva={reserva}
+        volverA={volverA}
         historial={historial.map((evento) => ({ id: evento.id, texto: textoDeEvento(evento) }))}
         alerta={
           <>
@@ -104,16 +76,12 @@ export default function DetalleReservaPage() {
           ) : null
         }
       />
-      <ModalConfirmacion
-        abierto={modal !== null}
-        titulo={modal?.titulo ?? ''}
-        resumen={resumenDe(reserva)}
-        advertencia={modal?.irreversible ? TEXTOS.advertenciaIrreversible : undefined}
-        textoConfirmar={modal?.confirmar ?? ''}
-        variante={modal?.variante}
-        cargando={vm.ejecutando}
-        onConfirmar={vm.confirmar}
-        onVolver={vm.cerrarModal}
+      <ModalDeReserva
+        accion={vm.modal}
+        reserva={reserva}
+        ejecutando={vm.ejecutando}
+        alConfirmar={vm.confirmar}
+        alVolver={vm.cerrarModal}
       />
     </>
   )

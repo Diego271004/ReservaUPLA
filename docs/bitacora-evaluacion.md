@@ -126,6 +126,43 @@ Errores de mis herramientas (no del producto):
 ### Finales de línea
 `dotnet format --verify-no-changes` salía con código 2 de forma intermitente: `.gitattributes` deja los `.cs` en LF pero, sin `.editorconfig`, el formateador esperaba CRLF en Windows. Se fijó `end_of_line = lf` en un `.editorconfig` en la raíz (y `*.cs`, `*.csproj` y `.editorconfig` como `eol=lf` en `.gitattributes`). Comprobado: tres ejecuciones seguidas de `dotnet format --verify-no-changes` salen con código 0.
 
+## Fase 9 — Salida de datos: Reservas, Dashboard y Mi ambiente (2026-11-04)
+
+Backend: `GET /api/reservas` (filtros, orden por fecha, páginas de 10 con total), `GET /api/dashboard` y `GET /api/mi-ambiente`. Frontend: tres pantallas y los componentes `Paginacion`, `FiltrosDeReservas` y `AvisoDeError`; `CardIndicador` se usa por fin. Cierra H01 y H02.
+
+### Defectos hallados y corregidos
+| # | Defecto | Cómo se encontró | Corrección | Prueba |
+|---|---|---|---|---|
+| 39 | **Un bucle infinito en `useCarga`** (mi cambio): el valor inicial por omisión era un `[]` nuevo en cada render y la carga se repetía sin fin; las pruebas se colgaban. | La batería de Vitest no terminaba. | Constante `LISTA_VACIA` fuera del hook. | Toda la batería (667 pruebas) |
+| 40 | **El nombre del «Ambiente más utilizado» se salía de su tarjeta** en el Dashboard (letra de número, 32 px). H25, severidad 3. | Captura real del Dashboard. | `valorTexto`: 20 px y las palabras largas parten línea. | `acciones.test.jsx`, `accesibilidad.test.js` |
+| 41 | **Los tres botones de cada fila del Dashboard se partían en dos filas.** H26. | La misma captura. | `flex-wrap: nowrap` en escritorio; apilados con 44 px en móvil. | `accesibilidad.test.js` |
+| 42 | El pie «Mostrando N de N» sin margen inferior. H27. | Captura de Reservas a 375 px. | Margen por todos lados. | `accesibilidad.test.js` |
+
+Pruebas de coherencia con la base real (`ListadoYPanelesConBaseRealTests`, 9 pruebas): total, pendientes, aprobadas, rechazadas, **empate** de «ambiente más utilizado», las 5 pendientes más antiguas y los indicadores de Mi ambiente se comparan con consultas SQL directas; cada rol y cada filtro, el orden y la paginación también. **Todas coincidieron.** Se comprobó que las pruebas detectan errores rompiendo a propósito el alcance del Responsable y el desempate: fallaron 2.
+
+Errores de mis guiones (no del producto): `fase9.mjs` creaba pendientes de relleno antes del flujo y la solicitud nueva quedaba fuera de las 5 más antiguas; un selector ambiguo («2 reservas aprobadas» coincidía con «Reservas aprobadas»); un patrón mal escapado en una plantilla; y no contaba con que Mario, responsable de tres ambientes, ve primero el Auditorio en Mi ambiente (H29). Además, varios comandos con heredocs largos fallaron en la terminal y dejaron archivos vacíos con nombres raros que se borraron.
+
+### Ajustes posteriores a la revisión de la Fase 9 (hallazgos H28, H30 y H31)
+| # | Defecto | Corrección | Prueba y captura |
+|---|---|---|---|
+| 43 | **H30:** el total de reservas incluye las Canceladas y no suma con las otras tarjetas. | La tarjeta «Total de reservas» muestra «Incluye canceladas» (Dashboard y Mi ambiente). | `DashboardPage.test.jsx`, `MiAmbientePage.test.jsx`, `indicadores.test.js` (en rojo antes de implementar); captura `fase9/estados/60-dashboard-escritorio` |
+| 44 | **H28:** en 375 px los filtros ocupaban toda la pantalla antes de la primera fila. | Botón «Filtros» (`Button` compartido, `aria-expanded`, `aria-controls`, con el número de filtros aplicados) que pliega los filtros solo en móvil; en escritorio siguen visibles. | 8 pruebas nuevas en `ReservasPage.test.jsx` (por estado y de teclado), `accesibilidad.test.js`; captura `fase9/estados/63-reservas-administrador-movil` |
+| 45 | **H31:** «Ver detalle» partía su texto en dos líneas en el Dashboard. | `white-space: nowrap` en los botones de la fila. | `accesibilidad.test.js`; captura `fase9/estados/60-dashboard-escritorio` |
+
+Los tres cerraron **solo después de mirar la imagen nueva**. Los guiones e2e (`fase9.mjs` y `estados.mjs`) se adaptaron al botón «Filtros» (`abrirFiltros` en `lib.mjs`) y a que la tarjeta del total ahora lleva más texto.
+
+**Excepción de método (TDD en el backend de la Fase 9).** Las pruebas del backend de esta fase (`ConsultaServiceTests` y `ListadoYPanelesConBaseRealTests`) se escribieron **antes** que el código, pero **no se observó su corrida en rojo** antes de implementar. Compensación: se rompió a propósito el alcance del Responsable y el desempate de «ambiente más utilizado» y fallaron 2 pruebas. **Desde aquí, también en el backend, se confirma el rojo antes de implementar.**
+
+### Decisiones de la Fase 9 (tomadas al construirla)
+| Tema | Decisión | Por qué |
+|---|---|---|
+| Orden y páginas | Reservas ordenadas por fecha y hora (ascendente), 10 por página, con `total`; el Dashboard ordena las pendientes por antigüedad de la solicitud (fecha de creación). | «Pendientes más antiguas» es la solicitud más vieja, no la fecha de la reserva. |
+| Filtros y página | Viven en la dirección (`?estado=Pendiente&pagina=2`); «Volver a Reservas» del detalle regresa a la misma lista. | Atrás/adelante y enlaces compartibles; cumple lo pedido sin estado oculto. |
+| Total de reservas | Cuenta todas, incluidas las Canceladas. | Es lo que dice «total»; queda como H30 para revisar con usuarios. |
+| Mi ambiente con varios ambientes | El Responsable puede estar a cargo de varios (así está la semilla): la pantalla abre el primero por nombre y ofrece una lista; pedir uno ajeno da 404. Los cuatro indicadores son la extensión del diseño 08 que decidió el planificador. | El modelo permite varios; no se podía suponer uno. Marcado como H29. |
+| Mensajes nuevos | `EstadoFiltroInvalido`, `RangoDeFechasInvalido` y `PaginaInvalida` en `MensajesValidacion` y `messages.js` (la prueba de paridad los vigila). | Mismos textos en los dos lados. |
+| Pantalla inicial | El Administrador aterriza en el Dashboard. | Pedido de la fase. |
+
 ## Decisiones y diferencias con el diseño
 | Tema | Diseño v2 | Lo construido | Por qué |
 |---|---|---|---|

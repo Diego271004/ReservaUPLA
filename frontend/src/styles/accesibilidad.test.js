@@ -168,3 +168,36 @@ describe('listados en móvil', () => {
     )
   })
 })
+
+// ---------------------------------------------------------------- Pantallas de la Fase 9 (defectos vistos en las capturas reales)
+describe('Dashboard, Reservas y Mi ambiente', () => {
+  it('un valor de texto de una tarjeta (el nombre de un ambiente) es más chico que un número y parte las palabras largas', () => {
+    const regla1 = regla(css('components/ui/CardIndicador.module.css'), '.valorTexto')
+    expect(regla1).toContain('font-size: 1.25rem')
+    expect(regla1).toContain('overflow-wrap: anywhere')
+  })
+
+  it('los tres botones de cada fila del Dashboard no se parten en dos líneas en escritorio', () => {
+    expect(regla(css('pages/DashboardPage.module.css'), '.acciones')).toContain('flex-wrap: nowrap')
+  })
+
+  it('el pie «Mostrando N de N» tiene margen por todos lados', () => {
+    expect(regla(css('components/PieDeLista/PieDeLista.module.css'), '.resumen')).toMatch(
+      /padding: var\(--espacio-2\)(;|$)/,
+    )
+  })
+
+  it('el botón «Filtros» solo se ve en móvil y el panel plegado solo se oculta en móvil (en escritorio los filtros siempre están a la vista)', () => {
+    const filtros = css('components/FiltrosDeReservas/FiltrosDeReservas.module.css')
+    expect(regla(filtros, '.alternar')).toContain('display: none')
+    expect(regla(filtros, '.alternar', '@media (max-width: 767px)')).toContain('display: block')
+    expect(regla(filtros, '.cerrado', '@media (max-width: 767px)')).toContain('display: none')
+    expect(filtros.slice(0, filtros.indexOf('@media'))).not.toMatch(/\.cerrado/)
+  })
+
+  it('«Ver detalle», «Rechazar» y «Aprobar» del Dashboard no parten su texto', () => {
+    expect(regla(css('pages/DashboardPage.module.css'), '.acciones > *')).toContain(
+      'white-space: nowrap',
+    )
+  })
+})

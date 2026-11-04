@@ -1,0 +1,38 @@
+.ambiente {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: var(--espacio-3);
+  margin-bottom: var(--espacio-3);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.ambiente h2 {
+  margin: 0 0 var(--espacio-1);
+}
+
+.ambiente p {
+  margin: 0;
+  color: var(--color-texto-suave);
+}
+
+.ambiente strong {
+  color: var(--color-marino);
+}
+
+.separador {
+  display: inline-block;
+  width: var(--espacio-3);
+}
+
+.ambiente > :last-child:not(div:first-child) {
+  min-width: 240px;
+}
+
+.uso {
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}

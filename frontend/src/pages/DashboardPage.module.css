@@ -1,0 +1,54 @@
+.pendientes {
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--espacio-1);
+  justify-content: flex-end;
+}
+
+/* Ningún botón parte su texto en dos líneas: la tabla le cede el ancho. */
+.acciones > * {
+  white-space: nowrap;
+}
+
+.pie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--espacio-2);
+  color: var(--color-texto-suave);
+}
+
+.pie p {
+  margin: 0;
+}
+
+.verTodas {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alto-control);
+  font-weight: 600;
+  color: var(--color-primario);
+  text-decoration: none;
+}
+
+.verTodas:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 767px) {
+  .acciones {
+    flex-wrap: wrap;
+    flex-direction: column;
+  }
+
+  .acciones > * {
+    width: 100%;
+  }
+}

@@ -23,7 +23,7 @@ public sealed class ReservaRepository : IReservaRepository
             .Include(reserva => reserva.Historial)
             .FirstOrDefaultAsync(reserva => reserva.Id == id, cancellationToken);
 
-    public async Task<IReadOnlyList<ReservaDto>> ListarAsync(FiltroReservas filtro, CancellationToken cancellationToken)
+    public async Task<PaginaDeReservasDto> ListarAsync(FiltroReservas filtro, CancellationToken cancellationToken)
     {
         var consulta =
             from reserva in _contexto.Reservas.AsNoTracking()
@@ -31,6 +31,7 @@ public sealed class ReservaRepository : IReservaRepository
             join solicitante in _contexto.Usuarios.AsNoTracking() on reserva.UsuarioId equals solicitante.Id
             select new { reserva, ambiente, solicitante };
 
+        // El alcance del rol y los filtros se aplican en la base: lo que no le corresponde al rol nunca sale de ella.
         if (filtro.UsuarioId is { } usuarioId)
         {
             consulta = consulta.Where(fila => fila.reserva.UsuarioId == usuarioId);
@@ -41,14 +42,86 @@ public sealed class ReservaRepository : IReservaRepository
             consulta = consulta.Where(fila => fila.ambiente.ResponsableId == responsableId);
         }
 
-        var filas = await consulta
-            .OrderByDescending(fila => fila.reserva.Fecha)
-            .ThenBy(fila => fila.reserva.HoraInicio)
+        if (filtro.Estado is { } estado)
+        {
+            consulta = consulta.Where(fila => fila.reserva.Estado == estado);
+        }
+
+        if (filtro.AmbienteId is { } ambienteId)
+        {
+            consulta = consulta.Where(fila => fila.reserva.AmbienteId == ambienteId);
+        }
+
+        if (filtro.Desde is { } desde)
+        {
+            consulta = consulta.Where(fila => fila.reserva.Fecha >= desde);
+        }
+
+        if (filtro.Hasta is { } hasta)
+        {
+            consulta = consulta.Where(fila => fila.reserva.Fecha <= hasta);
+        }
+
+        var total = await consulta.CountAsync(cancellationToken);
+
+        var ordenada = filtro.Orden == OrdenReservas.PorAntiguedad
+            ? consulta.OrderBy(fila => fila.reserva.FechaCreacion).ThenBy(fila => fila.reserva.Id)
+            : consulta.OrderBy(fila => fila.reserva.Fecha).ThenBy(fila => fila.reserva.HoraInicio).ThenBy(fila => fila.reserva.Id);
+
+        var filas = await ordenada
+            .Skip((filtro.Pagina - 1) * filtro.Tamano)
+            .Take(filtro.Tamano)
             .ToListAsync(cancellationToken);
 
-        return filas
+        var elementos = filas
             .Select(fila => fila.reserva.ADto(fila.ambiente.Nombre, fila.solicitante.NombreCompleto))
             .ToList();
+        return new PaginaDeReservasDto(elementos, total, filtro.Pagina, filtro.Tamano);
+    }
+
+    public async Task<IndicadoresDto> ContarAsync(int? ambienteId, CancellationToken cancellationToken)
+    {
+        var consulta = _contexto.Reservas.AsNoTracking();
+        if (ambienteId is { } id)
+        {
+            consulta = consulta.Where(reserva => reserva.AmbienteId == id);
+        }
+
+        var porEstado = await consulta
+            .GroupBy(reserva => reserva.Estado)
+            .Select(grupo => new { Estado = grupo.Key, Cantidad = grupo.Count() })
+            .ToListAsync(cancellationToken);
+
+        int De(EstadoReserva estado) => porEstado.FirstOrDefault(fila => fila.Estado == estado)?.Cantidad ?? 0;
+        return new IndicadoresDto(
+            Total: porEstado.Sum(fila => fila.Cantidad),
+            Pendientes: De(EstadoReserva.Pendiente),
+            Aprobadas: De(EstadoReserva.Aprobada),
+            Rechazadas: De(EstadoReserva.Rechazada));
+    }
+
+    public async Task<IReadOnlyList<AmbienteUsoDto>> AmbientesMasUtilizadosAsync(CancellationToken cancellationToken)
+    {
+        var aprobadas = await _contexto.Reservas.AsNoTracking()
+            .Where(reserva => reserva.Estado == EstadoReserva.Aprobada)
+            .GroupBy(reserva => reserva.AmbienteId)
+            .Select(grupo => new { AmbienteId = grupo.Key, Cantidad = grupo.Count() })
+            .ToListAsync(cancellationToken);
+
+        if (aprobadas.Count == 0)
+        {
+            return [];
+        }
+
+        // Si dos ambientes empatan en el máximo, salen los dos.
+        var maximo = aprobadas.Max(fila => fila.Cantidad);
+        var empatados = aprobadas.Where(fila => fila.Cantidad == maximo).Select(fila => fila.AmbienteId).ToList();
+
+        return await _contexto.Ambientes.AsNoTracking()
+            .Where(ambiente => empatados.Contains(ambiente.Id))
+            .OrderBy(ambiente => ambiente.Nombre)
+            .Select(ambiente => new AmbienteUsoDto(ambiente.Id, ambiente.Nombre, maximo))
+            .ToListAsync(cancellationToken);
     }
 
     // Dos rangos se cruzan si cada uno empieza antes de que termine el otro (extremos que se tocan no cuentan).

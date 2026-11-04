@@ -82,6 +82,12 @@ npm run dev
 
 Abre `http://localhost:5180` (puerto fijo: si estuviera ocupado, Vite avisa con un error en lugar de cambiar de puerto; CORS solo permite ese origen, configurable en `Cors:OrigenesPermitidos`). El frontend reenvía `/api` a `http://localhost:5263`; si la API usa otra dirección, define `VITE_API_URL` antes de `npm run dev`.
 
+### Qué hay en la Fase 9
+- **Reservas** (`/reservas`): lista con filtros (Estado, Ambiente, fecha desde y hasta), páginas de 10 con «Anterior» deshabilitado en la primera, estado vacío con «Limpiar filtros» y tarjetas apiladas en móvil (donde los filtros se pliegan detrás del botón «Filtros (n)»). Cada rol ve lo suyo. **Dashboard** (`/dashboard`, Administrador): cinco indicadores, las 5 pendientes más antiguas con Aprobar y Rechazar (con modal), «Mostrando 5 de N» y «Ver todas». **Mi ambiente** (`/mi-ambiente`, Responsable): su ambiente, cuatro indicadores y sus reservas, solo lectura.
+- **Endpoints nuevos:** `GET /api/reservas?estado=&ambienteId=&desde=&hasta=&pagina=` (devuelve `{ elementos, total, pagina, tamano }`), `GET /api/dashboard` y `GET /api/mi-ambiente?ambienteId=&pagina=`.
+- **Pruebas con la base real:** `ListadoYPanelesConBaseRealTests` compara cada indicador con una consulta SQL directa (variables `RESERVAUPLA_PRUEBAS_BD_*`, ver «Pruebas»).
+- **e2e:** `npm run fase9` en `tools/e2e` (flujo completo, capturas en `docs/evidencias/fase9/`); `npm run todo` ejecuta las fases 5, 6, 7 y 9. Accesibilidad de todas las pantallas: `ETAPA=fase9 node accesibilidad.mjs` en `tools/usabilidad` (`docs/evidencias/fase9-accesibilidad.txt`).
+
 ### Qué hay en la Fase 8
 - **Evaluación de usabilidad del sistema construido** (`docs/usabilidad/`): `contexto-de-uso.md` (personas como hipótesis, tareas T01 a T10, mapa de navegación en Mermaid), `evaluacion-sistema.md` (24 hallazgos con severidad y captura), `matriz-principios-final.md`, `cambios-evaluacion-a-final.md` (antes y después) y `plan-prueba-usuarios.md` (la prueba con personas **no está hecha**: ver el plan y qué le toca al estudiante).
 - **Accesibilidad medida** (`tools/usabilidad/`, informes en `docs/evidencias/fase8-accesibilidad*.txt`): axe-core en todas las pantallas y estados a 1280 px y 375 px, contraste WCAG de los tokens, objetivos táctiles, orden de Tab y foco visible, zoom 200 %/reflujo y movimiento reducido.

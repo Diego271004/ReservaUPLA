@@ -5,6 +5,7 @@
 //   PGPASSWORD="<clave de postgres>" CLAVE_PRUEBA="<clave de los usuarios de prueba>" ETAPA=antes node accesibilidad.mjs
 // ETAPA=antes   → docs/evidencias/fase8-accesibilidad-antes.txt y capturas en docs/evidencias/fase8/antes/
 // ETAPA=despues → docs/evidencias/fase8-accesibilidad.txt (informe final) y capturas en docs/evidencias/fase8/despues/
+// ETAPA=fase9   → docs/evidencias/fase9-accesibilidad.txt y capturas en docs/evidencias/fase9/estados/ (con las pantallas de la Fase 9)
 // Arranca la base, la API y el frontend por su cuenta (puertos 5263 y 5180 libres).
 import { createRequire } from 'node:module'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -16,9 +17,14 @@ import { recorrer } from './estados.mjs'
 
 const requerir = createRequire(import.meta.url)
 const RUTA_AXE = requerir.resolve('axe-core/axe.min.js')
-const ETAPA = process.env.ETAPA === 'despues' ? 'despues' : 'antes'
-const CAPTURAS = resolve(RAIZ, 'docs', 'evidencias', 'fase8', ETAPA)
-const INFORME = resolve(RAIZ, 'docs', 'evidencias', ETAPA === 'despues' ? 'fase8-accesibilidad.txt' : 'fase8-accesibilidad-antes.txt')
+const ETAPA = ['antes', 'despues', 'fase9'].includes(process.env.ETAPA) ? process.env.ETAPA : 'antes'
+const CAPTURAS = ETAPA === 'fase9' ? resolve(RAIZ, 'docs', 'evidencias', 'fase9', 'estados') : resolve(RAIZ, 'docs', 'evidencias', 'fase8', ETAPA)
+const INFORME = resolve(
+  RAIZ,
+  'docs',
+  'evidencias',
+  { antes: 'fase8-accesibilidad-antes.txt', despues: 'fase8-accesibilidad.txt', fase9: 'fase9-accesibilidad.txt' }[ETAPA],
+)
 const ETIQUETAS_AXE = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice']
 const MINIMO_TACTIL = 44
 
@@ -124,6 +130,9 @@ const RUTAS_ZOOM = [
   ['/ambientes/nuevo', 'carla'],
   ['/usuarios', 'carla'],
   ['/usuarios/nuevo', 'carla'],
+  ['/dashboard', 'carla'],
+  ['/reservas', 'carla'],
+  ['/mi-ambiente', 'mario'],
 ]
 
 async function controlDeAxe(navegador) {
@@ -139,10 +148,14 @@ async function extras(navegador) {
   const control = await controlDeAxe(navegador)
   await reiniciarBaseYApi()
   const sesiones = {}
-  for (const [rol, correo] of [['ana', 'ana.torres@upla.edu.pe'], ['carla', 'carla.rojas@upla.edu.pe']]) {
+  for (const [rol, correo] of [
+    ['ana', 'ana.torres@upla.edu.pe'],
+    ['carla', 'carla.rojas@upla.edu.pe'],
+    ['mario', 'mario.huaman@upla.edu.pe'],
+  ]) {
     const pagina = await nuevaPagina(navegador, 'escritorio')
     await iniciarSesion(pagina, correo)
-    await pagina.waitForURL(/\/(reservas\/nueva|ambientes)$/)
+    await pagina.waitForURL(/\/(reservas\/nueva|dashboard|mi-ambiente)$/)
     sesiones[rol] = await leerSesion(pagina)
     await pagina.context().close()
   }

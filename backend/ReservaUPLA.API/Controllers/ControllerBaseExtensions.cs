@@ -16,6 +16,7 @@ public static class Roles
 {
     public const string Administrador = nameof(RolUsuario.Administrador);
     public const string Solicitante = nameof(RolUsuario.Solicitante);
+    public const string Responsable = nameof(RolUsuario.Responsable);
     public const string AdministradorOSolicitante = Administrador + "," + Solicitante;
 }
 

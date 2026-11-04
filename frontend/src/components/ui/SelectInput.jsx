@@ -6,7 +6,7 @@ import estilos from './SelectInput.module.css'
 /**
  * Lista cerrada (el usuario solo puede elegir una opción de la lista). Vacío muestra "Selecciona…" y la
  * flecha siempre es visible. `opciones`: [{ valor, etiqueta, deshabilitada }]. `icono` cambia la flecha
- * por otro icono (TimeInput usa el reloj).
+ * por otro icono (TimeInput usa el reloj). Con `textoVacio={null}` no hay opción vacía (siempre hay una elegida).
  */
 export default function SelectInput({
   id,
@@ -42,7 +42,7 @@ export default function SelectInput({
           onBlur={onBlur}
           disabled={deshabilitado}
         >
-          <option value="">{textoVacio}</option>
+          {textoVacio !== null && <option value="">{textoVacio}</option>}
           {opciones.map((opcion) => (
             <option key={opcion.valor} value={opcion.valor} disabled={opcion.deshabilitada}>
               {opcion.etiqueta}

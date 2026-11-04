@@ -1,0 +1,46 @@
+.filtros {
+  padding: var(--espacio-3);
+  margin-bottom: var(--espacio-3);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0 var(--espacio-2); /* cada campo ya trae su margen inferior */
+}
+
+.acciones {
+  display: flex;
+  gap: var(--espacio-1);
+  justify-content: flex-end;
+}
+
+/* El botón «Filtros» solo existe en móvil: en escritorio los filtros siempre están a la vista. */
+.alternar {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .alternar {
+    display: block;
+    margin-bottom: var(--espacio-2);
+  }
+
+  .alternar > * {
+    width: 100%;
+  }
+
+  .cerrado {
+    display: none;
+  }
+
+  .acciones {
+    flex-direction: column-reverse; /* el primario arriba, como en los formularios */
+  }
+
+  .acciones > * {
+    width: 100%;
+  }
+}

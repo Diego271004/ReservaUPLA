@@ -4,8 +4,8 @@ Cada hallazgo de `evaluacion-sistema.md` con su captura **antes** (`docs/evidenc
 
 | Id | Antes (captura) | Después (captura) | Estado | Principio |
 |---|---|---|---|---|
-| **H01** | [50-dashboard-en-construccion](../evidencias/fase8/antes/50-dashboard-en-construccion-escritorio.png) | [50-dashboard-en-construccion](../evidencias/fase8/despues/50-dashboard-en-construccion-escritorio.png) | **Abierto**: la lista de Reservas es la Fase 9; la imagen nueva sigue mostrando la pantalla en construcción. | N1, N3, N6 |
-| **H02** | [41-mi-ambiente](../evidencias/fase8/antes/41-mi-ambiente-en-construccion-escritorio.png) | [41-mi-ambiente](../evidencias/fase8/despues/41-mi-ambiente-en-construccion-escritorio.png) | **Abierto**: Mi ambiente es la Fase 9 (solo cambió el texto, ver H06). | N1, N2 |
+| **H01** | [50-dashboard-en-construccion](../evidencias/fase8/antes/50-dashboard-en-construccion-escritorio.png) | [03-dashboard-tras-aprobar](../evidencias/fase9/03-dashboard-tras-aprobar-escritorio.png) | **Cerrado (Fase 9)**: la lista de Reservas y el Dashboard existen; «Volver a Reservas» conserva filtro y página. El e2e `fase9.mjs` lo recorre. | N1, N3, N6 |
+| **H02** | [41-mi-ambiente](../evidencias/fase8/antes/41-mi-ambiente-en-construccion-escritorio.png) | [05-mi-ambiente](../evidencias/fase9/05-mi-ambiente-escritorio.png) | **Cerrado (Fase 9)** con la salvedad H29 (varios ambientes). | N1, N2 |
 | **H03** | [28-modal-cancelar](../evidencias/fase8/antes/28-detalle-modal-cancelar-escritorio.png) | [34-modal-rechazar](../evidencias/fase8/despues/34-detalle-modal-rechazar-escritorio.png) | **Cerrado**: la imagen nueva muestra «Esta acción no se puede deshacer.» en el modal de rechazar (el de cancelar lleva la misma advertencia, comprobada por prueba). | N5, N9, S6 |
 | **H04** | [20-nueva-reserva-vacia](../evidencias/fase8/antes/20-nueva-reserva-vacia-escritorio.png) | [20-nueva-reserva-vacia](../evidencias/fase8/despues/20-nueva-reserva-vacia-escritorio.png) | **Cerrado**: los campos tienen un borde bien visible (medición: 3,9:1; antes 1,47:1). | N6, NS, S2 |
 | **H05** | (sin captura: es una medida a 320 px) | (sin captura) | **Cerrado, comprobado con la medición**: a 320 px el login mide 320 px (antes 346); 0 de 7 pantallas desbordan a 320 px. | S2, WCAG 1.4.10 |
@@ -29,19 +29,29 @@ Cada hallazgo de `evaluacion-sistema.md` con su captura **antes** (`docs/evidenc
 | **H23** | [18-contraseña](../evidencias/fase8/antes/18-usuario-contrasena-requisitos-movil.png) | [18-contraseña](../evidencias/fase8/despues/18-usuario-contrasena-requisitos-movil.png) | **Abierto, justificado**: así lo define la hoja de componentes. | N8, NS |
 | **H24** | [10-ambientes](../evidencias/fase8/antes/10-ambientes-listado-escritorio.png) | [10-ambientes](../evidencias/fase8/despues/10-ambientes-listado-escritorio.png) | **Abierto, cosmético.** | N8 |
 
-## Resumen por severidad
+## Resumen por severidad (Fase 8: 24 hallazgos)
 
 | Severidad | Hallazgos | Cerrados | Parciales | Abiertos |
 |---|---|---|---|---|
-| 4 | 1 (H01) | 0 | 0 | 1 (H01) |
-| 3 | 4 (H02 a H05) | 3 (H03, H04, H05) | 0 | 1 (H02) |
+| 4 | 1 (H01) | 1 (H01, Fase 9) | 0 | 0 |
+| 3 | 4 (H02 a H05) | 4 (H02 en la Fase 9) | 0 | 0 |
 | 2 | 10 (H06 a H13, H15, H16) | 8 (H06 a H13) | 0 | 2 (H15, H16) |
 | 1 | 9 (H14, H17 a H24) | 2 (H17, H18) | 1 (H20) | 6 (H14, H19, H21, H22, H23, H24) |
-| **Total** | **24** | **13** | **1** | **10** |
+| **Total** | **24** | **15** | **1** | **8** |
 
-H14 se evaluó con severidad 2; el planificador la fijó en 1 y no se cambia.
+## Fase 9: hallazgos nuevos de las pantallas Reservas, Dashboard y Mi ambiente
 
-Los dos hallazgos que más pesan (H01 y H02) **no se pueden cerrar en esta fase**: son pantallas que faltan y llegan con la Fase 9.
+| Id | Antes (captura) | Después (captura) | Estado | Principio |
+|---|---|---|---|---|
+| **H25** | [06-dashboard](../evidencias/fase9/06-dashboard-mostrando-5-de-n-escritorio.png) | [60-dashboard](../evidencias/fase9/estados/60-dashboard-escritorio.png) | **Cerrado** (sev. 3): el nombre del ambiente cabe en su tarjeta, comprobado en la imagen nueva. | N8, S3 |
+| **H26** | [06-dashboard](../evidencias/fase9/06-dashboard-mostrando-5-de-n-escritorio.png) | [60-dashboard](../evidencias/fase9/estados/60-dashboard-escritorio.png) | **Cerrado** (sev. 2): los tres botones van en una fila. | N4, S1 |
+| **H27** | [04-reservas](../evidencias/fase9/04-reservas-filtro-aprobada-movil.png) | [Mi ambiente](../evidencias/fase9/05-mi-ambiente-escritorio.png) | **Cerrado** (sev. 1), comprobado con la prueba de estilos. | N8 |
+| **H28** | [04-reservas](../evidencias/fase9/04-reservas-filtro-aprobada-movil.png) | [63-reservas](../evidencias/fase9/estados/63-reservas-administrador-movil.png) | **Cerrado** (sev. 2): comprobado en la imagen nueva: «Filtros» plegado y la primera fila a la vista. | N8, S8 |
+| **H29** | [05-mi-ambiente](../evidencias/fase9/05-mi-ambiente-escritorio.png) | — | **Abierto** (sev. 2): varios ambientes y extensión de indicadores, a revisar con usuarios. | N6, NMC |
+| **H30** | [60-dashboard](../evidencias/fase9/estados/60-dashboard-escritorio.png) | [60-dashboard](../evidencias/fase9/estados/60-dashboard-escritorio.png) | **Cerrado** (sev. 1): «Incluye canceladas» bajo el total, comprobado en la imagen nueva. | NGV |
+| **H31** | [60-dashboard](../evidencias/fase9/estados/60-dashboard-escritorio.png) | [60-dashboard](../evidencias/fase9/estados/60-dashboard-escritorio.png) | **Cerrado** (sev. 1): «Ver detalle» en una sola línea, comprobado en la imagen nueva. | N8 |
+
+**Total con la Fase 9: 31 hallazgos, 21 cerrados, 1 parcial (H20) y 9 abiertos** (H14, H15, H16, H19, H21, H22, H23, H24 y H29; ninguno de severidad 3 o 4). Severidad 3 o 4: 6 hallazgos, los 6 cerrados.
 
 ## Mediciones antes y después
 
@@ -52,7 +62,11 @@ Los dos hallazgos que más pesan (H01 y H02) **no se pueden cerrar en esta fase*
 | Elementos interactivos menores de 44 px a 375 px | 20 elementos en 17 de 35 estados | 0 |
 | Paradas de Tab sin foco visible / foco fuera del modal | 0 / 0 | 0 / 0 |
 | Scroll horizontal a 320 px | 1 de 7 pantallas (login) | 0 de 7 |
-| Scroll horizontal a 188 px (zoom 200 % en un teléfono) | 7 de 7 | 3 de 7 |
+| Scroll horizontal a 188 px (zoom 200 % en un teléfono) | 7 de 7 | 3 de 7 (con la Fase 9: 4 de 10; también desborda Mi ambiente) |
 | Animaciones infinitas con movimiento reducido | 1 | 0 |
 
 Lo que **no** se puede afirmar: la satisfacción y el tiempo de las personas **no están medidos** (la prueba con usuarios está planificada, no hecha), y 0 violaciones de axe no prueba que todo sea accesible.
+
+## Medición de la Fase 9 (`docs/evidencias/fase9-accesibilidad.txt`, 85 mediciones, 10 pantallas)
+
+axe-core: 0 violaciones · contraste: 0 pares por debajo del umbral (3 de texto deshabilitado, exentos) · objetivos táctiles menores de 44 px a 375 px: 0 en 43 estados · paradas de Tab sin foco visible: 0 y foco fuera del modal: 0 · movimiento reducido: 0 animaciones infinitas · scroll horizontal a 320 px: 0; a 188 px: 4 de 10 pantallas (login, Nueva reserva, Registrar usuario y Mi ambiente; H20 queda parcial).

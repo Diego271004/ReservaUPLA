@@ -42,7 +42,7 @@ try {
   const sesionAna = await leerSesion(ana)
   const carla = await nuevaPagina(navegador, 'escritorio')
   await iniciarSesion(carla, 'carla.rojas@upla.edu.pe')
-  await carla.waitForURL('**/ambientes')
+  await carla.waitForURL('**/dashboard')
   const sesionCarla = await leerSesion(carla)
   const tokenAna = tokenDe(sesionAna)
   ok('dos sesiones iniciadas')

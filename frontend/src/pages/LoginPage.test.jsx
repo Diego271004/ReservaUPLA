@@ -277,7 +277,7 @@ describe('Login: mensajes de éxito y de error', () => {
   })
 
   it.each([
-    ['Administrador', '/ambientes'],
+    ['Administrador', '/dashboard'],
     ['Responsable', '/mi-ambiente'],
   ])('el rol %s va a %s', async (rol, ruta) => {
     login.mockResolvedValue({ tipo: RESULTADO.exito, data: { ...SESIONES.administrador, rol } })
@@ -374,6 +374,6 @@ describe('Login: solo con teclado', () => {
 describe('Login: sesión', () => {
   it('quien ya tiene sesión va directo a su pantalla inicial', () => {
     mostrar({ sesionInicial: SESIONES.administrador })
-    expect(screen.getByTestId('ubicacion')).toHaveTextContent('/ambientes')
+    expect(screen.getByTestId('ubicacion')).toHaveTextContent('/dashboard')
   })
 })

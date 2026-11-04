@@ -18,4 +18,7 @@ public static class CamposFormulario
     public const string HoraInicio = "horaInicio";
     public const string HoraFin = "horaFin";
     public const string Motivo = "motivo";
+    public const string Desde = "desde";
+    public const string Hasta = "hasta";
+    public const string Pagina = "pagina";
 }

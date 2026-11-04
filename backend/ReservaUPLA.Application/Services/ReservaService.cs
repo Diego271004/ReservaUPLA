@@ -86,19 +86,6 @@ public sealed class ReservaService : IReservaService
             reserva.ADto(ambiente.Nombre, solicitante?.NombreCompleto ?? string.Empty));
     }
 
-    public Task<IReadOnlyList<ReservaDto>> ListarAsync(int usuarioId, RolUsuario rol, CancellationToken cancellationToken)
-    {
-        var filtro = rol switch
-        {
-            RolUsuario.Administrador => new FiltroReservas(),
-            RolUsuario.Solicitante => new FiltroReservas(UsuarioId: usuarioId),
-            RolUsuario.Responsable => new FiltroReservas(ResponsableId: usuarioId),
-            _ => throw new ArgumentOutOfRangeException(nameof(rol), rol, "Rol no contemplado."),
-        };
-
-        return _reservas.ListarAsync(filtro, cancellationToken);
-    }
-
     // ================================================================ Consultar
 
     public async Task<ResultadoOperacion<ReservaDetalleDto>> ObtenerAsync(

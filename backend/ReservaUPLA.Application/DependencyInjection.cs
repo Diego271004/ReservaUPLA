@@ -24,6 +24,7 @@ public static class DependencyInjection
         servicios.AddScoped<IValidator<CrearAmbienteDto>, CrearAmbienteValidator>();
         servicios.AddScoped<IValidator<CrearReservaDto>, CrearReservaValidator>();
         servicios.AddScoped<IValidator<ConsultarDisponibilidadDto>, ConsultarDisponibilidadValidator>();
+        servicios.AddScoped<IValidator<ConsultaReservasDto>, ConsultaReservasValidator>();
         servicios.AddScoped<ComprobadorDeHorario>();
         servicios.AddScoped<IReglaReserva, ReglaAmbienteDisponible>();
         servicios.AddScoped<IReglaReserva, ReglaFechaNoPasada>();
@@ -32,6 +33,7 @@ public static class DependencyInjection
         servicios.AddScoped<IUsuarioService, UsuarioService>();
         servicios.AddScoped<IAmbienteService, AmbienteService>();
         servicios.AddScoped<IReservaService, ReservaService>();
+        servicios.AddScoped<IConsultaService, ConsultaService>();
         return servicios;
     }
 }

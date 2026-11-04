@@ -20,6 +20,12 @@ public sealed class AmbienteRepository : IAmbienteRepository
     public async Task<IReadOnlyList<Ambiente>> ListarAsync(CancellationToken cancellationToken) =>
         await _contexto.Ambientes.AsNoTracking().OrderBy(ambiente => ambiente.Nombre).ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<Ambiente>> ListarPorResponsableAsync(int responsableId, CancellationToken cancellationToken) =>
+        await _contexto.Ambientes.AsNoTracking()
+            .Where(ambiente => ambiente.ResponsableId == responsableId)
+            .OrderBy(ambiente => ambiente.Nombre)
+            .ToListAsync(cancellationToken);
+
     // Sin distinguir mayúsculas: "Auditorio principal" y "Auditorio Principal" son el mismo ambiente para el usuario.
     public Task<bool> ExisteNombreAsync(string nombre, CancellationToken cancellationToken)
     {

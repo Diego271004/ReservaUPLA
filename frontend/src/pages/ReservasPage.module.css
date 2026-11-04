@@ -1,0 +1,16 @@
+.resultado {
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.vacio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  align-items: center;
+  padding: var(--espacio-3) 0;
+}
+
+.vacio p {
+  margin: 0;
+}

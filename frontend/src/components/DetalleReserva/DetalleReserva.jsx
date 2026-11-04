@@ -1,22 +1,22 @@
 import { Link } from 'react-router-dom'
 import { isoAFecha } from '../../utils/fechas.js'
+import { TIPO_INSIGNIA_DE_ESTADO } from '../../utils/reservas.js'
 import Insignia from '../ui/Insignia.jsx'
 import { Icono } from '../ui/Icono.jsx'
 import estilos from './DetalleReserva.module.css'
-
-const TIPO_INSIGNIA = {
-  Pendiente: 'pendiente',
-  Aprobada: 'aprobada',
-  Rechazada: 'rechazada',
-  Cancelada: 'cancelada',
-}
 
 /**
  * Único componente de detalle de reserva (hallazgo E4): la misma estructura para todos los estados y
  * roles (enlace de regreso, datos, historial). Las variantes solo cambian lo que se le pasa en `alerta`
  * (un AlertMessage) y en `acciones` (los botones). En la Fase 5 solo existe su estructura: sin acciones.
  */
-export default function DetalleReserva({ reserva, historial = [], alerta, acciones }) {
+export default function DetalleReserva({
+  reserva,
+  historial = [],
+  alerta,
+  acciones,
+  volverA = '/reservas',
+}) {
   const datos = [
     ['Ambiente', reserva.ambienteNombre],
     ['Solicitante', reserva.solicitanteNombre],
@@ -27,7 +27,7 @@ export default function DetalleReserva({ reserva, historial = [], alerta, accion
 
   return (
     <section className={estilos.detalle} aria-labelledby="titulo-detalle-reserva">
-      <Link to="/reservas" className={estilos.volver}>
+      <Link to={volverA} className={estilos.volver}>
         <Icono nombre="flechaIzquierda" />
         Volver a Reservas
       </Link>
@@ -44,7 +44,7 @@ export default function DetalleReserva({ reserva, historial = [], alerta, accion
           <div>
             <dt>Estado</dt>
             <dd>
-              <Insignia tipo={TIPO_INSIGNIA[reserva.estado]}>{reserva.estado}</Insignia>
+              <Insignia tipo={TIPO_INSIGNIA_DE_ESTADO[reserva.estado]}>{reserva.estado}</Insignia>
             </dd>
           </div>
         </dl>
