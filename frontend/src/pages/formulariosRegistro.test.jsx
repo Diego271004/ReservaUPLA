@@ -500,18 +500,26 @@ describe('Nueva reserva', () => {
     await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ })
   })
 
-  it('el ambiente se muestra con su capacidad y ubicación; el que está en mantenimiento no se puede elegir', async () => {
+  it('las opciones del ambiente muestran solo el nombre; el que está en mantenimiento no se puede elegir', async () => {
     mostrar()
-    expect(
-      await screen.findByRole('option', {
-        name: 'Laboratorio de Cómputo 2 · 30 personas · Pabellón A, piso 2',
-      }),
-    ).toBeEnabled()
+    expect(await screen.findByRole('option', { name: 'Laboratorio de Cómputo 2' })).toBeEnabled()
     expect(
       screen.getByRole('option', {
         name: 'Sala de Reuniones A · En mantenimiento (no disponible)',
       }),
     ).toBeDisabled()
+    expect(screen.queryByText(/30 personas/)).not.toBeInTheDocument()
+  })
+
+  it('al elegir un ambiente, su capacidad y ubicación aparecen como ayuda bajo el campo', async () => {
+    mostrar()
+    await userEvent.selectOptions(
+      ingresar('Ambiente'),
+      await screen.findByRole('option', { name: 'Laboratorio de Cómputo 2' }),
+    )
+    expect(screen.getByText('30 personas · Pabellón A, piso 2')).toBeInTheDocument()
+    await userEvent.selectOptions(ingresar('Ambiente'), '')
+    expect(screen.queryByText(/30 personas/)).not.toBeInTheDocument()
   })
 
   it('campos vacíos: no envía y marca ambiente, horas y motivo; la fecha ya tiene valor', async () => {

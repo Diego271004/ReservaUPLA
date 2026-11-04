@@ -82,6 +82,7 @@ export default function NuevaReservaPage() {
         {...form.campoDeLista('ambienteId')}
         etiqueta={TEXTOS.etiquetaAmbiente}
         opciones={form.opcionesAmbiente}
+        ayuda={form.ayudaAmbiente}
       />
       <DateInput {...form.campoDeTexto('fecha')} etiqueta={TEXTOS.etiquetaFecha} />
       <div className={estilos.horas}>
