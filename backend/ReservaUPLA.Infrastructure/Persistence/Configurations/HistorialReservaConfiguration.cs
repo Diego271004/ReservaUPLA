@@ -16,7 +16,6 @@ public class HistorialReservaConfiguration : IEntityTypeConfiguration<HistorialR
         builder.Property(evento => evento.EstadoNuevo).HasColumnName("estado_nuevo").HasMaxLength(20).HasConversion<string>();
         builder.Property(evento => evento.UsuarioId).HasColumnName("usuario_id");
         builder.Property(evento => evento.Fecha).HasColumnName("fecha").ValueGeneratedOnAdd();
-        builder.HasOne<Reserva>().WithMany().HasForeignKey(evento => evento.ReservaId);
         builder.HasOne<Usuario>().WithMany().HasForeignKey(evento => evento.UsuarioId);
     }
 }

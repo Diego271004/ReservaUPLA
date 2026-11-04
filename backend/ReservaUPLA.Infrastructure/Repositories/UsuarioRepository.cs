@@ -21,6 +21,12 @@ public sealed class UsuarioRepository : IUsuarioRepository
     public Task<Usuario?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken) =>
         _contexto.Usuarios.AsNoTracking().FirstOrDefaultAsync(usuario => usuario.Id == id, cancellationToken);
 
+    public async Task<IReadOnlyList<Usuario>> ObtenerPorIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken)
+    {
+        var lista = ids.Distinct().ToList();
+        return await _contexto.Usuarios.AsNoTracking().Where(usuario => lista.Contains(usuario.Id)).ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<Usuario>> ListarAsync(RolUsuario? rol, CancellationToken cancellationToken)
     {
         var consulta = _contexto.Usuarios.AsNoTracking();

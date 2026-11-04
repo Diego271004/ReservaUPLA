@@ -1,5 +1,6 @@
 using ReservaUPLA.Application.Common;
 using ReservaUPLA.Application.DTOs;
+using ReservaUPLA.Domain.Entities;
 using ReservaUPLA.Domain.Enums;
 
 namespace ReservaUPLA.Application.Interfaces;
@@ -23,20 +24,42 @@ public interface IAmbienteService
 
 public interface IReservaService
 {
-    /// <summary>Crea una reserva Pendiente a nombre de <paramref name="usuarioId"/>.</summary>
-    Task<ResultadoOperacion<ReservaDto>> CrearAsync(
-        CrearReservaDto dto, int usuarioId, CancellationToken cancellationToken);
+    /// <summary>Crea una reserva Pendiente a nombre de <paramref name="usuarioId"/> (RN-02, RN-03, RN-04, RN-01 y mantenimiento).</summary>
+    Task<ResultadoOperacion<ReservaDto>> CrearAsync(CrearReservaDto dto, int usuarioId, CancellationToken cancellationToken);
 
     /// <summary>Lista según el rol: el Administrador ve todas, el Solicitante las suyas y el Responsable las de sus ambientes.</summary>
     Task<IReadOnlyList<ReservaDto>> ListarAsync(int usuarioId, RolUsuario rol, CancellationToken cancellationToken);
+
+    /// <summary>Una reserva con su historial. Quien no puede verla recibe NoEncontrado (no se revela que existe).</summary>
+    Task<ResultadoOperacion<ReservaDetalleDto>> ObtenerAsync(int id, ActorDto actor, CancellationToken cancellationToken);
+
+    /// <summary>Aviso inmediato de disponibilidad (RN-01 contra reservas Aprobadas y mantenimiento).</summary>
+    Task<ResultadoOperacion<DisponibilidadDto>> ConsultarDisponibilidadAsync(
+        ConsultarDisponibilidadDto dto, CancellationToken cancellationToken);
+
+    /// <summary>RN-05: solo el Administrador. Vuelve a comprobar RN-01; si la base rechaza el cruce, el mismo mensaje de conflicto.</summary>
+    Task<ResultadoOperacion<ReservaDetalleDto>> AprobarAsync(int id, ActorDto actor, CancellationToken cancellationToken);
+
+    /// <summary>RN-05: solo el Administrador.</summary>
+    Task<ResultadoOperacion<ReservaDetalleDto>> RechazarAsync(int id, ActorDto actor, CancellationToken cancellationToken);
+
+    /// <summary>El solicitante dueño o el Administrador; solo Pendiente o Aprobada.</summary>
+    Task<ResultadoOperacion<ReservaDetalleDto>> CancelarAsync(int id, ActorDto actor, CancellationToken cancellationToken);
+}
+
+/// <summary>Un incumplimiento de una regla de negocio: de un campo (400) o de conflicto con otras reservas (409).</summary>
+public sealed record ViolacionDeRegla(string? Campo, string Mensaje, bool EsConflicto)
+{
+    public static ViolacionDeRegla EnCampo(string campo, string mensaje) => new(campo, mensaje, false);
+
+    public static ViolacionDeRegla Conflicto(string mensaje) => new(null, mensaje, true);
 }
 
 /// <summary>
-/// Punto de extensión de la Fase 6: reglas de negocio que se evalúan antes de guardar una reserva
-/// (RN-01 sin cruce con Aprobadas, ambiente en mantenimiento...). Devuelve un error por campo o null.
-/// En la Fase 5 no hay ninguna registrada.
+/// Regla de negocio que consulta datos y se evalúa antes de guardar una reserva nueva o de consultar su disponibilidad
+/// (RN-01, ambiente en mantenimiento). Devuelve la violación o null.
 /// </summary>
 public interface IReglaReserva
 {
-    Task<KeyValuePair<string, string>?> EvaluarAsync(Domain.Entities.Reserva reserva, CancellationToken cancellationToken);
+    Task<ViolacionDeRegla?> EvaluarAsync(Reserva reserva, Ambiente ambiente, CancellationToken cancellationToken);
 }

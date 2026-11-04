@@ -65,6 +65,6 @@ public sealed class AuthService : IAuthService
 
         var (token, expiraEn) = _tokenGenerator.Generar(usuario);
         return ResultadoAutenticacion.Exitoso(
-            new LoginResponseDto(token, usuario.NombreCompleto, usuario.Rol.ToString(), expiraEn));
+            new LoginResponseDto(token, usuario.Id, usuario.NombreCompleto, usuario.Rol.ToString(), expiraEn));
     }
 }
