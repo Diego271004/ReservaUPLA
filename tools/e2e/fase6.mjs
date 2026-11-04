@@ -8,6 +8,9 @@ import {
   capturar,
   capturasConDesbordamiento,
   carpeta,
+  aprobarReservaApi,
+  crearReservaApi,
+  fechaRelativa,
   iniciarSesion,
   leerSesion,
   nuevaPagina,
@@ -18,7 +21,11 @@ import {
 
 const destino = carpeta('docs', 'evidencias', 'fase6')
 const navegador = await abrirNavegador()
-const LABORATORIO = 'Laboratorio de Cómputo 2 · 30 personas · Pabellón A, piso 2'
+const LABORATORIO = 'Laboratorio de Cómputo 2'
+// Fechas relativas a hoy (RN-07 no admite fechas pasadas): la fase crea sus propios datos de partida.
+const OCUPADA = fechaRelativa(10) // aprobada de 10:00 a 12:00 (conflicto)
+const DIA_AB = fechaRelativa(11) // dos pendientes que se cruzan (A 10-12, B 11-13)
+const LIBRE = fechaRelativa(12) // sin reservas
 const CONFLICTO_10_12 = 'Ese ambiente ya tiene una reserva aprobada de 10:00 a 12:00. Elige otro horario u otro ambiente.'
 let falloGeneral = false
 
@@ -58,20 +65,22 @@ try {
   const tokenCarla = tokenDe(sesionCarla)
   ok('tres sesiones iniciadas')
 
-  const reservas = (await api('/api/reservas', { token: tokenCarla })).data
-  const pendienteA = reservas.find((r) => r.fecha === '2026-11-05' && r.horaInicio === '10:00' && r.estado === 'Pendiente')
-  const pendienteB = reservas.find((r) => r.fecha === '2026-11-05' && r.horaInicio === '11:00' && r.estado === 'Pendiente')
-  ok(`reservas de partida: A = #${pendienteA.id} (05/11 10:00-12:00, Pendiente), B = #${pendienteB.id} (05/11 11:00-13:00, Pendiente)`)
+  const laboratorio = (await api('/api/ambientes', { token: tokenAna })).data.find((a) => a.nombre === 'Laboratorio de Cómputo 2')
+  const idOcupada = await crearReservaApi(tokenAna, laboratorio.id, OCUPADA.iso, '10:00', '12:00', 'Reserva de partida aprobada')
+  await aprobarReservaApi(tokenCarla, idOcupada)
+  const pendienteA = { id: await crearReservaApi(tokenAna, laboratorio.id, DIA_AB.iso, '10:00', '12:00', 'Taller de bases de datos') }
+  const pendienteB = { id: await crearReservaApi(tokenAna, laboratorio.id, DIA_AB.iso, '11:00', '13:00', 'Práctica de redes') }
+  ok(`datos de partida creados por la API: aprobada #${idOcupada} (${OCUPADA.texto} 10-12), A = #${pendienteA.id} (${DIA_AB.texto} 10-12, Pendiente), B = #${pendienteB.id} (${DIA_AB.texto} 11-13, Pendiente)`)
 
   // ============================ Nueva reserva: disponibilidad (04, 04e, 04f) ============================
   paso('Escritorio · Ana: aviso de disponibilidad en Nueva reserva')
   await ana.getByRole('option', { name: /Laboratorio de Cómputo 2/ }).waitFor({ state: 'attached' })
-  await elegirHorario(ana, '05/11/2026', '14:00', '16:00')
+  await elegirHorario(ana, LIBRE.texto, '14:00', '16:00')
   await ana.getByText('Disponible: no hay reservas aprobadas en ese horario').waitFor()
   await capturar(ana, destino, '01-nueva-reserva-disponible', 'escritorio')
   ok('04: aviso verde "Disponible: no hay reservas aprobadas en ese horario"')
 
-  await elegirHorario(ana, '03/11/2026', '10:00', '12:00')
+  await elegirHorario(ana, OCUPADA.texto, '10:00', '12:00')
   await ana.getByText(CONFLICTO_10_12).waitFor()
   await capturar(ana, destino, '02-nueva-reserva-conflicto', 'escritorio')
   ok('04e: aviso rojo con la hora ocupada: "' + CONFLICTO_10_12 + '"')
@@ -87,7 +96,7 @@ try {
   await capturar(ana, destino, '03-nueva-reserva-mantenimiento', 'escritorio')
 
   paso('Escritorio · Ana registra una reserva libre y abre su detalle')
-  await elegirHorario(ana, '05/11/2026', '14:00', '16:00')
+  await elegirHorario(ana, LIBRE.texto, '14:00', '16:00')
   await ana.getByLabel('Motivo').fill('Práctica de laboratorio')
   await ana.getByRole('button', { name: 'Registrar solicitud' }).click()
   await ana.getByText('Solicitud registrada. Quedó Pendiente de aprobación.').waitFor()
@@ -173,7 +182,7 @@ try {
   const reservarEnMantenimiento = await api('/api/reservas', {
     metodo: 'POST',
     token: tokenAna,
-    cuerpo: { ambienteId: sala.id, fecha: '2026-12-10', horaInicio: '10:00', horaFin: '11:00', motivo: 'Prueba' },
+    cuerpo: { ambienteId: sala.id, fecha: fechaRelativa(21).iso, horaInicio: '10:00', horaFin: '11:00', motivo: 'Prueba' },
   })
   esperar(
     reservarEnMantenimiento.status === 400,
@@ -189,7 +198,7 @@ try {
   const apoyoX = await api('/api/reservas', {
     metodo: 'POST',
     token: tokenAna,
-    cuerpo: { ambienteId: ambientes.find((a) => a.nombre === 'Auditorio Principal').id, fecha: '2026-12-01', horaInicio: '09:00', horaFin: '10:00', motivo: 'Reserva de apoyo para las capturas móviles' },
+    cuerpo: { ambienteId: ambientes.find((a) => a.nombre === 'Auditorio Principal').id, fecha: fechaRelativa(20).iso, horaInicio: '09:00', horaFin: '10:00', motivo: 'Reserva de apoyo para las capturas móviles' },
   })
   const idX = apoyoX.data.id
   ok(`reserva de apoyo X = #${idX} (Pendiente)`)
@@ -197,10 +206,10 @@ try {
   const anaMovil = await nuevaPagina(navegador, 'movil', sesionAna)
   await anaMovil.goto(`${BASE}/reservas/nueva`)
   await anaMovil.getByRole('option', { name: /Laboratorio de Cómputo 2/ }).waitFor({ state: 'attached' })
-  await elegirHorario(anaMovil, '05/11/2026', '17:00', '18:00')
+  await elegirHorario(anaMovil, LIBRE.texto, '17:00', '18:00')
   await anaMovil.getByText('Disponible: no hay reservas aprobadas en ese horario').waitFor()
   await capturar(anaMovil, destino, '01-nueva-reserva-disponible', 'movil')
-  await elegirHorario(anaMovil, '03/11/2026', '10:00', '12:00')
+  await elegirHorario(anaMovil, OCUPADA.texto, '10:00', '12:00')
   await anaMovil.getByText(CONFLICTO_10_12).waitFor()
   await capturar(anaMovil, destino, '02-nueva-reserva-conflicto', 'movil')
   await anaMovil.goto(`${BASE}/reservas/${idX}`)
