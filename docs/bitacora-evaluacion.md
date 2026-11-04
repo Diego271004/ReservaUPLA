@@ -163,6 +163,42 @@ Los tres cerraron **solo después de mirar la imagen nueva**. Los guiones e2e (`
 | Mensajes nuevos | `EstadoFiltroInvalido`, `RangoDeFechasInvalido` y `PaginaInvalida` en `MensajesValidacion` y `messages.js` (la prueba de paridad los vigila). | Mismos textos en los dos lados. |
 | Pantalla inicial | El Administrador aterriza en el Dashboard. | Pedido de la fase. |
 
+## Fase 8 (ampliación) — Arquitectura de información (2026-11-04)
+
+Documento nuevo `docs/usabilidad/arquitectura-de-informacion.md`, con una tabla única de rutas (`constants/rutas.js`) de la que salen el router, la prueba de estructura (`rutas.test.jsx`) y el mapa del sitio (`tools/usabilidad/mapa-del-sitio.mjs`). Al auditar etiquetas, navegación y rutas contra el código aparecieron estos defectos; todos con rojo observado antes de implementar.
+
+### Defectos hallados y corregidos
+| # | Defecto | Cómo se encontró | Corrección | Prueba |
+|---|---|---|---|---|
+| 46 | «Volver a Reservas» llevaba al Dashboard cuando se abría el detalle desde allí; el texto estaba fijo y fuera de `messages.js`. | Lectura de `DetalleReserva` frente a `volverA` del Dashboard. | `textoDeRegreso(ruta)`: «Volver al Dashboard» o «Volver a Reservas»; textos en `TEXTOS`. | `LayoutYDetalle.test.jsx`, `utils/reservas.test.js` |
+| 47 | La Solicitante veía «Cancelar solicitud» sobre una reserva **Aprobada**, mientras el modal decía «¿Cancelar esta reserva?». | Comparación de botón, título y confirmación del mismo flujo. | «Solicitud» solo mientras está Pendiente; en los demás casos «Cancelar reserva». `tools/e2e/fase6.mjs` ajustado (la acción deshabilitada tras cancelar). | `utils/reservas.test.js`, `DetalleReservaPage.test.jsx` |
+| 48 | El cierre de Nueva reserva ofrecía «Registrar otra **reserva**» tras «Registrar solicitud». | Comparación de los dos botones de la misma pantalla. | «Registrar otra solicitud». | `formulariosRegistro.test.jsx` |
+| 49 | El título de la pestaña era «ReservaUPLA» en todas las pantallas. | `index.html` y ausencia de `document.title`. | `tituloDelDocumento` y `useTituloDelDocumento`: «Pantalla · ReservaUPLA» (también «Sin permiso» y la página no encontrada). | `utils/tituloDelDocumento.test.js`, `App.test.jsx` |
+| 50 | La Responsable abría `/reservas` escribiendo la dirección sin que estuviera en su menú y sin «Sin permiso». | La prueba nueva de estructura (`rutas.test.jsx`) falló en rojo. | La ruta queda para Administrador y Solicitante. | `rutas.test.jsx` |
+| 51 | `contexto-de-uso.md` 3.1 describía un mapa obsoleto (el Administrador aterrizaba en Ambientes; la Responsable abría el detalle desde Mi ambiente). | Comparación con `RUTA_INICIAL_POR_ROL` y con `MiAmbientePage`. | Sustituido por un enlace al documento nuevo; el mapa se genera del código. | `mapa-del-sitio.mjs --verificar`, `pruebas/mapa.test.mjs` |
+
+Excepción de método: `pruebas/mapa.test.mjs` se escribió **después** del script (no se observó el rojo). Compensación: se rompió a propósito el trazo del login en el diagrama y la prueba falló (1 de 12) antes de restaurarlo.
+
+### Ajustes aprobados tras la revisión (mismas pruebas rojo→verde)
+| # | Defecto | Cómo se encontró | Corrección | Prueba |
+|---|---|---|---|---|
+| 52 | **O1.** «Cancelar» significaba tres cosas (salir del formulario, vaciar Nueva reserva y anular una reserva). | Revisión de etiquetas. | Ambientes y Usuarios: «Volver»; Nueva reserva: «Limpiar formulario»; «Cancelar reserva/solicitud» solo anulan. El «Cancelar» del login (detiene una espera) queda como excepción. | `formulariosRegistro.test.jsx`, `etiquetasDeAcciones.test.jsx`, `tools/e2e/fase-ai.mjs` |
+| 53 | **O4.** El botón de enviar el alta decía «Guardar ambiente/usuario»: no cumplía «Registrar X lo envía» ni coincidía con «Ambiente registrado.». | Al comprobar la regla pantalla por pantalla. | «Registrar ambiente» y «Registrar usuario». `fase5.mjs` y `estados.mjs` ajustados. | `formulariosRegistro.test.jsx`, `etiquetasDeAcciones.test.jsx` |
+| 54 | **O5.** «Ver todas» no decía qué. | Revisión de etiquetas. | «Ver todas las pendientes». `fase9.mjs` ajustado. | `DashboardPage.test.jsx` |
+| 55 | **O2.** La Responsable abría el detalle solo por dirección. | Nueva regla de `rutas.test.jsx` (cada rol que entra a una ruta contextual debe llegar por un enlace). | «Ver detalle» por fila en Mi ambiente; detalle de solo lectura; «Volver a Mi ambiente» conserva ambiente y página (`utils/rutaDeRegreso.js`). `fase9.mjs`: Mi ambiente ya no tiene «ningún botón» sino «solo Ver detalle». | `MiAmbientePage.test.jsx`, `DetalleReservaPage.test.jsx`, `rutas.test.jsx`, `utils/rutaDeRegreso.test.js` |
+| 56 | **O3.** En el detalle ningún ítem del menú quedaba marcado. | Captura del detalle. | El menú marca la sección de origen con `aria-current="true"`; sin migas de pan. | `LayoutYDetalle.test.jsx`, `utils/rutaDeRegreso.test.js` |
+
+### Limitación conocida
+- **O6** «Mi ambiente» en singular aunque la Responsable pueda tener varios ambientes (hay un selector dentro). Se reconsidera con los resultados del test de árbol.
+
+### Verificación de los diagramas
+`npm run mermaid` (en `tools/usabilidad`) renderiza a SVG todos los bloques Mermaid de `docs/` y del README: 5 de 5 se renderizaron; una prueba negativa con un bloque roto confirmó que el validador falla cuando debe. `pruebas/mermaid.test.mjs` cubre la extracción de bloques.
+
+### Evidencias y accesibilidad de la ampliación
+Capturas nuevas en `docs/evidencias/fase-ai/` (1280 px y 375 px, `npm run faseai`) e informe `docs/evidencias/fase-ai-accesibilidad.txt`: 0 violaciones axe en 20 mediciones, 0 pares de contraste bajo el umbral, 0 objetivos menores de 44 px, 0 problemas de foco; los 4 desbordes a 188 px son los mismos ya conocidos (login, Nueva reserva, Registrar usuario y Mi ambiente).
+
+Excepción de método: `pruebas/mapa.test.mjs` y `pruebas/mermaid.test.mjs` se escribieron después de sus scripts; compensación: rotura deliberada del diagrama (1 de 12 falló) y de un bloque Mermaid (el validador lo reportó).
+
 ## Decisiones y diferencias con el diseño
 | Tema | Diseño v2 | Lo construido | Por qué |
 |---|---|---|---|

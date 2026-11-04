@@ -1,4 +1,4 @@
-// Ejecuta todas las fases de extremo a extremo en orden (5, 6, 7 y 9), cada una sobre una base recién creada y una API recién
+// Ejecuta todas las fases de extremo a extremo en orden (5, 6, 7, 9 y la ampliación de arquitectura de información), cada una sobre una base recién creada y una API recién
 // arrancada: ninguna depende de los datos que dejó otra, y el límite de intentos de login empieza de cero en cada fase.
 // Las fechas de los guiones son relativas a hoy (RN-07 no admite fechas pasadas).
 //
@@ -17,6 +17,7 @@ const FASES = [
   { nombre: 'Fase 6 · validaciones (disponibilidad, aprobar, conflicto, rechazar, cancelar)', guion: 'fase6.mjs' },
   { nombre: 'Fase 7 · ayuda del ambiente y RN-07', guion: 'fase7.mjs' },
   { nombre: 'Fase 9 · salida de datos (Dashboard, Reservas con filtros, Mi ambiente)', guion: 'fase9.mjs' },
+  { nombre: 'Ampliación · arquitectura de información (etiquetas, regreso y menú en el detalle)', guion: 'fase-ai.mjs' },
 ]
 
 const ejecutarGuion = (guion) =>

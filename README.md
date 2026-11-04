@@ -86,10 +86,15 @@ npm run dev
 Abre `http://localhost:5180` (puerto fijo: si estuviera ocupado, Vite avisa con un error en lugar de cambiar de puerto; CORS solo permite ese origen, configurable en `Cors:OrigenesPermitidos`). El frontend reenvía `/api` a `http://localhost:5263`; si la API usa otra dirección, define `VITE_API_URL` antes de `npm run dev`.
 
 ### Qué hay en la Fase 9
-- **Reservas** (`/reservas`): lista con filtros (Estado, Ambiente, fecha desde y hasta), páginas de 10 con «Anterior» deshabilitado en la primera, estado vacío con «Limpiar filtros» y tarjetas apiladas en móvil (donde los filtros se pliegan detrás del botón «Filtros (n)»). Cada rol ve lo suyo. **Dashboard** (`/dashboard`, Administrador): cinco indicadores, las 5 pendientes más antiguas con Aprobar y Rechazar (con modal), «Mostrando 5 de N» y «Ver todas». **Mi ambiente** (`/mi-ambiente`, Responsable): su ambiente, cuatro indicadores y sus reservas, solo lectura.
+- **Reservas** (`/reservas`): lista con filtros (Estado, Ambiente, fecha desde y hasta), páginas de 10 con «Anterior» deshabilitado en la primera, estado vacío con «Limpiar filtros» y tarjetas apiladas en móvil (donde los filtros se pliegan detrás del botón «Filtros (n)»). Cada rol ve lo suyo. **Dashboard** (`/dashboard`, Administrador): cinco indicadores, las 5 pendientes más antiguas con Aprobar y Rechazar (con modal), «Mostrando 5 de N» y «Ver todas las pendientes». **Mi ambiente** (`/mi-ambiente`, Responsable): su ambiente, cuatro indicadores y sus reservas, solo lectura.
 - **Endpoints nuevos:** `GET /api/reservas?estado=&ambienteId=&desde=&hasta=&pagina=` (devuelve `{ elementos, total, pagina, tamano }`), `GET /api/dashboard` y `GET /api/mi-ambiente?ambienteId=&pagina=`.
 - **Pruebas con la base real:** `ListadoYPanelesConBaseRealTests` compara cada indicador con una consulta SQL directa (variables `RESERVAUPLA_PRUEBAS_BD_*`, ver «Pruebas»).
-- **e2e:** `npm run fase9` en `tools/e2e` (flujo completo, capturas en `docs/evidencias/fase9/`); `npm run todo` ejecuta las fases 5, 6, 7 y 9. Accesibilidad de todas las pantallas: `ETAPA=fase9 node accesibilidad.mjs` en `tools/usabilidad` (`docs/evidencias/fase9-accesibilidad.txt`).
+- **e2e:** `npm run fase9` en `tools/e2e` (flujo completo, capturas en `docs/evidencias/fase9/`); `npm run todo` ejecuta las fases 5, 6, 7 y 9 y la ampliación de arquitectura de información. Accesibilidad de todas las pantallas: `ETAPA=fase9 node accesibilidad.mjs` en `tools/usabilidad` (`docs/evidencias/fase9-accesibilidad.txt`).
+
+### Ampliación: arquitectura de información
+- `docs/usabilidad/arquitectura-de-informacion.md`: organización, etiquetado (con las incoherencias halladas y corregidas), navegación, filtros, jerarquía por pantalla, modelo mental y mapa del sitio **generado del código** (`node mapa-del-sitio.mjs --escribir` / `--verificar` en `tools/usabilidad`). Las rutas viven en `frontend/src/constants/rutas.js` y `rutas.test.jsx` comprueba menú, roles y «Sin permiso».
+- Test de árbol para ejecutar con compañeros: sección 10 de `docs/usabilidad/plan-prueba-usuarios.md` (sin resultados).
+- Evidencias: `docs/evidencias/fase-ai/` (`npm run faseai` en `tools/e2e`) y `docs/evidencias/fase-ai-accesibilidad.txt` (`ETAPA=fase-ai node accesibilidad.mjs`).
 
 ### Qué hay en la Fase 8
 - **Evaluación de usabilidad del sistema construido** (`docs/usabilidad/`): `contexto-de-uso.md` (personas como hipótesis, tareas T01 a T10, mapa de navegación en Mermaid), `evaluacion-sistema.md` (24 hallazgos con severidad y captura), `matriz-principios-final.md`, `cambios-evaluacion-a-final.md` (antes y después) y `plan-prueba-usuarios.md` (la prueba con personas **no está hecha**: ver el plan y qué le toca al estudiante).
@@ -99,7 +104,9 @@ Abre `http://localhost:5180` (puerto fijo: si estuviera ocupado, Vite avisa con 
   node contraste.mjs                                   # solo el contraste (no necesita la base)
   PGPASSWORD="<clave de postgres>" CLAVE_PRUEBA="<clave de prueba>" ETAPA=despues node accesibilidad.mjs   # recrea la base, arranca la API y el frontend (puertos 5263 y 5180 libres)
   node analizar.mjs                                    # (necesita filas reales en el CSV; con solo el encabezado avisa «no hay resultados que analizar») eficacia, eficiencia y SUS desde docs/usabilidad/resultados-prueba.csv
-  npm run pruebas                                      # prueba del analizador con un archivo SINTÉTICO (no son resultados)
+  npm run mermaid                                      # renderiza a SVG todos los diagramas Mermaid de docs/ y del README (falla si alguno no se renderiza)
+  node mapa-del-sitio.mjs --verificar                  # el mapa del sitio de docs/usabilidad/arquitectura-de-informacion.md coincide con las rutas del código (--escribir lo regenera)
+  npm run pruebas                                      # prueba del analizador (archivo SINTÉTICO, no son resultados) y del mapa del sitio
   ```
 - **Correcciones** (cada una con su prueba): contraste del límite de los campos, objetivos de 44 px, reflujo a 320 px, movimiento reducido, aviso de «no se puede deshacer» en rechazar y cancelar, aviso de disponibilidad junto a las horas, ayuda del formato de la fecha y separación de los registros en móvil. Ver la bitácora (defectos 26 a 37).
 - Pendiente: la lista de Reservas, Mi ambiente y el dashboard (Fase 9); sin ellas, T03, T04, T08, T09 y T10 no se pueden hacer ni probar.
@@ -174,6 +181,7 @@ PGPASSWORD="<clave de postgres>" CLAVE_PRUEBA="<clave de los usuarios de prueba>
 cd tools/e2e && CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run fase5   # login, ambientes, usuarios y Nueva reserva
 cd tools/e2e && CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run fase6   # disponibilidad, aprobar, conflicto, rechazar y cancelar (base limpia antes de cada uno)
 cd tools/e2e && CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run fase7   # ayuda del ambiente y RN-07
+cd tools/e2e && CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run faseai  # etiquetas, regreso y menú del detalle (capturas en docs/evidencias/fase-ai/)
 
 # Todas las fases en orden, cada una con la base recreada y la API reiniciada (arranca y detiene la API y el frontend; los puertos 5263 y 5180 deben estar libres)
 cd tools/e2e && PGPASSWORD="<clave de postgres>" CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run todo   # salida de referencia: docs/evidencias/e2e-completo.txt

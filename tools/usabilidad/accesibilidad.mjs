@@ -6,6 +6,7 @@
 // ETAPA=antes   → docs/evidencias/fase8-accesibilidad-antes.txt y capturas en docs/evidencias/fase8/antes/
 // ETAPA=despues → docs/evidencias/fase8-accesibilidad.txt (informe final) y capturas en docs/evidencias/fase8/despues/
 // ETAPA=fase9   → docs/evidencias/fase9-accesibilidad.txt y capturas en docs/evidencias/fase9/estados/ (con las pantallas de la Fase 9)
+// ETAPA=fase-ai → docs/evidencias/fase-ai-accesibilidad.txt y capturas en docs/evidencias/fase-ai/estados/ (solo las pantallas cuyos textos cambiaron en la ampliación de arquitectura de información)
 // Arranca la base, la API y el frontend por su cuenta (puertos 5263 y 5180 libres).
 import { createRequire } from 'node:module'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -17,13 +18,27 @@ import { recorrer } from './estados.mjs'
 
 const requerir = createRequire(import.meta.url)
 const RUTA_AXE = requerir.resolve('axe-core/axe.min.js')
-const ETAPA = ['antes', 'despues', 'fase9'].includes(process.env.ETAPA) ? process.env.ETAPA : 'antes'
-const CAPTURAS = ETAPA === 'fase9' ? resolve(RAIZ, 'docs', 'evidencias', 'fase9', 'estados') : resolve(RAIZ, 'docs', 'evidencias', 'fase8', ETAPA)
+const ETAPA = ['antes', 'despues', 'fase9', 'fase-ai'].includes(process.env.ETAPA) ? process.env.ETAPA : 'antes'
+const CARPETA_DE_CAPTURAS = {
+  fase9: ['fase9', 'estados'],
+  'fase-ai': ['fase-ai', 'estados'],
+  antes: ['fase8', 'antes'],
+  despues: ['fase8', 'despues'],
+}
+const CAPTURAS = resolve(RAIZ, 'docs', 'evidencias', ...CARPETA_DE_CAPTURAS[ETAPA])
+// En fase-ai solo se miden estas pantallas (los demás estados se recorren porque son el camino hasta ellas).
+const SOLO_FASE_AI = ['12-', '16-', '20-', '26-', '27-', '36-', '40-', '41-', '60-', '63-']
+const seMide = (id) => ETAPA !== 'fase-ai' || SOLO_FASE_AI.some((prefijo) => id.startsWith(prefijo))
 const INFORME = resolve(
   RAIZ,
   'docs',
   'evidencias',
-  { antes: 'fase8-accesibilidad-antes.txt', despues: 'fase8-accesibilidad.txt', fase9: 'fase9-accesibilidad.txt' }[ETAPA],
+  {
+    antes: 'fase8-accesibilidad-antes.txt',
+    despues: 'fase8-accesibilidad.txt',
+    fase9: 'fase9-accesibilidad.txt',
+    'fase-ai': 'fase-ai-accesibilidad.txt',
+  }[ETAPA],
 )
 const ETIQUETAS_AXE = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice']
 const MINIMO_TACTIL = 44
@@ -107,6 +122,7 @@ async function recorrerConTab(pagina) {
 const resultados = [] // { id, descripcion, ancho, axe, pequenos, tab }
 
 async function medir(pagina, id, descripcion) {
+  if (!seMide(id)) return
   const ancho = pagina.viewportSize().width <= 400 ? 'movil' : 'escritorio'
   await pagina.waitForTimeout(250)
   await pagina.screenshot({ path: resolve(CAPTURAS, `${id}-${ancho}.png`), fullPage: true })
@@ -215,7 +231,7 @@ function informe(contraste, extra) {
   const rayas = '='.repeat(110)
   L.push(`ACCESIBILIDAD MEDIDA DEL SISTEMA REAL (${ETAPA.toUpperCase()}) — ${new Date().toISOString().slice(0, 10)}`)
   L.push(`Herramientas: axe-core ${requerir('axe-core/package.json').version} (etiquetas ${ETIQUETAS_AXE.join(', ')}), Playwright con Edge sin ventana, 1280 px y 375 px.`)
-  L.push(`Estados recorridos: ${unicos(resultados.map((r) => r.id)).length} por ancho (${resultados.length} mediciones). Capturas en docs/evidencias/fase8/${ETAPA}/.`, '')
+  L.push(`Estados recorridos: ${unicos(resultados.map((r) => r.id)).length} por ancho (${resultados.length} mediciones). Capturas en docs/evidencias/${CARPETA_DE_CAPTURAS[ETAPA].join('/')}/.`, '')
 
   // ---- A) axe
   L.push(rayas, 'A) AXE-CORE: violaciones por regla', rayas)
