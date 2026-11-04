@@ -17,15 +17,31 @@ namespace ReservaUPLA.API.Controllers;
 public sealed class ReservasController : ControllerBase
 {
     private readonly IReservaService _reservas;
+    private readonly IConsultaService _consultas;
 
-    public ReservasController(IReservaService reservas)
+    public ReservasController(IReservaService reservas, IConsultaService consultas)
     {
         _reservas = reservas;
+        _consultas = consultas;
     }
 
+    /// <summary>
+    /// Lista de Reservas con filtros (estado, ambiente, fecha desde y hasta en aaaa-mm-dd), ordenada por fecha y paginada
+    /// (10 por página; devuelve el total). Cada rol ve lo suyo: lo ajeno no aparece.
+    /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ReservaDto>>> Listar(CancellationToken cancellationToken) =>
-        Ok(await _reservas.ListarAsync(User.ObtenerUsuarioId(), User.ObtenerRol(), cancellationToken));
+    [ProducesResponseType(typeof(PaginaDeReservasDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
+    public async Task<IActionResult> Listar(
+        [FromQuery] string? estado,
+        [FromQuery] int? ambienteId,
+        [FromQuery] string? desde,
+        [FromQuery] string? hasta,
+        [FromQuery] int? pagina,
+        CancellationToken cancellationToken) =>
+        this.Traducir(
+            await _consultas.ListarAsync(User.ObtenerActor(), new ConsultaReservasDto(estado, ambienteId, desde, hasta, pagina), cancellationToken),
+            Ok);
 
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(ReservaDetalleDto), StatusCodes.Status200OK)]

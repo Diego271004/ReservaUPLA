@@ -27,9 +27,6 @@ public interface IReservaService
     /// <summary>Crea una reserva Pendiente a nombre de <paramref name="usuarioId"/> (RN-02, RN-03, RN-04, RN-01 y mantenimiento).</summary>
     Task<ResultadoOperacion<ReservaDto>> CrearAsync(CrearReservaDto dto, int usuarioId, CancellationToken cancellationToken);
 
-    /// <summary>Lista según el rol: el Administrador ve todas, el Solicitante las suyas y el Responsable las de sus ambientes.</summary>
-    Task<IReadOnlyList<ReservaDto>> ListarAsync(int usuarioId, RolUsuario rol, CancellationToken cancellationToken);
-
     /// <summary>Una reserva con su historial. Quien no puede verla recibe NoEncontrado (no se revela que existe).</summary>
     Task<ResultadoOperacion<ReservaDetalleDto>> ObtenerAsync(int id, ActorDto actor, CancellationToken cancellationToken);
 
@@ -45,6 +42,19 @@ public interface IReservaService
 
     /// <summary>El solicitante dueño o el Administrador; solo Pendiente o Aprobada.</summary>
     Task<ResultadoOperacion<ReservaDetalleDto>> CancelarAsync(int id, ActorDto actor, CancellationToken cancellationToken);
+}
+
+/// <summary>Salida de datos: lista de Reservas, Dashboard y Mi ambiente.</summary>
+public interface IConsultaService
+{
+    /// <summary>Lista según el rol (Administrador todas, Solicitante las suyas, Responsable las de sus ambientes), con filtros y página.</summary>
+    Task<ResultadoOperacion<PaginaDeReservasDto>> ListarAsync(ActorDto actor, ConsultaReservasDto consulta, CancellationToken cancellationToken);
+
+    Task<DashboardDto> ObtenerDashboardAsync(CancellationToken cancellationToken);
+
+    /// <summary>Mi ambiente: NoEncontrado si el ambiente pedido no está a cargo del responsable.</summary>
+    Task<ResultadoOperacion<MiAmbienteDto>> ObtenerMiAmbienteAsync(
+        int responsableId, int? ambienteId, int? pagina, CancellationToken cancellationToken);
 }
 
 /// <summary>Un incumplimiento de una regla de negocio: de un campo (400) o de conflicto con otras reservas (409).</summary>

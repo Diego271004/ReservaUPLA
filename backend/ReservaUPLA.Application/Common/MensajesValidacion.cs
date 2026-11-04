@@ -70,6 +70,10 @@ public static class MensajesValidacion
     public const string HoraFinNoPosterior = "La hora de fin debe ser posterior a la hora de inicio.";
     public const string MotivoVacio = "Ingresa el motivo de la reserva.";
     public const string MotivoDemasiadoLargo = "El motivo no puede superar los 300 caracteres.";
+    // Reservas: filtros del listado
+    public const string EstadoFiltroInvalido = "Elige un estado de la lista.";
+    public const string RangoDeFechasInvalido = "La fecha final no puede ser anterior a la inicial.";
+    public const string PaginaInvalida = "La página debe ser 1 o mayor.";
     public const string ReservaRegistrada = "Solicitud registrada. Quedó Pendiente de aprobación.";
 
     // Reservas: disponibilidad y reglas de negocio (RN-01, RN-05, RN-06)

@@ -8,7 +8,14 @@ public interface IReservaRepository
     /// <summary>La reserva con su historial, lista para cambiar de estado y guardarse (seguimiento activo).</summary>
     Task<Reserva?> ObtenerConHistorialAsync(int id, CancellationToken cancellationToken);
 
-    Task<IReadOnlyList<ReservaDto>> ListarAsync(FiltroReservas filtro, CancellationToken cancellationToken);
+    /// <summary>Una página de reservas con el alcance y los filtros pedidos, y el total que cumple esos filtros.</summary>
+    Task<PaginaDeReservasDto> ListarAsync(FiltroReservas filtro, CancellationToken cancellationToken);
+
+    /// <summary>Cuántas reservas hay por estado (de un ambiente, o de todos si es null).</summary>
+    Task<IndicadoresDto> ContarAsync(int? ambienteId, CancellationToken cancellationToken);
+
+    /// <summary>El ambiente con más reservas Aprobadas; si hay empate, todos los empatados. Vacío si no hay ninguna Aprobada.</summary>
+    Task<IReadOnlyList<AmbienteUsoDto>> AmbientesMasUtilizadosAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// La reserva Aprobada del ambiente que se cruza con el rango (RN-01), o null. `excluirReservaId` deja fuera a la

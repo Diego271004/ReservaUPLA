@@ -43,6 +43,8 @@ public sealed class ReservaFixture
 
     private ActorDto Actor(string correo, RolUsuario rol) => new(Usuarios.Agregar(correo, rol).Id, rol);
 
+    public ConsultaService CrearServicioDeConsulta() => new(new ConsultaReservasValidator(), Reservas, Ambientes);
+
     public ReservaService CrearServicio(params IReglaReserva[] reglasExtra)
     {
         var comprobador = new ComprobadorDeHorario(Reservas);

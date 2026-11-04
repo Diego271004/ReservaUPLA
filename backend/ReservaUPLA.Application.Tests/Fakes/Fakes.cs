@@ -75,6 +75,10 @@ public sealed class FakeAmbienteRepository : IAmbienteRepository
     public Task<bool> ExisteNombreAsync(string nombre, CancellationToken cancellationToken) =>
         Task.FromResult(Ambientes.Any(ambiente => string.Equals(ambiente.Nombre, nombre, StringComparison.OrdinalIgnoreCase)));
 
+    public Task<IReadOnlyList<Ambiente>> ListarPorResponsableAsync(int responsableId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<Ambiente>>(
+            Ambientes.Where(ambiente => ambiente.ResponsableId == responsableId).OrderBy(ambiente => ambiente.Nombre).ToList());
+
     public Task AgregarAsync(Ambiente ambiente, CancellationToken cancellationToken)
     {
         ambiente.Id = Ambientes.Count + 1;
@@ -91,6 +95,16 @@ public sealed class FakeReservaRepository : IReservaRepository
 {
     public List<Reserva> Reservas { get; } = new();
     public FiltroReservas? UltimoFiltro { get; private set; }
+
+    /// <summary>Todos los filtros con que se consultó el listado, en orden.</summary>
+    public List<FiltroReservas> Filtros { get; } = new();
+
+    /// <summary>Lo que devuelve el listado (los repositorios de verdad filtran y paginan en la base).</summary>
+    public PaginaDeReservasDto PaginaARetornar { get; set; } = new(new List<ReservaDto>(), 0, 1, 10);
+
+    public IndicadoresDto IndicadoresARetornar { get; set; } = new(0, 0, 0, 0);
+    public List<int?> AmbientesContados { get; } = new();
+    public List<AmbienteUsoDto> MasUtilizadosARetornar { get; } = new();
     public int Guardados { get; private set; }
 
     /// <summary>Se ejecuta justo antes de guardar: permite simular que otra aprobación se coló entre la comprobación y el guardado.</summary>
@@ -127,11 +141,21 @@ public sealed class FakeReservaRepository : IReservaRepository
     public Task<Reserva?> ObtenerConHistorialAsync(int id, CancellationToken cancellationToken) =>
         Task.FromResult(Reservas.FirstOrDefault(reserva => reserva.Id == id));
 
-    public Task<IReadOnlyList<ReservaDto>> ListarAsync(FiltroReservas filtro, CancellationToken cancellationToken)
+    public Task<PaginaDeReservasDto> ListarAsync(FiltroReservas filtro, CancellationToken cancellationToken)
     {
         UltimoFiltro = filtro;
-        return Task.FromResult<IReadOnlyList<ReservaDto>>(new List<ReservaDto>());
+        Filtros.Add(filtro);
+        return Task.FromResult(PaginaARetornar);
     }
+
+    public Task<IndicadoresDto> ContarAsync(int? ambienteId, CancellationToken cancellationToken)
+    {
+        AmbientesContados.Add(ambienteId);
+        return Task.FromResult(IndicadoresARetornar);
+    }
+
+    public Task<IReadOnlyList<AmbienteUsoDto>> AmbientesMasUtilizadosAsync(CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<AmbienteUsoDto>>(MasUtilizadosARetornar.ToList());
 
     public Task<Reserva?> BuscarAprobadaQueSeCruzaAsync(
         int ambienteId, DateOnly fecha, TimeOnly horaInicio, TimeOnly horaFin, int? excluirReservaId, CancellationToken cancellationToken) =>

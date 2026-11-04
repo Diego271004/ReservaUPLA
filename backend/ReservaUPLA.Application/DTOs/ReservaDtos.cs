@@ -42,5 +42,54 @@ public sealed record DisponibilidadDto(bool Disponible, string Mensaje);
 /// <summary>Quién hace la operación (viene del token).</summary>
 public sealed record ActorDto(int UsuarioId, RolUsuario Rol);
 
-/// <summary>Qué reservas puede ver quien consulta: todas, las de un solicitante o las de los ambientes de un responsable.</summary>
-public sealed record FiltroReservas(int? UsuarioId = null, int? ResponsableId = null);
+/// <summary>Cómo se ordena un listado: por fecha de la reserva o por antigüedad de la solicitud (las pendientes más antiguas).</summary>
+public enum OrdenReservas
+{
+    PorFecha,
+    PorAntiguedad,
+}
+
+/// <summary>
+/// Qué reservas se consultan: el alcance del rol (todas, las de un solicitante o las de los ambientes de un responsable) más
+/// los filtros de la pantalla Reservas y la página pedida.
+/// </summary>
+public sealed record FiltroReservas(
+    int? UsuarioId = null,
+    int? ResponsableId = null,
+    EstadoReserva? Estado = null,
+    int? AmbienteId = null,
+    DateOnly? Desde = null,
+    DateOnly? Hasta = null,
+    int Pagina = 1,
+    int Tamano = 10,
+    OrdenReservas Orden = OrdenReservas.PorFecha);
+
+/// <summary>Filtros tal como llegan en la dirección (?estado=&amp;ambienteId=&amp;desde=&amp;hasta=&amp;pagina=); fechas aaaa-mm-dd.</summary>
+public sealed record ConsultaReservasDto(string? Estado, int? AmbienteId, string? Desde, string? Hasta, int? Pagina);
+
+/// <summary>Una página de reservas y cuántas hay en total con esos filtros.</summary>
+public sealed record PaginaDeReservasDto(IReadOnlyList<ReservaDto> Elementos, int Total, int Pagina, int Tamano);
+
+/// <summary>Indicadores por estado. <c>Total</c> cuenta todas las reservas, también las Canceladas.</summary>
+public sealed record IndicadoresDto(int Total, int Pendientes, int Aprobadas, int Rechazadas);
+
+/// <summary>Un ambiente con sus reservas Aprobadas (el criterio de «más utilizado»).</summary>
+public sealed record AmbienteUsoDto(int AmbienteId, string Nombre, int ReservasAprobadas);
+
+/// <summary>
+/// Dashboard del Administrador. Las pendientes más antiguas son las 5 solicitudes más viejas (por fecha de creación);
+/// su <c>Total</c> es el total de pendientes («Mostrando 5 de 7»).
+/// </summary>
+public sealed record DashboardDto(
+    IndicadoresDto Indicadores,
+    IReadOnlyList<AmbienteUsoDto> AmbientesMasUtilizados,
+    PaginaDeReservasDto PendientesMasAntiguas);
+
+public sealed record AmbienteResumenDto(int Id, string Nombre, string Ubicacion, int Capacidad, string Estado);
+
+/// <summary>Mi ambiente (Responsable): el ambiente elegido, todos los suyos, sus indicadores y sus reservas (solo lectura).</summary>
+public sealed record MiAmbienteDto(
+    AmbienteResumenDto? Ambiente,
+    IReadOnlyList<AmbienteResumenDto> Ambientes,
+    IndicadoresDto Indicadores,
+    PaginaDeReservasDto Reservas);
