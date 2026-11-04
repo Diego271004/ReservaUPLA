@@ -19,7 +19,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
     contrasena_hash varchar(100) NOT NULL,
     CONSTRAINT uq_usuarios_correo UNIQUE (correo),
     CONSTRAINT ck_usuarios_correo_normalizado CHECK (correo = LOWER(TRIM(correo))),
-    CONSTRAINT ck_usuarios_rol CHECK (rol IN ('Administrador', 'Solicitante', 'Responsable'))
+    CONSTRAINT ck_usuarios_rol CHECK (rol IN ('Administrador', 'Solicitante', 'Responsable')),
+    -- Solo se guarda un hash BCrypt (la política de la contraseña se valida en la aplicación, antes de hashear): nunca texto plano.
+    CONSTRAINT ck_usuarios_hash_bcrypt CHECK (contrasena_hash ~ '^\$2[abxy]\$[0-9]{2}\$.{53}$')
 );
 
 CREATE TABLE IF NOT EXISTS ambientes (
@@ -72,3 +74,69 @@ CREATE TABLE IF NOT EXISTS historial_reserva (
 CREATE INDEX IF NOT EXISTS ix_reservas_usuario ON reservas (usuario_id);
 CREATE INDEX IF NOT EXISTS ix_reservas_ambiente_fecha ON reservas (ambiente_id, fecha);
 CREATE INDEX IF NOT EXISTS ix_historial_reserva ON historial_reserva (reserva_id);
+
+-- RN-06 y transiciones de estado: Rechazada y Cancelada son finales (no cambia ningún dato de la reserva) y solo
+-- se permite Pendiente → Aprobada, Rechazada o Cancelada, y Aprobada → Cancelada. (Hallazgo de la Fase 6: sin esto,
+-- un UPDATE directo podía reabrir una reserva rechazada.)
+CREATE OR REPLACE FUNCTION fn_reservas_validar_transicion() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+    IF OLD.estado IN ('Rechazada', 'Cancelada') THEN
+        RAISE EXCEPTION 'RN-06: una reserva % no se puede modificar.', lower(OLD.estado);
+    END IF;
+
+    IF NEW.estado <> OLD.estado AND NOT (
+           (OLD.estado = 'Pendiente' AND NEW.estado IN ('Aprobada', 'Rechazada', 'Cancelada'))
+        OR (OLD.estado = 'Aprobada'  AND NEW.estado = 'Cancelada')) THEN
+        RAISE EXCEPTION 'Transición de estado no permitida: % a %.', OLD.estado, NEW.estado;
+    END IF;
+
+    RETURN NEW;
+END $$;
+
+DROP TRIGGER IF EXISTS trg_reservas_validar_transicion ON reservas;
+CREATE TRIGGER trg_reservas_validar_transicion
+    BEFORE UPDATE ON reservas
+    FOR EACH ROW EXECUTE FUNCTION fn_reservas_validar_transicion();
+
+-- Ambiente en mantenimiento (decisión 4 del análisis): no admite reservas nuevas. Se comprueba al insertar; las reservas
+-- que ya existían no se tocan si el ambiente pasa a mantenimiento después.
+CREATE OR REPLACE FUNCTION fn_reservas_validar_ambiente() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+    IF (SELECT estado FROM ambientes WHERE id = NEW.ambiente_id) <> 'Disponible' THEN
+        RAISE EXCEPTION 'Un ambiente en mantenimiento no admite reservas nuevas.';
+    END IF;
+    RETURN NEW;
+END $$;
+
+DROP TRIGGER IF EXISTS trg_reservas_validar_ambiente ON reservas;
+CREATE TRIGGER trg_reservas_validar_ambiente
+    BEFORE INSERT ON reservas
+    FOR EACH ROW EXECUTE FUNCTION fn_reservas_validar_ambiente();
+
+-- RN-05: solo un Administrador deja constancia de aprobar o rechazar una reserva; cancelar lo hace el solicitante
+-- dueño de la reserva o un Administrador. Cada cambio de estado escribe una fila en historial_reserva.
+CREATE OR REPLACE FUNCTION fn_historial_validar_autor() RETURNS trigger
+LANGUAGE plpgsql AS $$
+DECLARE
+    v_es_administrador boolean;
+BEGIN
+    SELECT rol = 'Administrador' INTO v_es_administrador FROM usuarios WHERE id = NEW.usuario_id;
+
+    IF NEW.estado_nuevo IN ('Aprobada', 'Rechazada') AND NOT COALESCE(v_es_administrador, false) THEN
+        RAISE EXCEPTION 'RN-05: solo el Administrador aprueba o rechaza una reserva.';
+    END IF;
+
+    IF NEW.estado_nuevo = 'Cancelada' AND NOT COALESCE(v_es_administrador, false)
+       AND NOT EXISTS (SELECT 1 FROM reservas WHERE id = NEW.reserva_id AND usuario_id = NEW.usuario_id) THEN
+        RAISE EXCEPTION 'Solo el solicitante dueño o el Administrador cancela una reserva.';
+    END IF;
+
+    RETURN NEW;
+END $$;
+
+DROP TRIGGER IF EXISTS trg_historial_validar_autor ON historial_reserva;
+CREATE TRIGGER trg_historial_validar_autor
+    BEFORE INSERT ON historial_reserva
+    FOR EACH ROW EXECUTE FUNCTION fn_historial_validar_autor();
