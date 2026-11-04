@@ -16,7 +16,7 @@ export default function LoginPage() {
   // Quien ya tiene sesión no necesita volver a iniciarla.
   if (sesion) return <Navigate to={RUTA_INICIAL_POR_ROL[sesion.rol] ?? '/'} replace />
 
-  const { valores, errores, enviando } = form
+  const { enviando } = form
 
   return (
     <div className={estilos.pagina}>
@@ -40,36 +40,22 @@ export default function LoginPage() {
           )}
 
           <TextInput
-            id="correo"
-            nombre="correo"
+            {...form.campoDeTexto('correo')}
             etiqueta={TEXTOS.etiquetaCorreo}
             ayuda={TEXTOS.ayudaCorreo}
-            valor={valores.correo}
-            error={errores.correo}
-            onChange={form.handleChange}
-            onBlur={form.handleBlur}
-            soloLectura={enviando}
             tipo="email"
             autoComplete="username"
-            inputRef={form.refDe('correo')}
           />
           <PasswordInput
-            id="contrasena"
-            nombre="contrasena"
+            {...form.campoDeTexto('contrasena')}
             etiqueta={TEXTOS.etiquetaContrasena}
-            valor={valores.contrasena}
-            error={errores.contrasena}
             aviso={form.bloqMayusActivo ? TEXTOS.avisoBloqMayus : undefined}
-            onChange={form.handleChange}
-            onBlur={form.handleBlur}
             onKeyDown={form.handleBloqMayus}
             onKeyUp={form.handleBloqMayus}
             onMouseDown={form.handleBloqMayus}
-            soloLectura={enviando}
             mostrando={form.mostrarContrasena}
             onAlternar={form.alternarMostrarContrasena}
             autoComplete="current-password"
-            inputRef={form.refDe('contrasena')}
           />
 
           <div className={estilos.boton}>

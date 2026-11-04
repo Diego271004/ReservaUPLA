@@ -64,6 +64,14 @@ export function hoy(ahora = new Date()) {
   return `${dosDigitos(ahora.getDate())}/${dosDigitos(ahora.getMonth() + 1)}/${ahora.getFullYear()}`
 }
 
+/** RN-07: true si la fecha dd/mm/aaaa es anterior a hoy (hora local). La fecha mínima de una reserva es hoy. */
+export function esAnteriorAHoy(texto, ahora = new Date()) {
+  const fecha = parsearFecha(texto)
+  if (!fecha) return false
+  const comparable = ({ anio, mes, dia }) => anio * 10000 + mes * 100 + dia
+  return comparable(fecha) < comparable(parsearFecha(hoy(ahora)))
+}
+
 /** Mientras se escribe: deja solo dígitos (máximo 8) y agrega las barras: 05112026 → 05/11/2026. */
 export function aplicarMascaraFecha(entrada) {
   const digitos = String(entrada ?? '')

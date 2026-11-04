@@ -115,6 +115,22 @@ CREATE TRIGGER trg_reservas_validar_ambiente
     BEFORE INSERT ON reservas
     FOR EACH ROW EXECUTE FUNCTION fn_reservas_validar_ambiente();
 
+-- RN-07 (regla agregada): no se reserva para una fecha anterior a hoy ("hoy" = la fecha de Lima). Solo al INSERTAR: un
+-- UPDATE de estado sobre una reserva que ya pasó (aprobar, cancelar) sigue funcionando. Mismo texto que MensajesValidacion.FechaPasada.
+CREATE OR REPLACE FUNCTION fn_reservas_validar_fecha() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+    IF NEW.fecha < (now() AT TIME ZONE 'America/Lima')::date THEN
+        RAISE EXCEPTION 'No puedes reservar para una fecha anterior a hoy.';
+    END IF;
+    RETURN NEW;
+END $$;
+
+DROP TRIGGER IF EXISTS trg_reservas_validar_fecha ON reservas;
+CREATE TRIGGER trg_reservas_validar_fecha
+    BEFORE INSERT ON reservas
+    FOR EACH ROW EXECUTE FUNCTION fn_reservas_validar_fecha();
+
 -- RN-05: solo un Administrador deja constancia de aprobar o rechazar una reserva; cancelar lo hace el solicitante
 -- dueño de la reserva o un Administrador. Cada cambio de estado escribe una fila en historial_reserva.
 CREATE OR REPLACE FUNCTION fn_historial_validar_autor() RETURNS trigger

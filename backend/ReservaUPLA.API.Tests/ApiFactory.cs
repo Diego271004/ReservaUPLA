@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using ReservaUPLA.Application.Interfaces;
+using ReservaUPLA.Application.Reglas;
 using ReservaUPLA.Application.Tests.Fakes;
 using ReservaUPLA.Domain.Entities;
 using ReservaUPLA.Domain.Enums;
@@ -70,6 +71,12 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
             servicios.RemoveAll<IUsuarioRepository>();
             servicios.RemoveAll<IAmbienteRepository>();
             servicios.RemoveAll<IReservaRepository>();
+            // RN-07 compara con "hoy": con el reloj fijo (3/11/2026) las fechas de las pruebas no caducan.
+            // El reloj general no se toca: los tokens JWT se validan contra la hora real.
+            servicios.RemoveAll<IReglaReserva>();
+            servicios.AddScoped<IReglaReserva, ReglaAmbienteDisponible>();
+            servicios.AddScoped<IReglaReserva, ReglaFechaNoPasada>(_ => new ReglaFechaNoPasada(new FakeTimeProvider()));
+            servicios.AddScoped<IReglaReserva, ReglaSinCruceConAprobadas>();
             servicios.AddSingleton(_usuariosPropios ?? Usuarios);
             servicios.AddSingleton<IUsuarioRepository>(proveedor => _usuariosPropios ?? Usuarios);
             servicios.AddSingleton<IAmbienteRepository>(Ambientes);

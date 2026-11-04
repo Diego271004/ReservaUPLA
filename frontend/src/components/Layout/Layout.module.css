@@ -29,16 +29,9 @@
   font-weight: 700;
 }
 
+/* Contenedor del botón del menú: solo se muestra en móvil. */
 .botonMenu {
   display: none;
-  min-height: var(--alto-control);
-  padding: 0 var(--espacio-2);
-  font: inherit;
-  color: var(--color-sobre-oscuro);
-  background: transparent;
-  border: 1px solid var(--color-sobre-oscuro);
-  border-radius: var(--radio);
-  cursor: pointer;
 }
 
 .persona {
@@ -80,18 +73,6 @@
 .activa {
   font-weight: 700;
   background: var(--color-primario);
-}
-
-.cerrarSesion {
-  min-height: var(--alto-control);
-  padding: 0 var(--espacio-2);
-  font: inherit;
-  color: var(--color-sobre-oscuro);
-  text-align: left;
-  background: transparent;
-  border: 0;
-  border-top: 1px solid rgb(255 255 255 / 20%);
-  cursor: pointer;
 }
 
 .contenido {

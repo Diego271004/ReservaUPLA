@@ -50,10 +50,9 @@ public sealed class ReservaService : IReservaService
 
         var solicitud = dto with { Motivo = dto.Motivo?.Trim() };
 
-        var validacion = await _validador.ValidateAsync(solicitud, cancellationToken);
-        if (!validacion.IsValid)
+        if (ResultadoOperacion<ReservaDto>.SiNoEsValido(await _validador.ValidateAsync(solicitud, cancellationToken)) is { } invalido)
         {
-            return ResultadoOperacion<ReservaDto>.DatosInvalidos(validacion.Errors.AgruparPorCampo());
+            return invalido;
         }
 
         var ambiente = await _ambientes.ObtenerPorIdAsync(solicitud.AmbienteId!.Value, cancellationToken);
@@ -123,10 +122,9 @@ public sealed class ReservaService : IReservaService
     {
         ArgumentNullException.ThrowIfNull(dto);
 
-        var validacion = await _validadorDisponibilidad.ValidateAsync(dto, cancellationToken);
-        if (!validacion.IsValid)
+        if (ResultadoOperacion<DisponibilidadDto>.SiNoEsValido(await _validadorDisponibilidad.ValidateAsync(dto, cancellationToken)) is { } invalido)
         {
-            return ResultadoOperacion<DisponibilidadDto>.DatosInvalidos(validacion.Errors.AgruparPorCampo());
+            return invalido;
         }
 
         var ambiente = await _ambientes.ObtenerPorIdAsync(dto.AmbienteId!.Value, cancellationToken);
@@ -148,9 +146,51 @@ public sealed class ReservaService : IReservaService
 
     // ================================================================ Cambiar de estado
 
-    public async Task<ResultadoOperacion<ReservaDetalleDto>> AprobarAsync(int id, ActorDto actor, CancellationToken cancellationToken)
+    public Task<ResultadoOperacion<ReservaDetalleDto>> AprobarAsync(int id, ActorDto actor, CancellationToken cancellationToken) =>
+        TransicionarAsync(
+            id,
+            permitido: actor.Rol == RolUsuario.Administrador, // RN-05
+            comprobaciones: ComprobarSinCruceAsync,
+            transicion: reserva => reserva.Aprobar(actor.UsuarioId, _reloj.GetUtcNow()),
+            cancellationToken);
+
+    public Task<ResultadoOperacion<ReservaDetalleDto>> RechazarAsync(int id, ActorDto actor, CancellationToken cancellationToken) =>
+        TransicionarAsync(
+            id,
+            permitido: actor.Rol == RolUsuario.Administrador, // RN-05
+            comprobaciones: (_, _) => SinObjeciones,
+            transicion: reserva => reserva.Rechazar(actor.UsuarioId, _reloj.GetUtcNow()),
+            cancellationToken);
+
+    public Task<ResultadoOperacion<ReservaDetalleDto>> CancelarAsync(int id, ActorDto actor, CancellationToken cancellationToken) =>
+        TransicionarAsync(
+            id,
+            permitido: actor.Rol != RolUsuario.Responsable,
+            // Cancela el solicitante dueño de la reserva o el Administrador.
+            comprobaciones: (reserva, _) => Task.FromResult(
+                actor.Rol == RolUsuario.Solicitante && reserva.UsuarioId != actor.UsuarioId
+                    ? ResultadoOperacion<ReservaDetalleDto>.SinPermiso()
+                    : null),
+            transicion: reserva => reserva.Cancelar(actor.UsuarioId, _reloj.GetUtcNow()),
+            cancellationToken);
+
+    // ================================================================ Apoyo
+
+    private static readonly Task<ResultadoOperacion<ReservaDetalleDto>?> SinObjeciones =
+        Task.FromResult<ResultadoOperacion<ReservaDetalleDto>?>(null);
+
+    /// <summary>
+    /// El flujo común de aprobar, rechazar y cancelar: permiso por rol, la reserva existe, comprobaciones propias de la
+    /// acción y, por último, la transición del dominio (RN-06) guardada junto con su evento de historial.
+    /// </summary>
+    private async Task<ResultadoOperacion<ReservaDetalleDto>> TransicionarAsync(
+        int id,
+        bool permitido,
+        Func<Reserva, CancellationToken, Task<ResultadoOperacion<ReservaDetalleDto>?>> comprobaciones,
+        Action<Reserva> transicion,
+        CancellationToken cancellationToken)
     {
-        if (actor.Rol != RolUsuario.Administrador) // RN-05
+        if (!permitido)
         {
             return ResultadoOperacion<ReservaDetalleDto>.SinPermiso();
         }
@@ -161,52 +201,25 @@ public sealed class ReservaService : IReservaService
             return ResultadoOperacion<ReservaDetalleDto>.NoEncontrado();
         }
 
-        // RN-01 se vuelve a comprobar al aprobar: desde que se pidió pudo aprobarse otra reserva que se cruza.
+        if (await comprobaciones(reserva, cancellationToken) is { } rechazo)
+        {
+            return rechazo;
+        }
+
+        return await CambiarEstadoAsync(reserva, transicion, cancellationToken);
+    }
+
+    // RN-01 se vuelve a comprobar al aprobar: desde que se pidió pudo aprobarse otra reserva que se cruza.
+    private async Task<ResultadoOperacion<ReservaDetalleDto>?> ComprobarSinCruceAsync(Reserva reserva, CancellationToken cancellationToken)
+    {
         if (reserva.Estado == EstadoReserva.Pendiente
             && await _comprobador.MensajeDeConflictoAsync(reserva, cancellationToken) is { } mensaje)
         {
             return ResultadoOperacion<ReservaDetalleDto>.Conflicto(mensaje);
         }
 
-        return await CambiarEstadoAsync(reserva, r => r.Aprobar(actor.UsuarioId, _reloj.GetUtcNow()), cancellationToken);
+        return null;
     }
-
-    public async Task<ResultadoOperacion<ReservaDetalleDto>> RechazarAsync(int id, ActorDto actor, CancellationToken cancellationToken)
-    {
-        if (actor.Rol != RolUsuario.Administrador) // RN-05
-        {
-            return ResultadoOperacion<ReservaDetalleDto>.SinPermiso();
-        }
-
-        var reserva = await _reservas.ObtenerConHistorialAsync(id, cancellationToken);
-        return reserva is null
-            ? ResultadoOperacion<ReservaDetalleDto>.NoEncontrado()
-            : await CambiarEstadoAsync(reserva, r => r.Rechazar(actor.UsuarioId, _reloj.GetUtcNow()), cancellationToken);
-    }
-
-    public async Task<ResultadoOperacion<ReservaDetalleDto>> CancelarAsync(int id, ActorDto actor, CancellationToken cancellationToken)
-    {
-        if (actor.Rol == RolUsuario.Responsable)
-        {
-            return ResultadoOperacion<ReservaDetalleDto>.SinPermiso();
-        }
-
-        var reserva = await _reservas.ObtenerConHistorialAsync(id, cancellationToken);
-        if (reserva is null)
-        {
-            return ResultadoOperacion<ReservaDetalleDto>.NoEncontrado();
-        }
-
-        // Cancela el solicitante dueño de la reserva o el Administrador.
-        if (actor.Rol == RolUsuario.Solicitante && reserva.UsuarioId != actor.UsuarioId)
-        {
-            return ResultadoOperacion<ReservaDetalleDto>.SinPermiso();
-        }
-
-        return await CambiarEstadoAsync(reserva, r => r.Cancelar(actor.UsuarioId, _reloj.GetUtcNow()), cancellationToken);
-    }
-
-    // ================================================================ Apoyo
 
     private async Task<ResultadoOperacion<ReservaDetalleDto>> CambiarEstadoAsync(
         Reserva reserva, Action<Reserva> transicion, CancellationToken cancellationToken)

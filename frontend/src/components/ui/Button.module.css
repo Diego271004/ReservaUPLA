@@ -39,6 +39,25 @@
   background: transparent;
 }
 
+/* Sobre el fondo oscuro del menú lateral (solo Layout). */
+.sobreOscuro {
+  padding: 0 var(--espacio-2);
+  font-weight: 400;
+  color: var(--color-sobre-oscuro);
+  background: transparent;
+  border-color: var(--color-sobre-oscuro);
+}
+
+.sobreOscuroLista {
+  justify-content: flex-start;
+  padding: 0 var(--espacio-2);
+  font-weight: 400;
+  color: var(--color-sobre-oscuro);
+  background: transparent;
+  border-top: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 0;
+}
+
 .boton:disabled {
   color: var(--color-deshabilitado);
   background: var(--fondo-deshabilitado);

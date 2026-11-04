@@ -48,11 +48,17 @@ FROM (VALUES
 ) AS v (fecha, inicio, fin, motivo, estado, ambiente)
 WHERE NOT EXISTS (SELECT 1 FROM reservas);
 
+-- Los datos de ejemplo llevan fechas fijas que con el tiempo quedan en el pasado: RN-07 (solo al insertar) se apaga
+-- únicamente para esta carga y se vuelve a encender enseguida.
+ALTER TABLE reservas DISABLE TRIGGER trg_reservas_validar_fecha;
+
 INSERT INTO reservas (fecha, hora_inicio, hora_fin, motivo, estado, usuario_id, ambiente_id)
 SELECT n.fecha, n.inicio, n.fin, n.motivo, n.estado,
        (SELECT id FROM usuarios WHERE correo = 'ana.torres@upla.edu.pe'),
        (SELECT id FROM ambientes WHERE nombre = n.ambiente)
 FROM _reservas_nuevas n;
+
+ALTER TABLE reservas ENABLE TRIGGER trg_reservas_validar_fecha;
 
 -- Toda reserva nueva nace Pendiente (historial) y, si cambió de estado, lleva un segundo evento.
 INSERT INTO historial_reserva (reserva_id, estado_anterior, estado_nuevo, usuario_id)

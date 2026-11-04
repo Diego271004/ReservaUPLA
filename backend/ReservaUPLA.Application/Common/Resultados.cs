@@ -1,3 +1,4 @@
+using FluentValidation.Results;
 using ReservaUPLA.Application.DTOs;
 
 namespace ReservaUPLA.Application.Common;
@@ -79,6 +80,10 @@ public sealed class ResultadoOperacion<T>
 
     public static ResultadoOperacion<T> DatosInvalidos(string campo, string mensaje) =>
         DatosInvalidos(new Dictionary<string, string[]> { [campo] = [mensaje] });
+
+    /// <summary>El resultado 400 con los errores por campo si la validación falló; null si los datos son válidos.</summary>
+    public static ResultadoOperacion<T>? SiNoEsValido(ValidationResult validacion) =>
+        validacion.IsValid ? null : DatosInvalidos(validacion.Errors.AgruparPorCampo());
 
     public static ResultadoOperacion<T> NoEncontrado() => new(EstadoOperacion.NoEncontrado, default, SinErrores, null);
 

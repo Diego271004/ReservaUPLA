@@ -22,10 +22,14 @@ function derivar(campo, valor, valores) {
 }
 
 export function etiquetaDeAmbiente(ambiente) {
-  const base = `${ambiente.nombre} · ${ambiente.capacidad} ${TEXTOS.personas} · ${ambiente.ubicacion}`
   return ambiente.estado === 'Disponible'
-    ? base
+    ? ambiente.nombre
     : `${ambiente.nombre} · ${ambiente.estado} (no disponible)`
+}
+
+/** Detalle del ambiente elegido, como ayuda bajo el campo: "30 personas · Pabellón A, piso 2". */
+export function detalleDeAmbiente(ambiente) {
+  return `${ambiente.capacidad} ${TEXTOS.personas} · ${ambiente.ubicacion}`
 }
 
 export function useReservaForm() {
@@ -69,6 +73,13 @@ export function useReservaForm() {
     alExito,
   })
 
+  const ayudaAmbiente = useMemo(() => {
+    const elegido = ambientes.datos.find(
+      (ambiente) => String(ambiente.id) === formulario.valores.ambienteId,
+    )
+    return elegido ? detalleDeAmbiente(elegido) : undefined
+  }, [ambientes.datos, formulario.valores.ambienteId])
+
   const disponibilidad = useDisponibilidad(formulario.valores, reservaCreada === null)
 
   const { reiniciar } = formulario
@@ -80,6 +91,7 @@ export function useReservaForm() {
   return {
     ...formulario,
     opcionesAmbiente,
+    ayudaAmbiente,
     cargandoAmbientes: ambientes.cargando,
     errorAmbientes: ambientes.error,
     horasInicio: HORAS,

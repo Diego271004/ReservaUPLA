@@ -54,12 +54,11 @@ public sealed class ReservasController : ControllerBase
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType(typeof(MensajeResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Crear(
-        [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] CrearReservaDto? dto,
+        [CuerpoOpcional] CrearReservaDto? dto,
         CancellationToken cancellationToken)
     {
-        var solicitud = ModelState.IsValid && dto is not null ? dto : new CrearReservaDto(null, null, null, null, null);
-        var resultado = await _reservas.CrearAsync(solicitud, User.ObtenerUsuarioId(), cancellationToken);
-        return this.Traducir(resultado, reserva => StatusCode(StatusCodes.Status201Created, reserva));
+        var solicitud = this.CuerpoOVacio(dto, new CrearReservaDto(null, null, null, null, null));
+        return this.Creado(await _reservas.CrearAsync(solicitud, User.ObtenerUsuarioId(), cancellationToken));
     }
 
     [HttpPost("{id:int}/aprobar")]

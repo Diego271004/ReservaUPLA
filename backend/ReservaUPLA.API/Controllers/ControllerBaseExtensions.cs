@@ -1,6 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ReservaUPLA.API.Contracts;
 using ReservaUPLA.Application.Common;
 using ReservaUPLA.Application.DTOs;
@@ -15,6 +17,16 @@ public static class Roles
     public const string Administrador = nameof(RolUsuario.Administrador);
     public const string Solicitante = nameof(RolUsuario.Solicitante);
     public const string AdministradorOSolicitante = Administrador + "," + Solicitante;
+}
+
+/// <summary>[FromBody] que permite el cuerpo vacío: el controlador lo trata como datos ausentes y recibe los mensajes del validador.</summary>
+[AttributeUsage(AttributeTargets.Parameter)]
+public sealed class CuerpoOpcionalAttribute : FromBodyAttribute
+{
+    public CuerpoOpcionalAttribute()
+    {
+        EmptyBodyBehavior = EmptyBodyBehavior.Allow;
+    }
 }
 
 public static class ControllerBaseExtensions
@@ -56,5 +68,24 @@ public static class ControllerBaseExtensions
             EstadoOperacion.SinPermiso => controlador.StatusCode(StatusCodes.Status403Forbidden),
             EstadoOperacion.Conflicto => controlador.Conflict(new MensajeResponse(resultado.Mensaje!)),
             _ => throw new InvalidOperationException($"Estado de operación no contemplado: {resultado.Estado}"),
+        };
+
+
+    /// <summary>El cuerpo recibido, o <paramref name="vacio"/> (todos los campos ausentes) si no llegó o tenía un JSON mal formado.</summary>
+    public static T CuerpoOVacio<T>(this ControllerBase controlador, T? dto, T vacio) where T : class =>
+        controlador.ModelState.IsValid && dto is not null ? dto : vacio;
+
+    /// <summary>201 con el recurso creado, o el 400 / 403 / 404 / 409 que corresponda.</summary>
+    public static IActionResult Creado<T>(this ControllerBase controlador, ResultadoOperacion<T> resultado) =>
+        controlador.Traducir(resultado, valor => controlador.StatusCode(StatusCodes.Status201Created, valor));
+
+    /// <summary>Traduce el resultado del login: 200 con el token, 400 con errores por campo o 401 con el mensaje genérico.</summary>
+    public static IActionResult Traducir(this ControllerBase controlador, ResultadoAutenticacion resultado) =>
+        resultado.Estado switch
+        {
+            EstadoAutenticacion.Exitoso => controlador.Ok(resultado.Respuesta),
+            EstadoAutenticacion.DatosInvalidos => DatosInvalidos(resultado.Errores),
+            EstadoAutenticacion.CredencialesInvalidas => controlador.Unauthorized(new MensajeResponse(resultado.Mensaje!)),
+            _ => throw new UnreachableException($"Estado de autenticación no contemplado: {resultado.Estado}"),
         };
 }

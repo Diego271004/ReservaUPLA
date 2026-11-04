@@ -110,3 +110,25 @@ export async function api(ruta, { metodo = 'GET', token, cuerpo } = {}) {
 }
 
 export const tokenDe = (sesionTexto) => JSON.parse(sesionTexto).token
+
+const dos = (n) => String(n).padStart(2, '0')
+
+/** La fecha de hoy + `dias` (hora local): `texto` dd/mm/aaaa (lo que se escribe en el campo), `iso` aaaa-mm-dd (lo que usa la API). */
+export function fechaRelativa(dias = 0) {
+  const fecha = new Date()
+  fecha.setDate(fecha.getDate() + dias)
+  const [d, m, a] = [dos(fecha.getDate()), dos(fecha.getMonth() + 1), fecha.getFullYear()]
+  return { texto: `${d}/${m}/${a}`, digitos: `${d}${m}${a}`, iso: `${a}-${m}-${d}` }
+}
+
+/** Crea una reserva por la API como el usuario del token y devuelve su id (los guiones no dependen de datos de otra fase). */
+export async function crearReservaApi(token, ambienteId, fechaIso, horaInicio, horaFin, motivo) {
+  const respuesta = await api('/api/reservas', { metodo: 'POST', token, cuerpo: { ambienteId, fecha: fechaIso, horaInicio, horaFin, motivo } })
+  if (respuesta.status !== 201) throw new Error(`No se pudo crear la reserva de partida (HTTP ${respuesta.status}): ${JSON.stringify(respuesta.data)}`)
+  return respuesta.data.id
+}
+
+export async function aprobarReservaApi(token, id) {
+  const respuesta = await api(`/api/reservas/${id}/aprobar`, { metodo: 'POST', token })
+  if (respuesta.status !== 200) throw new Error(`No se pudo aprobar la reserva #${id} (HTTP ${respuesta.status})`)
+}

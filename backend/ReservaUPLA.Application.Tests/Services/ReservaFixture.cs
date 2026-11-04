@@ -46,9 +46,11 @@ public sealed class ReservaFixture
     public ReservaService CrearServicio(params IReglaReserva[] reglasExtra)
     {
         var comprobador = new ComprobadorDeHorario(Reservas);
+        var reloj = new FakeTimeProvider();
         IReglaReserva[] reglas =
         [
             new ReglaAmbienteDisponible(),
+            new ReglaFechaNoPasada(reloj),
             new ReglaSinCruceConAprobadas(comprobador),
             .. reglasExtra,
         ];
@@ -60,7 +62,7 @@ public sealed class ReservaFixture
             Usuarios,
             reglas,
             comprobador,
-            new FakeTimeProvider());
+            reloj);
     }
 
     public static CrearReservaDto Solicitud(

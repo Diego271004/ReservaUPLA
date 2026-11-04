@@ -99,6 +99,26 @@ public class ReservaServiceTests
         Assert.Equal(MensajesValidacion.MotivoDemasiadoLargo, resultado.Errores[CamposFormulario.Motivo][0]);
     }
 
+    [Theory]
+    [InlineData("2026-11-02")]
+    [InlineData("2025-01-01")]
+    public async Task RN07_una_fecha_anterior_a_hoy_se_rechaza(string fecha)
+    {
+        var resultado = await Crear(ReservaFixture.Solicitud(fecha: fecha));
+
+        Assert.Equal(EstadoOperacion.DatosInvalidos, resultado.Estado);
+        Assert.Equal(MensajesValidacion.FechaPasada, resultado.Errores[CamposFormulario.Fecha][0]);
+        Assert.Empty(_escenario.Reservas.Reservas);
+    }
+
+    [Fact]
+    public async Task RN07_la_fecha_de_hoy_es_valida()
+    {
+        var resultado = await Crear(ReservaFixture.Solicitud(fecha: "2026-11-03"));
+
+        Assert.Equal(EstadoOperacion.Exitoso, resultado.Estado);
+    }
+
     [Fact]
     public async Task Ambiente_inexistente_se_rechaza()
     {

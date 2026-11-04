@@ -29,10 +29,9 @@ public sealed class AmbienteService : IAmbienteService
 
         var solicitud = dto with { Nombre = dto.Nombre?.Trim(), Ubicacion = dto.Ubicacion?.Trim() };
 
-        var validacion = await _validator.ValidateAsync(solicitud, cancellationToken);
-        if (!validacion.IsValid)
+        if (ResultadoOperacion<AmbienteDto>.SiNoEsValido(await _validator.ValidateAsync(solicitud, cancellationToken)) is { } invalido)
         {
-            return ResultadoOperacion<AmbienteDto>.DatosInvalidos(validacion.Errors.AgruparPorCampo());
+            return invalido;
         }
 
         if (await _ambientes.ExisteNombreAsync(solicitud.Nombre!, cancellationToken))

@@ -63,6 +63,7 @@ public static class MensajesValidacion
     public const string AmbienteInexistente = "Selecciona un ambiente de la lista.";
     public const string FechaVacia = "Ingresa la fecha de la reserva.";
     public const string FechaFormatoInvalido = "Ingresa la fecha con el formato dd/mm/aaaa.";
+    public const string FechaPasada = "No puedes reservar para una fecha anterior a hoy.";
     public const string HoraInicioVacia = "Selecciona la hora de inicio.";
     public const string HoraFinVacia = "Selecciona la hora de fin.";
     public const string HoraFueraDeHorario = "El horario permitido es de 07:00 a 22:00.";

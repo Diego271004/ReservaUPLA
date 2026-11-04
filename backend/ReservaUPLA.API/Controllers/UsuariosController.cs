@@ -39,11 +39,10 @@ public sealed class UsuariosController : ControllerBase
     [ProducesResponseType(typeof(UsuarioDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
     public async Task<IActionResult> Crear(
-        [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] CrearUsuarioDto? dto,
+        [CuerpoOpcional] CrearUsuarioDto? dto,
         CancellationToken cancellationToken)
     {
-        var solicitud = ModelState.IsValid && dto is not null ? dto : new CrearUsuarioDto(null, null, null, null, null);
-        var resultado = await _usuarios.CrearAsync(solicitud, cancellationToken);
-        return this.Traducir(resultado, usuario => StatusCode(StatusCodes.Status201Created, usuario));
+        var solicitud = this.CuerpoOVacio(dto, new CrearUsuarioDto(null, null, null, null, null));
+        return this.Creado(await _usuarios.CrearAsync(solicitud, cancellationToken));
     }
 }

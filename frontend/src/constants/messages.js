@@ -58,6 +58,7 @@ export const MENSAJES = Object.freeze({
   ambienteInexistente: 'Selecciona un ambiente de la lista.',
   fechaVacia: 'Ingresa la fecha de la reserva.',
   fechaFormatoInvalido: 'Ingresa la fecha con el formato dd/mm/aaaa.',
+  fechaPasada: 'No puedes reservar para una fecha anterior a hoy.',
   horaInicioVacia: 'Selecciona la hora de inicio.',
   horaFinVacia: 'Selecciona la hora de fin.',
   horaFueraDeHorario: 'El horario permitido es de 07:00 a 22:00.',

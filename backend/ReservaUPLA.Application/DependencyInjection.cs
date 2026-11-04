@@ -26,6 +26,7 @@ public static class DependencyInjection
         servicios.AddScoped<IValidator<ConsultarDisponibilidadDto>, ConsultarDisponibilidadValidator>();
         servicios.AddScoped<ComprobadorDeHorario>();
         servicios.AddScoped<IReglaReserva, ReglaAmbienteDisponible>();
+        servicios.AddScoped<IReglaReserva, ReglaFechaNoPasada>();
         servicios.AddScoped<IReglaReserva, ReglaSinCruceConAprobadas>();
         servicios.AddScoped<IAuthService, AuthService>();
         servicios.AddScoped<IUsuarioService, UsuarioService>();

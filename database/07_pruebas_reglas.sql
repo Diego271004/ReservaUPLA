@@ -184,6 +184,27 @@ SELECT pg_temp.debe_fallar_sql('mantenimiento: la base no acepta una reserva nue
                (SELECT id FROM usuarios WHERE correo = 'prueba.reglas@upla.edu.pe'),
                (SELECT id FROM ambientes WHERE nombre = 'Ambiente en mantenimiento de prueba'))$q$, 'P0001', 'mantenimiento');
 
+-- RN-07 (regla agregada): no se reserva para una fecha anterior a hoy; solo al insertar, no al cambiar de estado.
+SELECT pg_temp.debe_fallar_sql('RN-07: la base no acepta una reserva con fecha anterior a hoy',
+    $q$INSERT INTO reservas (fecha, hora_inicio, hora_fin, motivo, usuario_id, ambiente_id)
+       VALUES ((now() AT TIME ZONE 'America/Lima')::date - 1, '09:00', '10:00', 'x',
+               (SELECT id FROM usuarios WHERE correo = 'prueba.reglas@upla.edu.pe'),
+               (SELECT id FROM ambientes WHERE nombre = 'Ambiente de prueba'))$q$, 'P0001', 'fecha anterior a hoy');
+SELECT pg_temp.debe_pasar_sql('RN-07: la base sí acepta una reserva para hoy',
+    $q$INSERT INTO reservas (fecha, hora_inicio, hora_fin, motivo, usuario_id, ambiente_id)
+       VALUES ((now() AT TIME ZONE 'America/Lima')::date, '09:00', '10:00', 'x',
+               (SELECT id FROM usuarios WHERE correo = 'prueba.reglas@upla.edu.pe'),
+               (SELECT id FROM ambientes WHERE nombre = 'Ambiente de prueba'))$q$);
+-- Una reserva que ya quedó en el pasado puede cambiar de estado (solo el INSERT se controla).
+ALTER TABLE reservas DISABLE TRIGGER trg_reservas_validar_fecha;
+INSERT INTO reservas (fecha, hora_inicio, hora_fin, motivo, usuario_id, ambiente_id)
+VALUES ('2020-01-10', '09:00', '10:00', 'Antigua',
+        (SELECT id FROM usuarios WHERE correo = 'prueba.reglas@upla.edu.pe'),
+        (SELECT id FROM ambientes WHERE nombre = 'Ambiente de prueba'));
+ALTER TABLE reservas ENABLE TRIGGER trg_reservas_validar_fecha;
+SELECT pg_temp.debe_pasar_sql('RN-07: una reserva antigua sí puede cambiar de estado (el control es solo al insertar)',
+    $q$UPDATE reservas SET estado = 'Cancelada' WHERE motivo = 'Antigua'$q$);
+
 -- Contraseñas (U2): la política se valida en la aplicación antes de guardar; la base solo acepta un hash BCrypt, nunca texto.
 SELECT pg_temp.debe_fallar_sql('la base no acepta una contraseña en texto plano',
     $q$INSERT INTO usuarios (nombre_completo, correo, rol, contrasena_hash)

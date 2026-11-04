@@ -11,6 +11,7 @@ import {
   iniciarSesion,
   leerSesion,
   nuevaPagina,
+  fechaRelativa,
   ok,
   paso,
 } from './lib.mjs'
@@ -135,9 +136,9 @@ try {
   await ana.getByRole('button', { name: 'Registrar solicitud' }).click()
   await ana.getByText('Ingresa el motivo de la reserva.').waitFor()
   await capturar(ana, destino, '05-nueva-reserva-errores', 'escritorio')
-  await ana.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Física · 24 personas · Pabellón C, piso 1' })
+  await ana.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Física' })
   await ana.getByLabel('Fecha').fill('')
-  await ana.getByLabel('Fecha').pressSequentially('18112026')
+  await ana.getByLabel('Fecha').pressSequentially(fechaRelativa(14).digitos)
   await ana.getByLabel('Hora de inicio').selectOption('14:00')
   const opcionesFin = await ana.getByLabel('Hora de fin').locator('option').allTextContents()
   ok(`hora de fin con inicio 14:00: ${opcionesFin[1]} a ${opcionesFin.at(-1)} (${opcionesFin.length - 1} opciones)`)
@@ -191,9 +192,9 @@ try {
   await anaMovil.getByRole('button', { name: 'Registrar solicitud' }).click()
   await anaMovil.getByText('Ingresa el motivo de la reserva.').waitFor()
   await capturar(anaMovil, destino, '05-nueva-reserva-errores', 'movil')
-  await anaMovil.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Física · 24 personas · Pabellón C, piso 1' })
+  await anaMovil.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Física' })
   await anaMovil.getByLabel('Fecha').fill('')
-  await anaMovil.getByLabel('Fecha').pressSequentially('20112026')
+  await anaMovil.getByLabel('Fecha').pressSequentially(fechaRelativa(16).digitos)
   await anaMovil.getByLabel('Hora de inicio').selectOption('08:00')
   await anaMovil.getByLabel('Hora de fin').selectOption('10:00')
   await anaMovil.getByLabel('Motivo').fill('Práctica de laboratorio de física')

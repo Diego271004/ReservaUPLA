@@ -6,7 +6,14 @@ import {
   mensajeDominioNoInstitucional,
 } from '../constants/messages.js'
 import { OPCIONES_ESTADO_AMBIENTE, OPCIONES_ROL, OPCIONES_TIPO } from '../constants/navegacion.js'
-import { HORAS, HORA_APERTURA, HORA_CIERRE, minutosDeHora, parsearFecha } from './fechas.js'
+import {
+  HORAS,
+  HORA_APERTURA,
+  HORA_CIERRE,
+  esAnteriorAHoy,
+  minutosDeHora,
+  parsearFecha,
+} from './fechas.js'
 
 const FORMATO_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const CAPACIDAD_MAXIMA = 5000
@@ -101,9 +108,11 @@ export function validarAmbienteId(valor) {
   return vacio(String(valor ?? '')) ? MENSAJES.ambienteVacio : null
 }
 
-export function validarFecha(valor) {
+/** RN-02 (obligatoria), formato dd/mm/aaaa y RN-07 (no anterior a hoy). `ahora` solo existe para las pruebas. */
+export function validarFecha(valor, ahora = new Date()) {
   if (vacio(valor)) return MENSAJES.fechaVacia
-  return parsearFecha(valor) ? null : MENSAJES.fechaFormatoInvalido
+  if (!parsearFecha(valor)) return MENSAJES.fechaFormatoInvalido
+  return esAnteriorAHoy(valor, ahora) ? MENSAJES.fechaPasada : null
 }
 
 const dentroDelHorario = (hora) =>

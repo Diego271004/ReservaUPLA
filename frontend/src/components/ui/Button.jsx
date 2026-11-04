@@ -2,7 +2,8 @@ import estilos from './Button.module.css'
 
 /**
  * Botón único del sistema. Variantes: primario (azul sólido), secundario (con borde), rechazar (contorno rojo),
- * confirmarRechazo (rojo sólido, solo en el modal) y enlace (texto, como "Cancelar" del login).
+ * confirmarRechazo (rojo sólido, solo en el modal) y enlace (texto, como "Cancelar" del login). Sobre el fondo
+ * oscuro del menú lateral: sobreOscuro (con borde, abre el menú en móvil) y sobreOscuroLista (fila, cierra la sesión).
  * Con `cargando` muestra el spinner y el texto de carga, y no responde a más clics (sin perder el foco).
  */
 export default function Button({

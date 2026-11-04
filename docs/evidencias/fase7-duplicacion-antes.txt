@@ -1,0 +1,289 @@
+INFORME DE DUPLICACIÓN (antes) — jscpd 4.0.5
+Carpetas: frontend/src y backend. Excluidos: bin, obj, node_modules, dist, CSS y todo el código de pruebas (*.test.js, *.test.jsx, src/test, proyectos *.Tests).
+Formatos: javascript, jsx y csharp.
+
+==============================================================================
+PERFIL SENSIBLE (MEDIDA DE REFERENCIA): bloques de al menos 4 líneas y 30 tokens
+==============================================================================
+  Archivos analizados : 144
+  Líneas analizadas   : 6326
+  Líneas duplicadas   : 87
+  Bloques duplicados  : 12
+  PORCENTAJE DUPLICADO: 1.38 % de las líneas (1.22 % de los tokens)
+  Por formato:
+    csharp        2544 líneas     73 duplicadas   11 bloques    2.87 %
+    javascript    2166 líneas     14 duplicadas    1 bloques    0.65 %
+    jsx           1616 líneas      0 duplicadas    0 bloques    0.00 %
+
+  BLOQUES DUPLICADOS (12), de mayor a menor:
+    1. [javascript] 15 líneas
+        frontend/src/pages/LoginPage.jsx:45-59
+        frontend/src/pages/UsuarioFormPage.jsx:35-54
+    2. [csharp] 11 líneas
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:190-200
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:154-114
+    3. [csharp] 9 líneas
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:174-182
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:151-159
+    4. [csharp] 9 líneas
+        backend/ReservaUPLA.Infrastructure/Repositories/ReservaRepository.cs:4-12
+        backend/ReservaUPLA.Infrastructure/Repositories/UsuarioRepository.cs:1-9
+    5. [csharp] 8 líneas
+        backend/ReservaUPLA.Application/Services/AmbienteService.cs:1-8
+        backend/ReservaUPLA.Infrastructure/Repositories/ReservaRepository.cs:2-8
+    6. [csharp] 8 líneas
+        backend/ReservaUPLA.Application/Validators/CrearUsuarioValidator.cs:1-8
+        backend/ReservaUPLA.Application/Validators/LoginRequestValidator.cs:1-8
+    7. [csharp] 7 líneas
+        backend/ReservaUPLA.Application/Services/AuthService.cs:1-7
+        backend/ReservaUPLA.Application/Services/UsuarioService.cs:1-6
+    8. [csharp] 7 líneas
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:158-164
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:108-114
+    9. [csharp] 7 líneas
+        backend/ReservaUPLA.Infrastructure/Persistence/Configurations/HistorialReservaConfiguration.cs:1-7
+        backend/ReservaUPLA.Infrastructure/Persistence/Configurations/UsuarioConfiguration.cs:1-7
+   10. [csharp] 7 líneas
+        backend/ReservaUPLA.Infrastructure/Persistence/Configurations/ReservaConfiguration.cs:1-7
+        backend/ReservaUPLA.Infrastructure/Persistence/Configurations/UsuarioConfiguration.cs:1-7
+   11. [csharp] 6 líneas
+        backend/ReservaUPLA.Application/Validators/ConsultarDisponibilidadValidator.cs:9-14
+        backend/ReservaUPLA.Application/Validators/CrearReservaValidator.cs:15-21
+   12. [csharp] 5 líneas
+        backend/ReservaUPLA.API/Controllers/ReservasController.cs:72-76
+        backend/ReservaUPLA.API/Controllers/ReservasController.cs:65-69
+
+==============================================================================
+PERFIL ESTÁNDAR DE JSCPD: bloques de al menos 5 líneas y 50 tokens
+==============================================================================
+  Archivos analizados : 144
+  Líneas analizadas   : 6326
+  Líneas duplicadas   : 0
+  Bloques duplicados  : 0
+  PORCENTAJE DUPLICADO: 0.00 % de las líneas (0.00 % de los tokens)
+  Por formato:
+    csharp        2544 líneas      0 duplicadas    0 bloques    0.00 %
+    javascript    2166 líneas      0 duplicadas    0 bloques    0.00 %
+    jsx           1616 líneas      0 duplicadas    0 bloques    0.00 %
+
+==============================================================================
+PERFIL MUY SENSIBLE: bloques de al menos 3 líneas y 20 tokens
+==============================================================================
+  Archivos analizados : 144
+  Líneas analizadas   : 6326
+  Líneas duplicadas   : 390
+  Bloques duplicados  : 69
+  PORCENTAJE DUPLICADO: 6.17 % de las líneas (5.40 % de los tokens)
+  Por formato:
+    csharp        2544 líneas    192 duplicadas   40 bloques    7.55 %
+    javascript    2166 líneas    114 duplicadas   19 bloques    5.26 %
+    jsx           1616 líneas     84 duplicadas   10 bloques    5.20 %
+
+  BLOQUES DUPLICADOS (69), de mayor a menor:
+    1. [javascript] 15 líneas
+        frontend/src/pages/LoginPage.jsx:45-59
+        frontend/src/pages/UsuarioFormPage.jsx:35-54
+    2. [jsx] 13 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:10-22
+        frontend/src/pages/UsuarioFormPage.jsx:13-25
+    3. [jsx] 12 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:62-73
+        frontend/src/pages/UsuarioFormPage.jsx:27-36
+    4. [csharp] 11 líneas
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:190-200
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:154-114
+    5. [javascript] 11 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:16-26
+        frontend/src/pages/UsuarioFormPage.jsx:19-28
+    6. [jsx] 11 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:25-35
+        frontend/src/pages/UsuarioFormPage.jsx:27-37
+    7. [jsx] 11 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:37-47
+        frontend/src/pages/UsuarioFormPage.jsx:53-63
+    8. [jsx] 11 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:74-84
+        frontend/src/pages/UsuarioFormPage.jsx:53-63
+    9. [javascript] 11 líneas
+        frontend/src/pages/NuevaReservaPage.jsx:74-84
+        frontend/src/pages/UsuarioFormPage.jsx:19-28
+   10. [jsx] 11 líneas
+        frontend/src/pages/NuevaReservaPage.jsx:83-93
+        frontend/src/pages/UsuarioFormPage.jsx:53-63
+   11. [jsx] 10 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:13-22
+        frontend/src/pages/NuevaReservaPage.jsx:71-80
+   12. [csharp] 9 líneas
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:174-182
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:151-159
+   13. [csharp] 9 líneas
+        backend/ReservaUPLA.Infrastructure/Repositories/ReservaRepository.cs:4-12
+        backend/ReservaUPLA.Infrastructure/Repositories/UsuarioRepository.cs:1-9
+   14. [javascript] 9 líneas
+        frontend/src/hooks/useAmbienteForm.js:44-52
+        frontend/src/hooks/useReservaForm.js:55-62
+   15. [csharp] 8 líneas
+        backend/ReservaUPLA.Application/Services/AmbienteService.cs:1-8
+        backend/ReservaUPLA.Application/Services/UsuarioService.cs:1-5
+   16. [csharp] 8 líneas
+        backend/ReservaUPLA.Application/Validators/CrearReservaValidator.cs:1-8
+        backend/ReservaUPLA.Application/Validators/LoginRequestValidator.cs:2-9
+   17. [csharp] 8 líneas
+        backend/ReservaUPLA.Application/Validators/CrearUsuarioValidator.cs:1-8
+        backend/ReservaUPLA.Application/Validators/LoginRequestValidator.cs:1-8
+   18. [javascript] 8 líneas
+        frontend/src/hooks/useAmbienteForm.js:45-52
+        frontend/src/hooks/useUsuarioForm.js:23-30
+   19. [csharp] 7 líneas
+        backend/ReservaUPLA.API/Controllers/AmbientesController.cs:2-8
+        backend/ReservaUPLA.API/Controllers/ReservasController.cs:3-9
+   20. [csharp] 7 líneas
+        backend/ReservaUPLA.Application/Interfaces/IServicios.cs:2-8
+        backend/ReservaUPLA.Application/Services/UsuarioService.cs:5-6
+   21. [csharp] 7 líneas
+        backend/ReservaUPLA.Application/Services/AmbienteService.cs:4-10
+        backend/ReservaUPLA.Application/Services/UsuarioService.cs:5-11
+   22. [csharp] 7 líneas
+        backend/ReservaUPLA.Application/Services/AuthService.cs:1-7
+        backend/ReservaUPLA.Application/Services/UsuarioService.cs:1-6
+   23. [csharp] 7 líneas
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:158-164
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:108-114
+   24. [csharp] 7 líneas
+        backend/ReservaUPLA.Application/Validators/CrearAmbienteValidator.cs:1-7
+        backend/ReservaUPLA.Application/Validators/CrearReservaValidator.cs:1-8
+   25. [csharp] 7 líneas
+        backend/ReservaUPLA.Infrastructure/Persistence/Configurations/HistorialReservaConfiguration.cs:1-7
+        backend/ReservaUPLA.Infrastructure/Persistence/Configurations/UsuarioConfiguration.cs:1-7
+   26. [csharp] 7 líneas
+        backend/ReservaUPLA.Infrastructure/Persistence/Configurations/ReservaConfiguration.cs:1-7
+        backend/ReservaUPLA.Infrastructure/Persistence/Configurations/UsuarioConfiguration.cs:1-7
+   27. [javascript] 7 líneas
+        frontend/src/hooks/useAmbienteForm.js:52-58
+        frontend/src/hooks/useUsuarioForm.js:30-36
+   28. [javascript] 7 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:52-58
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   29. [javascript] 7 líneas
+        frontend/src/pages/UsuarioFormPage.jsx:43-49
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   30. [csharp] 6 líneas
+        backend/ReservaUPLA.API/Controllers/AmbientesController.cs:1-6
+        backend/ReservaUPLA.API/Controllers/UsuariosController.cs:1-5
+   31. [csharp] 6 líneas
+        backend/ReservaUPLA.Application/Reglas/ReglasDeReserva.cs:1-6
+        backend/ReservaUPLA.Infrastructure/Repositories/UsuarioRepository.cs:1-9
+   32. [csharp] 6 líneas
+        backend/ReservaUPLA.Application/Services/AmbienteService.cs:30-35
+        backend/ReservaUPLA.Application/Services/AuthService.cs:42-40
+   33. [csharp] 6 líneas
+        backend/ReservaUPLA.Application/Services/AuthService.cs:42-47
+        backend/ReservaUPLA.Application/Services/UsuarioService.cs:35-40
+   34. [csharp] 6 líneas
+        backend/ReservaUPLA.Application/Validators/ConsultarDisponibilidadValidator.cs:9-14
+        backend/ReservaUPLA.Application/Validators/CrearReservaValidator.cs:15-21
+   35. [jsx] 6 líneas
+        frontend/src/components/ui/CampoFormulario.jsx:37-42
+        frontend/src/components/ui/InterruptorActivo.jsx:16-21
+   36. [javascript] 6 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:28-33
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   37. [javascript] 6 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:65-70
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   38. [javascript] 6 líneas
+        frontend/src/pages/NuevaReservaPage.jsx:136-141
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   39. [csharp] 5 líneas
+        backend/ReservaUPLA.API/Controllers/AuthController.cs:5-9
+        backend/ReservaUPLA.API/Controllers/ControllerBaseExtensions.cs:3-7
+   40. [csharp] 5 líneas
+        backend/ReservaUPLA.API/Controllers/AuthController.cs:6-10
+        backend/ReservaUPLA.Infrastructure/Repositories/ReservaRepository.cs:2-6
+   41. [csharp] 5 líneas
+        backend/ReservaUPLA.API/Controllers/ReservasController.cs:72-76
+        backend/ReservaUPLA.API/Controllers/ReservasController.cs:65-56
+   42. [csharp] 5 líneas
+        backend/ReservaUPLA.Application/DependencyInjection.cs:3-7
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:2-6
+   43. [csharp] 5 líneas
+        backend/ReservaUPLA.Application/Reglas/ComprobadorDeHorario.cs:1-5
+        backend/ReservaUPLA.Application/Reglas/ReglasDeReserva.cs:1-4
+   44. [csharp] 5 líneas
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:1-5
+        backend/ReservaUPLA.Application/Services/UsuarioService.cs:1-6
+   45. [csharp] 5 líneas
+        backend/ReservaUPLA.Application/Services/UsuarioService.cs:1-5
+        backend/ReservaUPLA.Infrastructure/Repositories/ReservaRepository.cs:2-6
+   46. [csharp] 5 líneas
+        backend/ReservaUPLA.Application/Validators/CrearUsuarioValidator.cs:18-22
+        backend/ReservaUPLA.Application/Validators/LoginRequestValidator.cs:16-20
+   47. [csharp] 5 líneas
+        backend/ReservaUPLA.Application/Validators/CrearUsuarioValidator.cs:36-40
+        backend/ReservaUPLA.Application/Validators/LoginRequestValidator.cs:22-26
+   48. [javascript] 5 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:41-45
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   49. [javascript] 5 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:78-82
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   50. [javascript] 5 líneas
+        frontend/src/pages/AmbienteFormPage.jsx:90-94
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   51. [jsx] 5 líneas
+        frontend/src/pages/ErrorRutaPage.jsx:18-22
+        frontend/src/pages/ErrorRutaPage.jsx:9-13
+   52. [javascript] 5 líneas
+        frontend/src/pages/NuevaReservaPage.jsx:111-115
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   53. [javascript] 5 líneas
+        frontend/src/pages/NuevaReservaPage.jsx:123-127
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   54. [javascript] 5 líneas
+        frontend/src/pages/NuevaReservaPage.jsx:87-91
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   55. [javascript] 5 líneas
+        frontend/src/pages/NuevaReservaPage.jsx:98-102
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   56. [javascript] 5 líneas
+        frontend/src/pages/UsuarioFormPage.jsx:57-61
+        frontend/src/pages/UsuarioFormPage.jsx:30-35
+   57. [csharp] 4 líneas
+        backend/ReservaUPLA.API/Controllers/AmbientesController.cs:27-30
+        backend/ReservaUPLA.API/Controllers/UsuariosController.cs:39-42
+   58. [csharp] 4 líneas
+        backend/ReservaUPLA.API/Controllers/AmbientesController.cs:30-33
+        backend/ReservaUPLA.API/Controllers/UsuariosController.cs:42-45
+   59. [csharp] 4 líneas
+        backend/ReservaUPLA.API/Controllers/ControllerBaseExtensions.cs:2-5
+        backend/ReservaUPLA.API/Controllers/ReservasController.cs:1-4
+   60. [csharp] 4 líneas
+        backend/ReservaUPLA.API/Controllers/ReservasController.cs:57-60
+        backend/ReservaUPLA.API/Controllers/UsuariosController.cs:42-45
+   61. [csharp] 4 líneas
+        backend/ReservaUPLA.API/Controllers/ReservasController.cs:80-83
+        backend/ReservaUPLA.API/Controllers/ReservasController.cs:66-56
+   62. [csharp] 4 líneas
+        backend/ReservaUPLA.API/Controllers/UsuariosController.cs:2-5
+        backend/ReservaUPLA.Infrastructure/Repositories/ReservaRepository.cs:3-6
+   63. [csharp] 4 líneas
+        backend/ReservaUPLA.Application/Common/Resultados.cs:58-61
+        backend/ReservaUPLA.Application/Common/Resultados.cs:14-17
+   64. [csharp] 4 líneas
+        backend/ReservaUPLA.Application/DependencyInjection.cs:1-4
+        backend/ReservaUPLA.Infrastructure/DependencyInjection.cs:2-5
+   65. [csharp] 4 líneas
+        backend/ReservaUPLA.Application/Services/AmbienteService.cs:74-77
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:275-277
+   66. [csharp] 4 líneas
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:129-132
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:56-59
+   67. [csharp] 4 líneas
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:184-187
+        backend/ReservaUPLA.Application/Services/ReservaService.cs:171-174
+   68. [csharp] 4 líneas
+        backend/ReservaUPLA.Infrastructure/Repositories/AmbienteRepository.cs:1-4
+        backend/ReservaUPLA.Infrastructure/Repositories/UsuarioRepository.cs:1-4
+   69. [jsx] 4 líneas
+        frontend/src/components/ui/Icono.jsx:12-15
+        frontend/src/components/ui/Icono.jsx:6-9

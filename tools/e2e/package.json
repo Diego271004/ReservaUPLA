@@ -6,7 +6,9 @@
   "description": "Pruebas de extremo a extremo por la interfaz real (navegador sin ventana) contra la API y la base reales.",
   "scripts": {
     "fase5": "node fase5.mjs",
-    "fase6": "node fase6.mjs"
+    "fase6": "node fase6.mjs",
+    "fase7": "node fase7.mjs",
+    "todo": "node todo.mjs"
   },
   "dependencies": {
     "playwright-core": "1.64.1"
