@@ -1,5 +1,5 @@
 Compilando la API una vez…
-(node:37872) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(node:25216) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 
 ====================================================================================================
@@ -93,7 +93,7 @@ Fase 6 · validaciones (disponibilidad, aprobar, conflicto, rechazar, cancelar)
    OK  08-detalle-admin-pendiente-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
    OK  09-modal-aprobar-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
    OK  10-detalle-aprobada-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
-   OK  05g: "Reserva aprobada." y el historial muestra el evento: Reserva aprobada por Carla Rojas, 04/11/2026 11:42
+   OK  05g: "Reserva aprobada." y el historial muestra el evento: Reserva aprobada por Carla Rojas, 04/11/2026 15:04
 
 == Escritorio · Carla intenta aprobar la reserva B, que se cruza con la A (RN-01)
    OK  la reserva B sigue Pendiente tras el conflicto
@@ -151,7 +151,7 @@ Fase 7 · ayuda del ambiente y RN-07
 
 == Nueva reserva · RN-07: una fecha anterior a hoy se avisa junto al campo (1280 px)
    OK  aparece «No puedes reservar para una fecha anterior a hoy.» bajo el campo Fecha
-   OK  no se registró ninguna reserva (6 antes, 6 después)
+   OK  no se registró ninguna reserva (undefined antes, undefined después)
    OK  03-fecha-pasada-con-aviso-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
    OK  con la fecha de hoy (04/11/2026) el aviso desaparece
 
@@ -163,7 +163,7 @@ Fase 7 · ayuda del ambiente y RN-07
 
 == Nueva reserva · RN-07: una fecha anterior a hoy se avisa junto al campo (375 px)
    OK  aparece «No puedes reservar para una fecha anterior a hoy.» bajo el campo Fecha
-   OK  no se registró ninguna reserva (6 antes, 6 después)
+   OK  no se registró ninguna reserva (undefined antes, undefined después)
    OK  03-fecha-pasada-con-aviso-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
    OK  con la fecha de hoy (04/11/2026) el aviso desaparece
 
@@ -189,10 +189,85 @@ Fase 7 · ayuda del ambiente y RN-07
 Resultado: todo correcto
 
 ====================================================================================================
-RESUMEN (91 s, 2026-11-04)
+Fase 9 · salida de datos (Dashboard, Reservas con filtros, Mi ambiente)
+====================================================================================================
+   recreando la base con los scripts de database/ y reiniciando la API…
+   Base ReservaUPLADB recreada (scripts 00 a 06).
+
+== Inicio de sesión de Ana, Carla y Mario (una vez; las páginas móviles reutilizan la sesión)
+   OK  el Administrador aterriza en el Dashboard, la Solicitante en Nueva reserva y la Responsable en Mi ambiente
+
+== La Solicitante registra una reserva para el 04/12/2026 (1280 px)
+   OK  reserva registrada: queda Pendiente
+
+== El Administrador la ve en el Dashboard (1280 px)
+   OK  el indicador «Reservas pendientes» (3) coincide con la API
+   OK  el indicador «Reservas aprobadas» (2) coincide con la API
+   OK  01-dashboard-con-la-solicitud-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+
+== La aprueba desde el modal (1280 px)
+   OK  02-dashboard-modal-aprobar-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  el indicador de pendientes bajó en 1
+   OK  el indicador de aprobadas subió en 1
+   OK  03-dashboard-tras-aprobar-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+
+== Aparece Aprobada en Reservas con el filtro Estado (1280 px)
+   OK  con el filtro Aprobada no aparece ninguna Pendiente
+   OK  04-reservas-filtro-aprobada-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+
+== «Volver a Reservas» conserva el filtro (1280 px)
+   OK  al volver, el filtro Estado sigue en Aprobada
+
+== La Responsable la ve en Mi ambiente (1280 px)
+   OK  Mi ambiente es de solo lectura: ningún botón en la pantalla
+   OK  el total de Mi ambiente coincide con la API
+   OK  05-mi-ambiente-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+
+== La Solicitante registra una reserva para el 05/12/2026 (375 px)
+   OK  reserva registrada: queda Pendiente
+
+== El Administrador la ve en el Dashboard (375 px)
+   OK  el indicador «Reservas pendientes» (3) coincide con la API
+   OK  el indicador «Reservas aprobadas» (3) coincide con la API
+   OK  01-dashboard-con-la-solicitud-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+
+== La aprueba desde el modal (375 px)
+   OK  02-dashboard-modal-aprobar-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+   OK  el indicador de pendientes bajó en 1
+   OK  el indicador de aprobadas subió en 1
+   OK  03-dashboard-tras-aprobar-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+
+== Aparece Aprobada en Reservas con el filtro Estado (375 px)
+   OK  con el filtro Aprobada no aparece ninguna Pendiente
+   OK  04-reservas-filtro-aprobada-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+
+== «Volver a Reservas» conserva el filtro (375 px)
+   OK  al volver, el filtro Estado sigue en Aprobada
+
+== La Responsable la ve en Mi ambiente (375 px)
+   OK  Mi ambiente es de solo lectura: ningún botón en la pantalla
+   OK  el total de Mi ambiente coincide con la API
+   OK  05-mi-ambiente-movil.png sin scroll horizontal (375px de contenido en 375px visibles)
+
+== «Mostrando 5 de N» y «Ver todas» llevan a Reservas con el filtro Pendiente
+   OK  el pie dice «Mostrando 5 de 8»
+   OK  06-dashboard-mostrando-5-de-n-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  «Ver todas» abre Reservas con el filtro Pendiente aplicado
+   OK  07-reservas-ver-todas-pendientes-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+
+== Paginación: con más de 10 reservas hay páginas y «Anterior» está deshabilitado en la primera
+   OK  «Anterior» está deshabilitado en la primera página
+   OK  08-reservas-paginacion-escritorio.png sin scroll horizontal (1280px de contenido en 1280px visibles)
+   OK  la página 2 permite volver con «Anterior»
+
+Resultado: todo correcto
+
+====================================================================================================
+RESUMEN (98 s, 2026-11-04)
 ====================================================================================================
   OK     Fase 5 · entrada de datos (login, ambientes, usuarios, nueva reserva)
   OK     Fase 6 · validaciones (disponibilidad, aprobar, conflicto, rechazar, cancelar)
   OK     Fase 7 · ayuda del ambiente y RN-07
+  OK     Fase 9 · salida de datos (Dashboard, Reservas con filtros, Mi ambiente)
 
 Resultado general: todo correcto

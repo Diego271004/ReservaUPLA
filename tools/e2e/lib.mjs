@@ -132,3 +132,9 @@ export async function aprobarReservaApi(token, id) {
   const respuesta = await api(`/api/reservas/${id}/aprobar`, { metodo: 'POST', token })
   if (respuesta.status !== 200) throw new Error(`No se pudo aprobar la reserva #${id} (HTTP ${respuesta.status})`)
 }
+
+/** En móvil los filtros de Reservas están plegados detrás del botón «Filtros»: lo despliega si hace falta (en escritorio no hace nada). */
+export async function abrirFiltros(pagina) {
+  const boton = pagina.getByRole('button', { name: /^Filtros/ })
+  if ((await boton.isVisible()) && (await boton.getAttribute('aria-expanded')) === 'false') await boton.click()
+}

@@ -68,7 +68,7 @@ export async function recorrer(navegador, ancho, medir) {
   ]) {
     const pagina = await nuevaPagina(navegador, 'escritorio')
     await iniciarSesion(pagina, correo)
-    await pagina.waitForURL(/\/(reservas\/nueva|ambientes|mi-ambiente)$/)
+    await pagina.waitForURL(/\/(reservas\/nueva|dashboard|mi-ambiente)$/)
     sesiones[rol] = await leerSesion(pagina)
     await pagina.context().close()
   }
@@ -125,8 +125,40 @@ export async function recorrer(navegador, ancho, medir) {
   await abrir(ana, `/reservas/${idC}`, 'heading', 'Detalle de la reserva')
   await medir(ana, '29-detalle-cancelada', 'Detalle, reserva Cancelada (estado final)')
 
-  // ---------------------------------------------------------------- Administrador: detalle
+  // ---------------------------------------------------------------- Administrador: Dashboard y lista de Reservas
   const carla = await nuevaPagina(navegador, ancho, sesiones.carla)
+  await abrir(carla, '/dashboard', 'heading', 'Dashboard')
+  await carla.getByRole('region', { name: 'Indicadores' }).waitFor()
+  await carla.getByRole('table').waitFor()
+  await medir(carla, '60-dashboard', 'Dashboard (Administrador): cinco indicadores y las pendientes más antiguas')
+  await carla.getByRole('button', { name: /^Aprobar:/ }).first().click()
+  await carla.getByRole('dialog').waitFor()
+  await medir(carla, '61-dashboard-modal-aprobar', 'Dashboard, modal de confirmación de aprobar')
+  await carla.getByRole('button', { name: 'Volver' }).click()
+  await carla.getByRole('button', { name: /^Rechazar:/ }).first().click()
+  await carla.getByRole('dialog').waitFor()
+  await medir(carla, '62-dashboard-modal-rechazar', 'Dashboard, modal de confirmación de rechazar')
+  await carla.getByRole('button', { name: 'Volver' }).click()
+  await abrir(carla, '/reservas', 'heading', 'Reservas')
+  await carla.getByRole('table').waitFor()
+  await medir(carla, '63-reservas-administrador', 'Reservas (Administrador): filtros, tabla y pie')
+  await abrir(carla, '/reservas?estado=Pendiente', 'heading', 'Reservas')
+  await carla.getByRole('table').waitFor()
+  await medir(carla, '64-reservas-filtro-pendiente', 'Reservas con el filtro Pendiente aplicado (como llega desde «Ver todas»)')
+  await carla.getByRole('button', { name: /^Filtros/ }).isVisible().then(async (visible) => visible && (await carla.getByRole('button', { name: /^Filtros/ }).click()))
+  await carla.getByLabel('Fecha desde').fill('0511')
+  await carla.getByRole('button', { name: 'Aplicar filtros' }).click()
+  await carla.getByText('Ingresa la fecha con el formato dd/mm/aaaa.').waitFor()
+  await medir(carla, '65-reservas-fecha-invalida', 'Reservas, fecha de filtro mal escrita (error bajo el campo)')
+  await abrir(carla, '/reservas?desde=2020-01-01&hasta=2020-01-02', 'heading', 'Reservas')
+  await carla.getByText('No hay reservas con esos filtros.').waitFor()
+  await medir(carla, '66-reservas-vacio-con-filtros', 'Reservas, sin resultados con filtros (estado vacío con «Limpiar filtros»)')
+  await ana.goto(`${BASE}/reservas`)
+  await ana.getByRole('heading', { name: 'Reservas' }).waitFor()
+  await ana.getByRole('table').waitFor()
+  await medir(ana, '67-reservas-solicitante', 'Reservas (Solicitante): solo las suyas, sin columna Solicitante')
+
+  // ---------------------------------------------------------------- Administrador: detalle
   await abrir(carla, `/reservas/${idA}`, 'heading', 'Detalle de la reserva')
   await medir(carla, '30-detalle-admin-pendiente', 'Detalle, Administrador con una reserva Pendiente')
   await carla.getByRole('button', { name: 'Aprobar' }).click()
@@ -152,8 +184,10 @@ export async function recorrer(navegador, ancho, medir) {
   await abrir(mario, `/reservas/${idA}`, 'heading', 'Detalle de la reserva')
   await medir(mario, '40-detalle-responsable', 'Detalle, Responsable (solo consulta)')
   await mario.goto(`${BASE}/mi-ambiente`)
-  await mario.getByText('Pantalla en construcción').waitFor()
-  await medir(mario, '41-mi-ambiente-en-construccion', 'Mi ambiente (Responsable), pantalla en construcción')
+  await mario.getByRole('heading', { name: 'Mi ambiente' }).waitFor()
+  await mario.getByRole('table').waitFor()
+  await medir(mario, '41-mi-ambiente', 'Mi ambiente (Responsable): su ambiente, cuatro indicadores y sus reservas')
+
 
   // ---------------------------------------------------------------- Administrador: ambientes y usuarios
   await abrir(carla, '/ambientes', 'heading', 'Ambientes')
@@ -203,8 +237,8 @@ export async function recorrer(navegador, ancho, medir) {
 
   // ---------------------------------------------------------------- Otras pantallas
   await carla.goto(`${BASE}/dashboard`)
-  await carla.getByText('Pantalla en construcción').waitFor()
-  await medir(carla, '50-dashboard-en-construccion', 'Dashboard (Administrador), pantalla en construcción')
+  await carla.getByRole('region', { name: 'Indicadores' }).waitFor()
+  await medir(carla, '50-dashboard-tras-decidir', 'Dashboard (Administrador) después de aprobar y rechazar')
   await ana.goto(`${BASE}/usuarios`)
   await ana.getByRole('heading', { name: 'Sin permiso' }).waitFor()
   await medir(ana, '51-sin-permiso', 'Sin permiso (Solicitante entra a Usuarios por la dirección)')

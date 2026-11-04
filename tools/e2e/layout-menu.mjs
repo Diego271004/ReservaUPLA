@@ -7,7 +7,8 @@ let fallo = false
 try {
   const admin = await nuevaPagina(navegador, 'escritorio')
   await iniciarSesion(admin, 'carla.rojas@upla.edu.pe')
-  await admin.waitForURL('**/ambientes')
+  await admin.waitForURL('**/dashboard')
+  await admin.goto(`${BASE}/ambientes`)
   const sesion = await leerSesion(admin)
 
   paso('Escritorio: el botón del menú no se ve y "Cerrar sesión" sí')
