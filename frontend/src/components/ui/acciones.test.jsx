@@ -59,6 +59,29 @@ describe('Button', () => {
     },
   )
 
+  it.each(['sobreOscuro', 'sobreOscuroLista'])(
+    'la variante %s (menú lateral) se muestra, responde y pasa los atributos de accesibilidad',
+    async (variante) => {
+      const alHacerClic = vi.fn()
+      render(
+        <Button
+          variante={variante}
+          aria-expanded={false}
+          aria-controls="menu-principal"
+          onClick={alHacerClic}
+        >
+          Menú
+        </Button>,
+      )
+      const boton = screen.getByRole('button', { name: 'Menú' })
+      expect(boton).toHaveAttribute('aria-expanded', 'false')
+      expect(boton).toHaveAttribute('aria-controls', 'menu-principal')
+      expect(boton.className).toContain(variante)
+      await userEvent.click(boton)
+      expect(alHacerClic).toHaveBeenCalledTimes(1)
+    },
+  )
+
   it('de tipo submit envía el formulario', async () => {
     const alEnviar = vi.fn((e) => e.preventDefault())
     render(

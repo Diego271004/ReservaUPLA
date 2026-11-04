@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { NOMBRE_DE_ROL, MENU_POR_ROL } from '../../constants/navegacion.js'
 import { TEXTOS } from '../../constants/messages.js'
+import Button from '../ui/Button.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import estilos from './Layout.module.css'
 
@@ -28,15 +29,16 @@ export default function Layout() {
       <aside className={estilos.menu}>
         <div className={estilos.cabecera}>
           <span className={estilos.marca}>{TEXTOS.nombreProducto}</span>
-          <button
-            type="button"
-            className={estilos.botonMenu}
-            aria-expanded={menuAbierto}
-            aria-controls="menu-principal"
-            onClick={() => setMenuAbierto((abierto) => !abierto)}
-          >
-            {TEXTOS.menuAbrir}
-          </button>
+          <div className={estilos.botonMenu}>
+            <Button
+              variante="sobreOscuro"
+              aria-expanded={menuAbierto}
+              aria-controls="menu-principal"
+              onClick={() => setMenuAbierto((abierto) => !abierto)}
+            >
+              {TEXTOS.menuAbrir}
+            </Button>
+          </div>
         </div>
         <div className={`${estilos.panel} ${menuAbierto ? estilos.abierto : ''}`}>
           <div className={estilos.persona}>
@@ -56,9 +58,9 @@ export default function Layout() {
               </NavLink>
             ))}
           </nav>
-          <button type="button" className={estilos.cerrarSesion} onClick={alCerrarSesion}>
+          <Button variante="sobreOscuroLista" onClick={alCerrarSesion}>
             {TEXTOS.cerrarSesion}
-          </button>
+          </Button>
         </div>
       </aside>
       <main className={estilos.contenido}>
