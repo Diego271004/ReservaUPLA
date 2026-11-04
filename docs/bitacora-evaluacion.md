@@ -69,6 +69,25 @@ Cómo se trabajó: cada comportamiento nuevo se escribió primero como prueba y 
 
 Errores de mis pruebas (no del producto): el `vi.mock` de `App.test.jsx` no incluía las funciones nuevas de `recursosService` (Vitest lo avisa al usarlas).
 
+## Fase 7 — Reutilización (2026-11-04)
+
+Medidas completas en `docs/reutilizacion.md` y `docs/evidencias/fase7-duplicacion-{antes,despues}.txt`. Resumen: duplicación de referencia (jscpd, 4 líneas y 30 tokens) de 1,38 % a 0,88 %; perfil muy sensible de 6,17 % a 3,30 %; con el umbral estándar de jscpd era 0 % antes y sigue en 0 %.
+
+### Defectos hallados y corregidos
+| # | Defecto | Cómo se encontró | Corrección | Prueba |
+|---|---|---|---|---|
+| 20 | **El ambiente se cortaba en móvil (hallazgo N2 de la v1):** la opción mostraba nombre, capacidad y ubicación juntos y en 375 px no cabía. | Revisión de usuario sobre las capturas de la Fase 6. | Las opciones muestran solo el nombre; al elegir, capacidad y ubicación aparecen como ayuda bajo el campo («30 personas · Pabellón A, piso 2»). | `formulariosRegistro.test.jsx` («las opciones del ambiente muestran solo el nombre…», «al elegir un ambiente, su capacidad y ubicación aparecen como ayuda…»); captura `docs/evidencias/fase7/02-ambiente-elegido-con-ayuda-movil.png` |
+| 21 | **Se podía reservar para una fecha pasada:** ni el frontend, ni la API, ni la base lo impedían (regla que faltaba, ahora RN-07 propuesta). | Revisión de usuario. | Frontend: aviso junto al campo. API: 400 con el mismo texto (`ReglaFechaNoPasada`, «hoy» = fecha de Lima). Base: disparador `trg_reservas_validar_fecha` solo al INSERT. | `validators.test.js`, `formulariosRegistro.test.jsx`, `ReservaServiceTests.RN07_*`, `ReservasEndpointsTests.RN07_*`, `07_pruebas_reglas.sql` (3 comprobaciones) |
+| 22 | **Pruebas que caducan:** las pruebas del frontend y de la API tenían fechas fijas (`05/11/2026`) y, con RN-07, empezarían a fallar al pasar esa fecha. | Al diseñar RN-07 (antes de que fallaran). | Frontend: fechas de 2030 en los envíos y reloj inyectado (`ahora`) en el validador. API: la regla RN-07 de la fábrica de pruebas usa el reloj fijo del 03/11/2026. | Todo el conjunto en verde |
+| 23 | **Los datos de ejemplo (`05_datos_prueba.sql`) tienen reservas de fechas fijas que ya son pasadas** y el disparador de RN-07 las rechazaría al cargarlas. | Al diseñar el disparador (antes de recrear la base). | El guion apaga `trg_reservas_validar_fecha` solo durante esa inserción y lo vuelve a encender. | `recrear-bd.sh` termina bien; `07` comprueba que el disparador está activo |
+| 24 | **El menú del `Layout` escribía dos `<button>` a mano** (abrir el menú en móvil y Cerrar sesión): la prueba de arquitectura solo revisaba `src/pages` y no lo veía. | Al ampliar `arquitectura.test.js` a todo `src` fuera de `components/ui` (la prueba falló solo con `Layout.jsx`). | Variantes `sobreOscuro` y `sobreOscuroLista` del componente `Button`; `Layout` las usa. Revisado a 1280 y 375 px, menú cerrado y abierto. | `arquitectura.test.js` («components/Layout/Layout.jsx no usa …»), `acciones.test.jsx` («la variante %s (menú lateral)…»); `tools/e2e/layout-menu.mjs` |
+| 25 | **Los guiones e2e de las fases 5 y 6 ya no servían:** buscaban el ambiente con la etiqueta antigua, usaban fechas fijas (`18/11/2026`, `05/11/2026`, `03/11/2026`) que RN-07 rechaza cuando quedan en el pasado y `fase6` dependía de las reservas del seed 05, también con fechas fijas. | Al preparar el cierre de la Fase 7. | Fechas relativas a hoy (`fechaRelativa` en `lib.mjs`); la etiqueta nueva; `fase6` crea sus propios datos de partida por la API; nuevo `tools/e2e/todo.mjs` que recrea la base, reinicia la API y ejecuta las fases 5, 6 y 7 en orden, cada una sobre datos limpios (el reinicio también reinicia el límite de 5 intentos de login). | `docs/evidencias/e2e-completo.txt` (las tres fases correctas) |
+
+Errores de mis pruebas (no del producto):
+- Primer intento de que las pruebas de la API no caducaran: cambié sus fechas a 2030. Dos pruebas de RN-01 fallaron porque dependían de la fecha por defecto de los datos falsos (`2026-11-05`). Lo revertí.
+- Segundo intento: sustituir el `TimeProvider` de toda la API por el reloj fijo. Fallaron 34 pruebas porque los tokens JWT se vencían contra la hora real. Quedó el reloj fijo solo en la regla RN-07.
+- Varios comandos de terminal con comillas o `>` crearon archivos vacíos con nombres raros dentro del repositorio; se borraron todos (estaban vacíos) y no entran en el trabajo.
+
 ## Decisiones y diferencias con el diseño
 | Tema | Diseño v2 | Lo construido | Por qué |
 |---|---|---|---|
@@ -91,4 +110,5 @@ Errores de mis pruebas (no del producto): el `vi.mock` de `App.test.jsx` no incl
 | Pruebas con la base real | Se omiten (y lo dicen) si faltan `RESERVAUPLA_PRUEBAS_BD_ADMIN` y `RESERVAUPLA_PRUEBAS_BD_APP`. | Que `dotnet test` siga funcionando en un equipo sin PostgreSQL; la matriz indica cuáles son. |
 
 ## Observaciones sin corregir
+- `CardIndicador` sigue sin usarse en ninguna pantalla (la usará el dashboard).
 - `npm audit` informa 7 vulnerabilidades moderadas, todas en dependencias de desarrollo (cadena `eslint` / `minimatch`). No llegan al paquete que se compila. Se revisan al cierre del proyecto.

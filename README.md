@@ -82,6 +82,13 @@ npm run dev
 
 Abre `http://localhost:5180` (puerto fijo: si estuviera ocupado, Vite avisa con un error en lugar de cambiar de puerto; CORS solo permite ese origen, configurable en `Cors:OrigenesPermitidos`). El frontend reenvía `/api` a `http://localhost:5263`; si la API usa otra dirección, define `VITE_API_URL` antes de `npm run dev`.
 
+### Qué hay en la Fase 7
+- **Reutilización medida:** duplicación de código (jscpd) de 1,38 % a 0,88 % en la medida de referencia; informe y tabla de componentes por pantalla en `docs/reutilizacion.md`. Para repetir la medición y regenerar la tabla: `cd tools/reutilizacion && npm install && node medir-duplicacion.mjs <archivo> <antes|despues> && node componentes-por-pantalla.mjs`.
+- **Nueva reserva:** las opciones del ambiente muestran solo el nombre; al elegir, su capacidad y ubicación aparecen como ayuda bajo el campo.
+- **RN-07 (propuesta):** no se reserva para una fecha anterior a hoy (frontend, API con 400 y disparador solo al insertar en la base). Ver `docs/matriz-reglas.md`.
+- **Pruebas de arquitectura** (`frontend/src/arquitectura.test.js`): ningún archivo fuera de `src/components/ui` (pantallas, Layout, etc.) puede escribir `<input>`, `<select>`, `<textarea>` ni `<button>` a mano.
+- **e2e de la fase:** `cd tools/e2e && CLAVE_PRUEBA="<clave>" npm run fase7` (capturas en `docs/evidencias/fase7/`).
+
 ### Qué hay en la Fase 6
 - **Validaciones de reservas (RN-01 a RN-06):** cada regla se valida en el frontend, el backend y la base de datos; la tabla de pruebas está en `docs/matriz-reglas.md`.
 - **Nueva reserva:** aviso inmediato de disponibilidad (verde o rojo con la hora ocupada), lista de hora de fin solo posterior al inicio, ambiente en mantenimiento deshabilitado y cierre con "Ver detalle".
@@ -143,6 +150,10 @@ PGPASSWORD="<clave de postgres>" CLAVE_PRUEBA="<clave de los usuarios de prueba>
 # 4. Ejecutar (desde tools/e2e)
 cd tools/e2e && CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run fase5   # login, ambientes, usuarios y Nueva reserva
 cd tools/e2e && CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run fase6   # disponibilidad, aprobar, conflicto, rechazar y cancelar (base limpia antes de cada uno)
+cd tools/e2e && CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run fase7   # ayuda del ambiente y RN-07
+
+# Todas las fases en orden, cada una con la base recreada y la API reiniciada (arranca y detiene la API y el frontend; los puertos 5263 y 5180 deben estar libres)
+cd tools/e2e && PGPASSWORD="<clave de postgres>" CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run todo   # salida de referencia: docs/evidencias/e2e-completo.txt
 ```
 - Si no encuentra Edge ni Chrome, indica el ejecutable con `E2E_NAVEGADOR`. Otras variables: `E2E_BASE_URL` (por defecto `http://localhost:5180`) y `E2E_API_URL`.
 - El login permite 5 intentos por minuto por IP: los guiones inician sesión una vez por rol y reutilizan la sesión en las capturas móviles.
