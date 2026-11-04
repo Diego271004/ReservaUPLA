@@ -16,13 +16,18 @@ const RUTA_DOMINIO_CS = resolve(
 
 const aMinuscula = (nombre) => nombre.charAt(0).toLowerCase() + nombre.slice(1)
 
-function leerConstantesDelBackend() {
+function leerMensajesDelDominio() {
   const dominio = {}
   for (const [, nombre, texto] of readFileSync(RUTA_DOMINIO_CS, 'utf8').matchAll(
     /public const string (\w+)\s*=\s*"([^"]*)";/g,
   )) {
     dominio[nombre] = texto
   }
+  return dominio
+}
+
+function leerConstantesDelBackend() {
+  const dominio = leerMensajesDelDominio()
 
   const codigo = readFileSync(RUTA_CS, 'utf8')
   const constantes = {}
@@ -51,6 +56,16 @@ describe('mensajes del frontend y del backend', () => {
       expect(backend[clave], `falta ${clave} en MensajesValidacion.cs`).toBe(texto)
     },
   )
+
+  it('todos los mensajes de MensajesDominio existen idénticos en el frontend', () => {
+    const dominio = Object.entries(leerMensajesDelDominio())
+    expect(dominio.length).toBeGreaterThanOrEqual(3)
+    const enElFrontend = new Set(Object.values(MENSAJES))
+    const faltantes = dominio
+      .filter(([, texto]) => !enElFrontend.has(texto))
+      .map(([nombre]) => nombre)
+    expect(faltantes).toEqual([])
+  })
 
   it('todos los mensajes del backend existen también en el frontend', () => {
     const faltantes = Object.keys(backend).filter((clave) => !(clave in MENSAJES))
