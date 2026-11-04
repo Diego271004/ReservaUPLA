@@ -1,2 +1,6 @@
 * text=auto eol=lf
 *.sln text eol=crlf
+# Fijos en LF en todos los sistemas (coinciden con .editorconfig; dotnet format los verifica)
+*.cs text eol=lf
+*.csproj text eol=lf
+.editorconfig text eol=lf
