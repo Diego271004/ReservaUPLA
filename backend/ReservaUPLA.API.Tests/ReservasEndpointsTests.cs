@@ -122,6 +122,20 @@ public class ReservasEndpointsTests
     // ======================================================================== POST /api/reservas (reglas al registrar)
 
     [Fact]
+    public async Task RN07_reservar_para_una_fecha_anterior_a_hoy_da_400_en_la_fecha()
+    {
+        using var api = new ApiFactory();
+        var cuerpo = new { ambienteId = 1, fecha = "2026-11-02", horaInicio = "10:00", horaFin = "12:00", motivo = "Práctica" };
+
+        var respuesta = await api.CrearCliente(api.Solicitante).PostAsJsonAsync("/api/reservas", cuerpo);
+
+        Assert.Equal(HttpStatusCode.BadRequest, respuesta.StatusCode);
+        var errores = (await Leer(respuesta)).GetProperty("errors");
+        Assert.Equal(MensajesValidacion.FechaPasada, errores.GetProperty("fecha")[0].GetString());
+        Assert.Empty(api.Reservas.Reservas);
+    }
+
+    [Fact]
     public async Task Reservar_en_un_ambiente_en_mantenimiento_da_400_en_el_ambiente()
     {
         using var api = new ApiFactory();

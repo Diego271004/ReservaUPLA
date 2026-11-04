@@ -52,6 +52,7 @@ Una regla importante nunca se valida en un solo sitio: el frontend ayuda al usua
 | RN-04 Solo entre 07:00 y 22:00 | Límites en el selector de hora y mensaje | Validación del DTO | `CHECK` |
 | RN-05 Solo el administrador aprueba o rechaza | Oculta los botones a otros roles | Autorización por rol (devuelve 403) | No aplica |
 | RN-06 Una reserva rechazada no se modifica | Deshabilita las acciones | Rechaza el cambio con un mensaje claro | No aplica |
+| RN-07 propuesta: no se reserva para una fecha anterior a hoy (regla agregada, como la de mantenimiento) | Mensaje junto al campo; la fecha mínima es hoy | Validación al registrar: 400 con el mismo mensaje | Disparador solo en `INSERT` (no en el cambio de estado, para no romper aprobaciones antiguas) |
 
 **Transiciones de estado (propuesta):**
 
@@ -80,3 +81,4 @@ Se parte de las tres entidades del enunciado y se amplía lo justificado:
 2. **La disponibilidad se valida solo contra reservas aprobadas**, que es lo que dice RN-01. Las pendientes pueden coexistir y el administrador aprueba una y rechaza la otra.
 3. **"Ambiente más utilizado"** es el que tiene más reservas aprobadas; en caso de empate se muestran todos los empatados.
 4. **Un ambiente que no está disponible** (por ejemplo, en mantenimiento) no admite reservas nuevas.
+5. **RN-07 propuesta: no se reserva para una fecha anterior a hoy.** No venía en el caso; se agrega como la regla de mantenimiento. "Hoy" es la fecha de Lima. Se controla solo al registrar, nunca al cambiar de estado, para que las reservas ya existentes puedan seguir aprobándose, rechazándose o cancelándose. Por confirmar con el docente.

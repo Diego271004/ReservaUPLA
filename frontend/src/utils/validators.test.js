@@ -141,7 +141,19 @@ describe('campos de la reserva', () => {
     ['2026-11-05', MENSAJES.fechaFormatoInvalido],
     ['31/02/2026', MENSAJES.fechaFormatoInvalido],
     ['05/11/2026', null],
-  ])('fecha "%s"', (valor, mensaje) => expect(validarFecha(valor)).toBe(mensaje))
+  ])('fecha "%s"', (valor, mensaje) =>
+    expect(validarFecha(valor, new Date(2026, 10, 3))).toBe(mensaje),
+  )
+
+  it.each([
+    ['02/11/2026', MENSAJES.fechaPasada],
+    ['01/01/2020', MENSAJES.fechaPasada],
+    ['03/11/2026', null],
+    ['04/11/2026', null],
+    ['03/11/2027', null],
+  ])('RN-07: la fecha %s (hoy es 03/11/2026)', (valor, mensaje) =>
+    expect(validarFecha(valor, new Date(2026, 10, 3, 23, 59))).toBe(mensaje),
+  )
 
   it('hora de inicio: vacía, fuera de horario (RN-04) y válida', () => {
     expect(validarHoraInicio('')).toBe(MENSAJES.horaInicioVacia)

@@ -484,7 +484,7 @@ describe('Nueva reserva', () => {
       await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ }),
     )
     await userEvent.clear(ingresar('Fecha'))
-    await userEvent.type(ingresar('Fecha'), '05112026')
+    await userEvent.type(ingresar('Fecha'), '05112030')
     await userEvent.selectOptions(ingresar('Hora de inicio'), '10:00')
     await userEvent.selectOptions(ingresar('Hora de fin'), '12:00')
     await userEvent.type(ingresar('Motivo'), 'Práctica de programación')
@@ -590,7 +590,7 @@ describe('Nueva reserva', () => {
     expect(crearReserva).toHaveBeenCalledWith(
       {
         ambienteId: 1,
-        fecha: '2026-11-05',
+        fecha: '2030-11-05',
         horaInicio: '10:00',
         horaFin: '12:00',
         motivo: 'Práctica de programación',
@@ -608,6 +608,17 @@ describe('Nueva reserva', () => {
     expect(ingresar('Hora de fin')).toBeDisabled()
     await userEvent.click(boton('Guardando…'))
     expect(crearReserva).toHaveBeenCalledTimes(1)
+  })
+
+  it('RN-07: una fecha anterior a hoy se avisa junto al campo y no se envía', async () => {
+    mostrar()
+    await llenarValido()
+    await userEvent.clear(ingresar('Fecha'))
+    await userEvent.type(ingresar('Fecha'), '01012020')
+    await userEvent.click(boton('Registrar solicitud'))
+    expect(await screen.findByText(MENSAJES.fechaPasada)).toBeInTheDocument()
+    expect(ingresar('Fecha')).toHaveAttribute('aria-invalid', 'true')
+    expect(crearReserva).not.toHaveBeenCalled()
   })
 
   it('éxito (cierre): mensaje, resumen con ambiente, fecha, horario e insignia Pendiente', async () => {
@@ -709,7 +720,7 @@ describe('Nueva reserva', () => {
     )
     if (ambiente !== '1') await userEvent.selectOptions(ingresar('Ambiente'), ambiente)
     await userEvent.clear(ingresar('Fecha'))
-    await userEvent.type(ingresar('Fecha'), '05112026')
+    await userEvent.type(ingresar('Fecha'), '05112030')
     await userEvent.selectOptions(ingresar('Hora de inicio'), inicio)
     await userEvent.selectOptions(ingresar('Hora de fin'), fin)
   }
@@ -721,7 +732,7 @@ describe('Nueva reserva', () => {
     expect(aviso.closest('[role="status"]')).toBeInTheDocument()
     expect(consultarDisponibilidad).toHaveBeenLastCalledWith({
       ambienteId: 1,
-      fecha: '2026-11-05',
+      fecha: '2030-11-05',
       horaInicio: '10:00',
       horaFin: '12:00',
     })
