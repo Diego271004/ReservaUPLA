@@ -1,0 +1,23 @@
+.estado {
+  margin: 0;
+  padding: var(--espacio-2);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-left-width: 4px;
+  border-radius: var(--radio);
+}
+
+.cargando {
+  border-left-color: var(--color-info);
+  color: var(--color-info);
+}
+
+.disponible {
+  border-left-color: var(--color-exito);
+  color: var(--color-exito);
+}
+
+.sinConexion {
+  border-left-color: var(--color-error);
+  color: var(--color-error);
+}
