@@ -5,11 +5,12 @@ import estilos from './FormularioTarjeta.module.css'
 
 /**
  * Estructura común de las pantallas de registro (usuario, ambiente, reserva): título, tarjeta con el
- * formulario, mensaje de error y el grupo de botones (secundario "Cancelar" y primario a la derecha).
+ * formulario, mensaje de error y el grupo de botones (el secundario sale sin enviar —«Volver» o «Limpiar formulario»— y el primario va a la derecha).
  */
 export default function FormularioTarjeta({
   titulo,
   textoGuardar,
+  textoSecundario,
   enviando,
   alerta,
   onSubmit,
@@ -24,7 +25,7 @@ export default function FormularioTarjeta({
         {children}
         <div className={estilos.acciones}>
           <Button variante="secundario" onClick={onCancelar} deshabilitado={enviando}>
-            {TEXTOS.cancelar}
+            {textoSecundario}
           </Button>
           <Button
             variante="primario"

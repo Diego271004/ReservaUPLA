@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
+import { TEXTOS } from '../../constants/messages.js'
 import { isoAFecha } from '../../utils/fechas.js'
+import { textoDeRegreso } from '../../utils/rutaDeRegreso.js'
 import { TIPO_INSIGNIA_DE_ESTADO } from '../../utils/reservas.js'
 import Insignia from '../ui/Insignia.jsx'
 import { Icono } from '../ui/Icono.jsx'
@@ -29,9 +31,9 @@ export default function DetalleReserva({
     <section className={estilos.detalle} aria-labelledby="titulo-detalle-reserva">
       <Link to={volverA} className={estilos.volver}>
         <Icono nombre="flechaIzquierda" />
-        Volver a Reservas
+        {textoDeRegreso(volverA)}
       </Link>
-      <h1 id="titulo-detalle-reserva">Detalle de la reserva</h1>
+      <h1 id="titulo-detalle-reserva">{TEXTOS.tituloDetalleReserva}</h1>
       {alerta}
       <div className={estilos.tarjeta}>
         <dl className={estilos.datos}>

@@ -9,6 +9,7 @@
     "fase6": "node fase6.mjs",
     "fase7": "node fase7.mjs",
     "fase9": "node fase9.mjs",
+    "faseai": "node fase-ai.mjs",
     "todo": "node todo.mjs"
   },
   "dependencies": {

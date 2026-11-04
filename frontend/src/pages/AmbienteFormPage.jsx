@@ -12,7 +12,8 @@ export default function AmbienteFormPage() {
   return (
     <FormularioTarjeta
       titulo={TEXTOS.tituloRegistrarAmbiente}
-      textoGuardar={TEXTOS.guardarAmbiente}
+      textoGuardar={TEXTOS.registrarAmbiente}
+      textoSecundario={TEXTOS.volver}
       enviando={form.enviando}
       alerta={form.alerta}
       onSubmit={form.handleSubmit}

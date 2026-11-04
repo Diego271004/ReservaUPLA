@@ -41,20 +41,24 @@ describe('accionesDeReserva (RN-05 y RN-06 en la interfaz)', () => {
     expect(resultado.aviso).toBe(aviso)
   })
 
-  it.each(['Pendiente', 'Aprobada'])(
-    'RN-05: la Solicitante dueña solo cancela su solicitud (%s)',
-    (estado) => {
-      const resultado = accionesDeReserva(solicitante, reserva(estado))
-      expect(resultado.acciones).toEqual([
-        { id: 'cancelar', texto: 'Cancelar solicitud', habilitada: true },
-      ])
-    },
-  )
+  it('RN-05: la Solicitante dueña solo cancela, y mientras está Pendiente se llama «Cancelar solicitud»', () => {
+    const resultado = accionesDeReserva(solicitante, reserva('Pendiente'))
+    expect(resultado.acciones).toEqual([
+      { id: 'cancelar', texto: 'Cancelar solicitud', habilitada: true },
+    ])
+  })
+
+  it('una reserva Aprobada ya no es una solicitud: la Solicitante dueña ve «Cancelar reserva», como el modal', () => {
+    const resultado = accionesDeReserva(solicitante, reserva('Aprobada'))
+    expect(resultado.acciones).toEqual([
+      { id: 'cancelar', texto: 'Cancelar reserva', habilitada: true },
+    ])
+  })
 
   it('RN-06: la Solicitante con una reserva Rechazada ve el aviso y la acción deshabilitada', () => {
     const resultado = accionesDeReserva(solicitante, reserva('Rechazada'))
     expect(resultado.acciones).toEqual([
-      { id: 'cancelar', texto: 'Cancelar solicitud', habilitada: false },
+      { id: 'cancelar', texto: 'Cancelar reserva', habilitada: false },
     ])
     expect(resultado.aviso).toBe(MENSAJES.reservaRechazadaNoSeModifica)
   })

@@ -201,7 +201,16 @@ describe('Detalle de reserva: acciones según el rol y el estado (RN-05 y RN-06)
     obtenerReserva.mockResolvedValue(exito(detalle('Rechazada')))
     mostrar(SESIONES.solicitante)
     expect(await screen.findByText(MENSAJES.reservaRechazadaNoSeModifica)).toBeInTheDocument()
-    expect(boton('Cancelar solicitud')).toBeDisabled()
+    expect(boton('Cancelar reserva')).toBeDisabled()
+    sinBoton('Cancelar solicitud')
+  })
+
+  it('la Solicitante con una reserva Aprobada ve «Cancelar reserva», no «Cancelar solicitud»', async () => {
+    obtenerReserva.mockResolvedValue(exito(detalle('Aprobada')))
+    mostrar(SESIONES.solicitante)
+    await screen.findByText('Laboratorio de Cómputo 2')
+    expect(boton('Cancelar reserva')).toBeEnabled()
+    sinBoton('Cancelar solicitud')
   })
 
   it('RN-05: la Responsable no ve ninguna acción ni aviso, solo la información', async () => {
@@ -221,6 +230,45 @@ describe('Detalle de reserva: acciones según el rol y el estado (RN-05 y RN-06)
       '/reservas',
     )
   })
+})
+
+describe('Detalle de la reserva para la Responsable: solo lectura', () => {
+  const mostrarComoResponsable = (volverA) =>
+    renderEnRuta(<DetalleReservaPage />, {
+      ruta: { pathname: '/reservas/7', state: volverA ? { volverA } : null },
+      rutaDelElemento: '/reservas/:id',
+      sesionInicial: SESIONES.responsable,
+    })
+
+  it('vuelve a Mi ambiente, con su ambiente y página si se vino de allí', async () => {
+    mostrarComoResponsable('/mi-ambiente?ambienteId=3&pagina=2')
+    expect(await screen.findByRole('link', { name: 'Volver a Mi ambiente' })).toHaveAttribute(
+      'href',
+      '/mi-ambiente?ambienteId=3&pagina=2',
+    )
+  })
+
+  it('sin origen vuelve a Mi ambiente, no a una lista que su menú no tiene', async () => {
+    mostrarComoResponsable()
+    expect(await screen.findByRole('link', { name: 'Volver a Mi ambiente' })).toHaveAttribute(
+      'href',
+      '/mi-ambiente',
+    )
+    expect(screen.queryByRole('link', { name: 'Volver a Reservas' })).not.toBeInTheDocument()
+  })
+
+  it.each(['Pendiente', 'Aprobada', 'Rechazada', 'Cancelada'])(
+    'con una reserva %s no hay acciones ni aviso',
+    async (estado) => {
+      obtenerReserva.mockResolvedValue(exito(detalle(estado)))
+      mostrarComoResponsable()
+      await screen.findByText('Laboratorio de Cómputo 2')
+      expect(screen.queryByTestId('acciones-reserva')).not.toBeInTheDocument()
+      expect(screen.queryByRole('button')).not.toBeInTheDocument()
+      expect(screen.queryByText(MENSAJES.reservaRechazadaNoSeModifica)).not.toBeInTheDocument()
+      expect(screen.queryByText(MENSAJES.reservaCanceladaNoSeModifica)).not.toBeInTheDocument()
+    },
+  )
 })
 
 describe('Detalle de reserva: modales y acciones', () => {

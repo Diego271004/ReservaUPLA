@@ -72,6 +72,7 @@ export default function NuevaReservaPage() {
     <FormularioTarjeta
       titulo={TEXTOS.tituloNuevaReserva}
       textoGuardar={TEXTOS.registrarSolicitud}
+      textoSecundario={TEXTOS.limpiarFormulario}
       enviando={enviando}
       alerta={form.alerta}
       onSubmit={form.handleSubmit}

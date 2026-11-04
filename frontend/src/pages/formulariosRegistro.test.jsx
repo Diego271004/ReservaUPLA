@@ -103,7 +103,7 @@ describe('Registrar usuario', () => {
 
   it('campos vacíos: no envía y muestra un mensaje en cada campo, enfocando el primero', async () => {
     mostrar()
-    await userEvent.click(boton('Guardar usuario'))
+    await userEvent.click(boton('Registrar usuario'))
     expect(crearUsuario).not.toHaveBeenCalled()
     expect(screen.getByText(MENSAJES.nombreCompletoVacio)).toBeInTheDocument()
     expect(screen.getByText(MENSAJES.correoUsuarioVacio)).toBeInTheDocument()
@@ -166,7 +166,7 @@ describe('Registrar usuario', () => {
     await userEvent.type(ingresar('Contraseña inicial'), 'Abcdefg1')
     await userEvent.tab()
     expect(screen.queryByText(MENSAJES.contrasenaInicialRequisitos)).not.toBeInTheDocument()
-    await userEvent.click(boton('Guardar usuario'))
+    await userEvent.click(boton('Registrar usuario'))
     expect(crearUsuario).toHaveBeenCalledTimes(1)
   })
 
@@ -177,7 +177,7 @@ describe('Registrar usuario', () => {
     })
     mostrar()
     await llenarValido()
-    await userEvent.click(boton('Guardar usuario'))
+    await userEvent.click(boton('Registrar usuario'))
     expect(await screen.findByText(MENSAJES.contrasenaInicialRequisitos)).toBeInTheDocument()
     expect(ingresar('Contraseña inicial')).toHaveFocus()
   })
@@ -190,7 +190,7 @@ describe('Registrar usuario', () => {
     await userEvent.selectOptions(ingresar('Rol'), 'Responsable')
     await userEvent.click(screen.getByRole('switch', { name: 'Activo' }))
     await userEvent.type(ingresar('Contraseña inicial'), 'Clave#123')
-    await userEvent.click(boton('Guardar usuario'))
+    await userEvent.click(boton('Registrar usuario'))
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     expect(crearUsuario).toHaveBeenCalledWith(
       {
@@ -220,18 +220,18 @@ describe('Registrar usuario', () => {
     crearUsuario.mockReturnValue(pendiente())
     mostrar()
     await llenarValido()
-    await userEvent.click(boton('Guardar usuario'))
+    await userEvent.click(boton('Registrar usuario'))
     expect(boton('Guardando…')).toHaveAttribute('aria-busy', 'true')
     expect(ingresar('Nombre completo')).toHaveAttribute('readonly')
     expect(ingresar('Rol')).toBeDisabled()
-    expect(boton('Cancelar')).toBeDisabled()
+    expect(boton('Volver')).toBeDisabled()
   })
 
   it('no permite un doble envío', async () => {
     crearUsuario.mockReturnValue(pendiente())
     mostrar()
     await llenarValido()
-    await userEvent.click(boton('Guardar usuario'))
+    await userEvent.click(boton('Registrar usuario'))
     await userEvent.click(boton('Guardando…'))
     expect(crearUsuario).toHaveBeenCalledTimes(1)
   })
@@ -240,7 +240,7 @@ describe('Registrar usuario', () => {
     crearUsuario.mockResolvedValue(exito({ id: 9 }))
     mostrar()
     await llenarValido()
-    await userEvent.click(boton('Guardar usuario'))
+    await userEvent.click(boton('Registrar usuario'))
     await waitFor(() => expect(screen.getByTestId('ubicacion')).toHaveTextContent('/usuarios'))
     expect(JSON.parse(screen.getByTestId('ubicacion').dataset.state)).toEqual({
       exito: MENSAJES.usuarioRegistrado,
@@ -254,11 +254,11 @@ describe('Registrar usuario', () => {
     })
     mostrar()
     await llenarValido()
-    await userEvent.click(boton('Guardar usuario'))
+    await userEvent.click(boton('Registrar usuario'))
     expect(await screen.findByText(MENSAJES.correoYaRegistrado)).toBeInTheDocument()
     expect(ingresar('Correo institucional')).toHaveFocus()
     expect(ingresar('Correo institucional')).toHaveAttribute('aria-invalid', 'true')
-    expect(boton('Guardar usuario')).not.toHaveAttribute('aria-busy')
+    expect(boton('Registrar usuario')).not.toHaveAttribute('aria-busy')
   })
 
   it.each([
@@ -270,15 +270,15 @@ describe('Registrar usuario', () => {
     crearUsuario.mockResolvedValue({ tipo })
     mostrar()
     await llenarValido()
-    await userEvent.click(boton('Guardar usuario'))
+    await userEvent.click(boton('Registrar usuario'))
     expect(await screen.findByRole('alert')).toHaveTextContent(mensaje)
     expect(ingresar('Nombre completo')).toHaveValue('Rosa Chávez')
     expect(ingresar('Nombre completo')).not.toHaveAttribute('readonly')
   })
 
-  it('Cancelar vuelve al listado sin guardar', async () => {
+  it('Volver regresa al listado sin guardar', async () => {
     mostrar()
-    await userEvent.click(boton('Cancelar'))
+    await userEvent.click(boton('Volver'))
     expect(crearUsuario).not.toHaveBeenCalled()
     expect(screen.getByTestId('ubicacion')).toHaveTextContent('/usuarios')
   })
@@ -332,7 +332,7 @@ describe('Registrar ambiente', () => {
 
   it('campos vacíos: no envía y marca los cinco obligatorios (Responsable es opcional)', async () => {
     mostrar()
-    await userEvent.click(boton('Guardar ambiente'))
+    await userEvent.click(boton('Registrar ambiente'))
     expect(crearAmbiente).not.toHaveBeenCalled()
     for (const mensaje of [
       MENSAJES.nombreAmbienteVacio,
@@ -362,7 +362,7 @@ describe('Registrar ambiente', () => {
     crearAmbiente.mockResolvedValue(exito({ id: 5 }))
     mostrar()
     await llenarValido()
-    await userEvent.click(boton('Guardar ambiente'))
+    await userEvent.click(boton('Registrar ambiente'))
     expect(crearAmbiente).toHaveBeenCalledWith(
       {
         nombre: 'Auditorio Principal',
@@ -384,7 +384,7 @@ describe('Registrar ambiente', () => {
       ingresar('Responsable'),
       await screen.findByRole('option', { name: 'Mario Huamán' }),
     )
-    await userEvent.click(boton('Guardar ambiente'))
+    await userEvent.click(boton('Registrar ambiente'))
     expect(crearAmbiente.mock.calls[0][0].responsableId).toBe(3)
   })
 
@@ -392,7 +392,7 @@ describe('Registrar ambiente', () => {
     crearAmbiente.mockReturnValue(pendiente())
     mostrar()
     await llenarValido()
-    await userEvent.click(boton('Guardar ambiente'))
+    await userEvent.click(boton('Registrar ambiente'))
     expect(boton('Guardando…')).toBeInTheDocument()
     expect(ingresar('Tipo')).toBeDisabled()
     await userEvent.click(boton('Guardando…'))
@@ -403,7 +403,7 @@ describe('Registrar ambiente', () => {
     crearAmbiente.mockResolvedValue(exito({ id: 5 }))
     mostrar()
     await llenarValido()
-    await userEvent.click(boton('Guardar ambiente'))
+    await userEvent.click(boton('Registrar ambiente'))
     await waitFor(() => expect(screen.getByTestId('ubicacion')).toHaveTextContent('/ambientes'))
     expect(JSON.parse(screen.getByTestId('ubicacion').dataset.state)).toEqual({
       exito: MENSAJES.ambienteRegistrado,
@@ -417,7 +417,7 @@ describe('Registrar ambiente', () => {
     })
     mostrar()
     await llenarValido()
-    await userEvent.click(boton('Guardar ambiente'))
+    await userEvent.click(boton('Registrar ambiente'))
     expect(await screen.findByText(MENSAJES.nombreAmbienteDuplicado)).toBeInTheDocument()
     expect(ingresar('Nombre')).toHaveFocus()
   })
@@ -430,7 +430,7 @@ describe('Registrar ambiente', () => {
     crearAmbiente.mockResolvedValue({ tipo })
     mostrar()
     await llenarValido()
-    await userEvent.click(boton('Guardar ambiente'))
+    await userEvent.click(boton('Registrar ambiente'))
     expect(await screen.findByRole('alert')).toHaveTextContent(mensaje)
   })
 
@@ -440,9 +440,9 @@ describe('Registrar ambiente', () => {
     expect(await screen.findByText(MENSAJES.errorConexion)).toBeInTheDocument()
   })
 
-  it('Cancelar vuelve al listado', async () => {
+  it('Volver regresa al listado', async () => {
     mostrar()
-    await userEvent.click(boton('Cancelar'))
+    await userEvent.click(boton('Volver'))
     expect(screen.getByTestId('ubicacion')).toHaveTextContent('/ambientes')
   })
 
@@ -465,9 +465,9 @@ describe('Registrar ambiente', () => {
     await userEvent.tab()
     expect(ingresar('Responsable')).toHaveFocus()
     await userEvent.tab()
-    expect(boton('Cancelar')).toHaveFocus()
+    expect(boton('Volver')).toHaveFocus()
     await userEvent.tab()
-    expect(boton('Guardar ambiente')).toHaveFocus()
+    expect(boton('Registrar ambiente')).toHaveFocus()
     await userEvent.keyboard('{Enter}')
     await waitFor(() => expect(crearAmbiente).toHaveBeenCalledTimes(1))
   })
@@ -662,7 +662,7 @@ describe('Nueva reserva', () => {
     mostrar()
     await llenarValido()
     await userEvent.click(boton('Registrar solicitud'))
-    await userEvent.click(await screen.findByRole('button', { name: 'Registrar otra reserva' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Registrar otra solicitud' }))
     expect(ingresar('Motivo')).toHaveValue('')
     expect(ingresar('Hora de inicio')).toHaveValue('')
   })
@@ -699,10 +699,10 @@ describe('Nueva reserva', () => {
     expect(await screen.findByText(MENSAJES.errorServidor)).toBeInTheDocument()
   })
 
-  it('Cancelar limpia el formulario', async () => {
+  it('Limpiar formulario vacía los campos sin salir de la pantalla', async () => {
     mostrar()
     await userEvent.type(ingresar('Motivo'), 'algo')
-    await userEvent.click(boton('Cancelar'))
+    await userEvent.click(boton('Limpiar formulario'))
     expect(ingresar('Motivo')).toHaveValue('')
   })
 
@@ -725,7 +725,7 @@ describe('Nueva reserva', () => {
     expect(ingresar('Motivo')).toHaveFocus()
     await userEvent.keyboard('Práctica')
     await userEvent.tab()
-    expect(boton('Cancelar')).toHaveFocus()
+    expect(boton('Limpiar formulario')).toHaveFocus()
     await userEvent.tab()
     expect(boton('Registrar solicitud')).toHaveFocus()
     await userEvent.keyboard('{Enter}')

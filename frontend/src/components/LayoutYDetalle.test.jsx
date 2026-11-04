@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from '../context/AuthContext.jsx'
@@ -31,6 +31,44 @@ const opcionesDelMenu = () =>
   within(screen.getByRole('navigation', { name: 'Principal' }))
     .getAllByRole('link')
     .map((enlace) => enlace.textContent)
+
+const marcadas = () =>
+  within(screen.getByRole('navigation', { name: 'Principal' }))
+    .getAllByRole('link')
+    .filter((enlace) => enlace.hasAttribute('aria-current'))
+    .map((enlace) => enlace.textContent)
+
+describe('Layout: en el detalle de una reserva el menú marca la sección de origen', () => {
+  const detalle = (volverA) => ({ pathname: '/reservas/7', state: volverA ? { volverA } : null })
+
+  it('por defecto marca Reservas', () => {
+    mostrarLayout(SESIONES.administrador, detalle())
+    expect(marcadas()).toEqual(['Reservas'])
+  })
+
+  it('si se vino del Dashboard marca Dashboard', () => {
+    mostrarLayout(SESIONES.administrador, detalle('/dashboard'))
+    expect(marcadas()).toEqual(['Dashboard'])
+  })
+
+  it('si se vino de una lista filtrada marca Reservas', () => {
+    mostrarLayout(SESIONES.solicitante, detalle('/reservas?estado=Pendiente&pagina=2'))
+    expect(marcadas()).toEqual(['Reservas'])
+  })
+
+  it('la Responsable ve marcada Mi ambiente, con o sin origen', () => {
+    mostrarLayout(SESIONES.responsable, detalle())
+    expect(marcadas()).toEqual(['Mi ambiente'])
+    cleanup()
+    mostrarLayout(SESIONES.responsable, detalle('/mi-ambiente?ambienteId=3'))
+    expect(marcadas()).toEqual(['Mi ambiente'])
+  })
+
+  it('«Nueva reserva» sigue marcando solo su opción', () => {
+    mostrarLayout(SESIONES.solicitante, '/reservas/nueva')
+    expect(marcadas()).toEqual(['Nueva reserva'])
+  })
+})
 
 describe('Layout: menú por rol (hallazgo G1: un solo layout)', () => {
   it('el Administrador ve las cinco opciones', () => {
@@ -118,6 +156,23 @@ describe('DetalleReserva (hallazgo E4: un único componente)', () => {
         <DetalleReserva reserva={reserva} {...props} />
       </MemoryRouter>,
     )
+
+  it('el enlace de regreso se llama como su destino: «Volver al Dashboard» si se vino del Dashboard', () => {
+    mostrar({ volverA: '/dashboard' })
+    expect(screen.getByRole('link', { name: 'Volver al Dashboard' })).toHaveAttribute(
+      'href',
+      '/dashboard',
+    )
+    expect(screen.queryByRole('link', { name: 'Volver a Reservas' })).not.toBeInTheDocument()
+  })
+
+  it('«Volver a Reservas» conserva los filtros y la página de la lista de donde se vino', () => {
+    mostrar({ volverA: '/reservas?estado=Pendiente&pagina=2' })
+    expect(screen.getByRole('link', { name: 'Volver a Reservas' })).toHaveAttribute(
+      'href',
+      '/reservas?estado=Pendiente&pagina=2',
+    )
+  })
 
   it('muestra enlace de regreso con flecha, datos, estado con icono e historial vacío', () => {
     const { container } = mostrar()

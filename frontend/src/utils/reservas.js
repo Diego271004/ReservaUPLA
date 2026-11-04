@@ -24,6 +24,10 @@ const AVISO_POR_ESTADO_FINAL = {
   Cancelada: MENSAJES.reservaCanceladaNoSeModifica,
 }
 
+// Solo una reserva Pendiente es todavía una «solicitud»; una Aprobada (o ya cerrada) se cancela como «reserva», igual que el modal.
+const textoDeCancelar = (reserva) =>
+  reserva.estado === 'Pendiente' ? TEXTOS.cancelarSolicitud : TEXTOS.cancelarReserva
+
 /**
  * Qué acciones muestra el detalle de una reserva a quien lo mira. Es una ayuda para el usuario: el backend es quien decide
  * (403 y 409).
@@ -50,7 +54,7 @@ export function accionesDeReserva(actor, reserva) {
 
   if (actor.rol === ROLES.solicitante && reserva.usuarioId === actor.usuarioId) {
     return {
-      acciones: [{ id: 'cancelar', texto: TEXTOS.cancelarSolicitud, habilitada: !esFinal }],
+      acciones: [{ id: 'cancelar', texto: textoDeCancelar(reserva), habilitada: !esFinal }],
       aviso,
     }
   }

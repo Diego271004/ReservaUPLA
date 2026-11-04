@@ -187,6 +187,18 @@ describe('rutas protegidas por rol', () => {
     expect(obtenerReserva).not.toHaveBeenCalled()
   })
 
+  it('el título de la pestaña cambia con la pantalla y con el estado «Sin permiso»', async () => {
+    obtenerDashboard.mockReturnValue(new Promise(() => {}))
+    await renderApp('/dashboard', SESIONES.administrador)
+    await waitFor(() => expect(document.title).toBe('Dashboard · ReservaUPLA'))
+    cleanup()
+    await renderApp('/dashboard', SESIONES.solicitante)
+    await waitFor(() => expect(document.title).toBe('Sin permiso · ReservaUPLA'))
+    cleanup()
+    await renderApp('/login')
+    await waitFor(() => expect(document.title).toBe('Iniciar sesión · ReservaUPLA'))
+  })
+
   it('una ruta que no existe muestra "No encontramos esa página."', async () => {
     await renderApp('/no-existe', SESIONES.administrador)
     expect(screen.getByRole('heading', { name: 'No encontramos esa página.' })).toBeInTheDocument()

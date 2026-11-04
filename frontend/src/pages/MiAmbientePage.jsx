@@ -1,14 +1,16 @@
 import { useCallback } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import GrupoDeIndicadores from '../components/GrupoDeIndicadores/GrupoDeIndicadores.jsx'
 import PieDeLista from '../components/PieDeLista/PieDeLista.jsx'
 import AvisoDeError from '../components/AvisoDeError/AvisoDeError.jsx'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
+import Button from '../components/ui/Button.jsx'
 import SelectInput from '../components/ui/SelectInput.jsx'
 import TableList from '../components/ui/TableList.jsx'
 import { TEXTOS } from '../constants/messages.js'
 import { useCarga } from '../hooks/useCarga.js'
 import { obtenerMiAmbiente } from '../services/recursosService.js'
+import { isoAFecha } from '../utils/fechas.js'
 import { indicadoresDeEstado } from '../utils/indicadores.js'
 import { columnasDeReservas } from './columnasDeReservas.jsx'
 import estilos from './MiAmbientePage.module.css'
@@ -20,8 +22,6 @@ const PANEL_VACIO = Object.freeze({
   reservas: { elementos: [], total: 0, pagina: 1, tamano: 10 },
 })
 
-const COLUMNAS = columnasDeReservas(['fecha', 'horario', 'solicitante', 'estado'])
-
 /**
  * Mi ambiente (Responsable): su ambiente, cuatro indicadores acotados a él y sus reservas, solo para consultar (sin
  * aprobar ni rechazar). Si tiene más de un ambiente a cargo puede elegir cuál mira. Los indicadores en esta pantalla son
@@ -30,6 +30,7 @@ const COLUMNAS = columnasDeReservas(['fecha', 'horario', 'solicitante', 'estado'
 export default function MiAmbientePage() {
   const [buscar, setBuscar] = useSearchParams()
   const clave = buscar.toString()
+  const navigate = useNavigate()
 
   const cargar = useCallback(() => {
     const consulta = new URLSearchParams(clave)
@@ -40,6 +41,21 @@ export default function MiAmbientePage() {
   }, [clave])
   const { datos, cargando, error, recargar } = useCarga(cargar, PANEL_VACIO)
   const { ambiente, ambientes, indicadores, reservas } = datos
+
+  // «Ver detalle» recuerda esta pantalla (ambiente y página) para que el detalle vuelva a ella.
+  const columnas = columnasDeReservas(['fecha', 'horario', 'solicitante', 'estado'], (reserva) => (
+    <Button
+      variante="secundario"
+      aria-label={`${TEXTOS.verDetalle}: ${reserva.ambienteNombre}, ${isoAFecha(reserva.fecha)}`}
+      onClick={() =>
+        navigate(`/reservas/${reserva.id}`, {
+          state: { volverA: clave ? `/mi-ambiente?${clave}` : '/mi-ambiente' },
+        })
+      }
+    >
+      {TEXTOS.verDetalle}
+    </Button>
+  ))
 
   const elegir = (evento) => setBuscar({ ambienteId: evento.target.value })
   const irAPagina = (pagina) => {
@@ -87,7 +103,7 @@ export default function MiAmbientePage() {
           <div className={estilos.uso}>
             <TableList
               titulo={TEXTOS.usoDelAmbiente}
-              columnas={COLUMNAS}
+              columnas={columnas}
               filas={reservas.elementos}
               textoVacio={TEXTOS.sinReservas}
             />

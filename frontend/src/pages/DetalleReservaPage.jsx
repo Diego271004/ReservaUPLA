@@ -7,15 +7,17 @@ import { TEXTOS } from '../constants/messages.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { ESTADOS_PAGINA, useDetalleReserva } from '../hooks/useDetalleReserva.js'
 import { accionesDeReserva, textoDeEvento } from '../utils/reservas.js'
+import { rutaDeRegreso, textoDeRegreso } from '../utils/rutaDeRegreso.js'
 import estilos from './DetalleReservaPage.module.css'
 
 const VARIANTE_DE_BOTON = { cancelar: 'secundario', rechazar: 'rechazar', aprobar: 'primario' }
 
 export default function DetalleReservaPage() {
   const { id } = useParams()
-  // «Volver a Reservas» regresa a la lista de donde se vino, con sus filtros y su página.
-  const volverA = useLocation().state?.volverA ?? '/reservas'
   const { sesion } = useAuth()
+  // El enlace de regreso lleva a la lista o al panel de donde se vino, con sus filtros y su página.
+  const { state } = useLocation()
+  const volverA = rutaDeRegreso(sesion.rol, state?.volverA)
   const vm = useDetalleReserva(id)
 
   if (vm.estado === ESTADOS_PAGINA.cargando) return <p role="status">{TEXTOS.cargandoReserva}</p>
@@ -24,7 +26,7 @@ export default function DetalleReservaPage() {
     return (
       <>
         <h1>{TEXTOS.reservaNoEncontrada}</h1>
-        <Link to={volverA}>Volver a Reservas</Link>
+        <Link to={volverA}>{textoDeRegreso(volverA)}</Link>
       </>
     )
   }
