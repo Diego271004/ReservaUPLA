@@ -113,7 +113,7 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   await mario.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Cómputo 2' })
   await mario.getByRole('heading', { name: 'Laboratorio de Cómputo 2' }).waitFor()
   await mario.locator('tr', { hasText: fecha.texto }).filter({ hasText: 'Aprobada' }).waitFor()
-  esperar((await mario.getByRole('main').getByRole('button').count()) === 0, 'Mi ambiente es de solo lectura: ningún botón en la pantalla')
+  esperar((await mario.getByRole('main').getByRole('button').filter({ hasNotText: /^Ver detalle/ }).count()) === 0, 'Mi ambiente es de solo lectura: solo hay «Ver detalle», ningún botón de decidir')
   const idLaboratorio = (await api('/api/ambientes', { token: tokenCarla })).data.find((x) => x.nombre === 'Laboratorio de Cómputo 2').id
   const miAmbienteApi = (await api(`/api/mi-ambiente?ambienteId=${idLaboratorio}`, { token: tokenDe(sesiones.mario) })).data
   esperar((await indicador(mario, 'Total de reservas')) === miAmbienteApi.indicadores.total, 'el total de Mi ambiente coincide con la API')
@@ -156,7 +156,7 @@ try {
   await carla.getByText(`Mostrando 5 de ${total}`).waitFor()
   ok(`el pie dice «Mostrando 5 de ${total}»`)
   await capturar(carla, destino, '06-dashboard-mostrando-5-de-n', 'escritorio')
-  await carla.getByRole('link', { name: 'Ver todas' }).click()
+  await carla.getByRole('link', { name: 'Ver todas las pendientes' }).click()
   await carla.waitForURL('**/reservas?estado=Pendiente')
   await carla.getByRole('table').waitFor()
   esperar((await carla.getByLabel('Estado', { exact: true }).inputValue()) === 'Pendiente', '«Ver todas» abre Reservas con el filtro Pendiente aplicado')

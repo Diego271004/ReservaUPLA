@@ -121,23 +121,23 @@ describe('Dashboard: pendientes', () => {
     expect(within(fila(2)).getByText('Luis Quispe')).toBeInTheDocument()
   })
 
-  it('«Mostrando 5 de 7» y «Ver todas» lleva a Reservas con el filtro Pendiente', async () => {
+  it('«Mostrando 5 de 7» y «Ver todas las pendientes» lleva a Reservas con el filtro Pendiente', async () => {
     obtenerDashboard.mockResolvedValue(
       exito(panel({ pendientes: [1, 2, 3, 4, 5].map((id) => pendiente(id)), total: 7 })),
     )
     mostrar()
     expect(await screen.findByText('Mostrando 5 de 7')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Ver todas' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Ver todas las pendientes' })).toHaveAttribute(
       'href',
       '/reservas?estado=Pendiente',
     )
   })
 
-  it('sin pendientes dice «No hay solicitudes pendientes.» y no ofrece «Ver todas»', async () => {
+  it('sin pendientes dice «No hay solicitudes pendientes.» y no ofrece «Ver todas las pendientes»', async () => {
     obtenerDashboard.mockResolvedValue(exito(panel({ pendientes: [] })))
     mostrar()
     expect(await screen.findByText(TEXTOS.sinPendientes)).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Ver todas' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Ver todas las pendientes' })).not.toBeInTheDocument()
     expect(screen.queryByText(/Mostrando/)).not.toBeInTheDocument()
   })
 

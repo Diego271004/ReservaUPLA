@@ -15,7 +15,8 @@ export default function UsuarioFormPage() {
   return (
     <FormularioTarjeta
       titulo={TEXTOS.tituloRegistrarUsuario}
-      textoGuardar={TEXTOS.guardarUsuario}
+      textoGuardar={TEXTOS.registrarUsuario}
+      textoSecundario={TEXTOS.volver}
       enviando={form.enviando}
       alerta={form.alerta}
       onSubmit={form.handleSubmit}

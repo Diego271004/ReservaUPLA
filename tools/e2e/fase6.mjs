@@ -115,7 +115,7 @@ try {
   await ana.getByRole('button', { name: 'Sí, cancelar reserva' }).click()
   await ana.getByText('Reserva cancelada.').waitFor()
   await ana.getByText('Una reserva cancelada no se puede modificar.').waitFor()
-  esperar(await ana.getByRole('button', { name: 'Cancelar solicitud' }).isDisabled(), 'RN-06: tras cancelar, la acción queda deshabilitada y con el aviso informativo')
+  esperar(await ana.getByRole('button', { name: 'Cancelar reserva' }).isDisabled(), 'RN-06: tras cancelar, la acción queda deshabilitada y con el aviso informativo')
   await capturar(ana, destino, '07-detalle-cancelada', 'escritorio')
 
   // ============================ Administrador: aprobar, conflicto, rechazar ============================

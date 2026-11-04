@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Link, matchPath, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { NOMBRE_DE_ROL, MENU_POR_ROL } from '../../constants/navegacion.js'
 import { TEXTOS } from '../../constants/messages.js'
 import Button from '../ui/Button.jsx'
+import { rutaDeRegreso } from '../../utils/rutaDeRegreso.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 import estilos from './Layout.module.css'
 
@@ -13,11 +14,15 @@ import estilos from './Layout.module.css'
 export default function Layout() {
   const { sesion, cerrarSesion } = useAuth()
   const navigate = useNavigate()
+  const { pathname, state } = useLocation()
   const [menuAbierto, setMenuAbierto] = useState(false)
 
   // Al cerrar la sesión (o si vence) el layout se vuelve a pintar un instante sin sesión antes de que el router redirija.
   if (!sesion) return null
   const opciones = MENU_POR_ROL[sesion.rol] ?? []
+  // En el detalle de una reserva el menú marca la sección de origen (sin migas de pan).
+  const esDetalle = matchPath('/reservas/:id', pathname) && pathname !== '/reservas/nueva'
+  const origen = esDetalle ? rutaDeRegreso(sesion.rol, state?.volverA).split('?')[0] : null
 
   const alCerrarSesion = () => {
     cerrarSesion()
@@ -46,17 +51,31 @@ export default function Layout() {
             <p className={estilos.rol}>{NOMBRE_DE_ROL[sesion.rol] ?? sesion.rol}</p>
           </div>
           <nav id="menu-principal" aria-label="Principal" className={estilos.navegacion}>
-            {opciones.map((opcion) => (
-              <NavLink
-                key={opcion.ruta}
-                to={opcion.ruta}
-                end={opcion.exacta}
-                className={({ isActive }) => `${estilos.opcion} ${isActive ? estilos.activa : ''}`}
-                onClick={() => setMenuAbierto(false)}
-              >
-                {opcion.texto}
-              </NavLink>
-            ))}
+            {opciones.map((opcion) =>
+              opcion.ruta === origen ? (
+                <Link
+                  key={opcion.ruta}
+                  to={opcion.ruta}
+                  aria-current="true"
+                  className={`${estilos.opcion} ${estilos.activa}`}
+                  onClick={() => setMenuAbierto(false)}
+                >
+                  {opcion.texto}
+                </Link>
+              ) : (
+                <NavLink
+                  key={opcion.ruta}
+                  to={opcion.ruta}
+                  end={opcion.exacta}
+                  className={({ isActive }) =>
+                    `${estilos.opcion} ${isActive ? estilos.activa : ''}`
+                  }
+                  onClick={() => setMenuAbierto(false)}
+                >
+                  {opcion.texto}
+                </NavLink>
+              ),
+            )}
           </nav>
           <Button variante="sobreOscuroLista" onClick={alCerrarSesion}>
             {TEXTOS.cerrarSesion}

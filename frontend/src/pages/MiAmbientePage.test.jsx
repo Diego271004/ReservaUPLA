@@ -67,6 +67,25 @@ beforeEach(() => {
   obtenerMiAmbiente.mockResolvedValue(exito(panel()))
 })
 
+describe('Mi ambiente: «Ver detalle» por fila', () => {
+  it('cada reserva tiene un botón «Ver detalle» secundario, como en las otras tablas', async () => {
+    mostrar()
+    const botones = await screen.findAllByRole('button', { name: /Ver detalle/ })
+    expect(botones).toHaveLength(4)
+    expect(botones[0]).toHaveAccessibleName('Ver detalle: Laboratorio de Cómputo 2, 05/11/2026')
+    expect(screen.getByRole('columnheader', { name: 'Acciones' })).toBeInTheDocument()
+  })
+
+  it('abre la reserva y recuerda Mi ambiente (con su ambiente y página) para volver', async () => {
+    mostrar('/mi-ambiente?ambienteId=1&pagina=2')
+    await userEvent.click((await screen.findAllByRole('button', { name: /Ver detalle/ }))[1])
+    expect(screen.getByTestId('ubicacion')).toHaveTextContent('/reservas/2')
+    expect(JSON.parse(screen.getByTestId('ubicacion').dataset.state)).toEqual({
+      volverA: '/mi-ambiente?ambienteId=1&pagina=2',
+    })
+  })
+})
+
 describe('Mi ambiente', () => {
   it('muestra el título y mientras carga «Cargando…»', () => {
     obtenerMiAmbiente.mockReturnValue(new Promise(() => {}))
@@ -106,10 +125,9 @@ describe('Mi ambiente', () => {
   it('«Uso del ambiente»: la tabla con fecha, horario, solicitante y estado con insignia', async () => {
     mostrar()
     const tabla = await screen.findByRole('table', { name: TEXTOS.usoDelAmbiente })
-    for (const encabezado of ['Fecha', 'Horario', 'Solicitante', 'Estado']) {
+    for (const encabezado of ['Fecha', 'Horario', 'Solicitante', 'Estado', 'Acciones']) {
       expect(within(tabla).getByRole('columnheader', { name: encabezado })).toBeInTheDocument()
     }
-    expect(within(tabla).queryByRole('columnheader', { name: 'Acciones' })).not.toBeInTheDocument()
     expect(within(tabla).getAllByRole('row')).toHaveLength(5)
     for (const estado of ['Aprobada', 'Pendiente', 'Rechazada', 'Cancelada']) {
       expect(within(tabla).getByText(estado)).toBeInTheDocument()
@@ -117,13 +135,14 @@ describe('Mi ambiente', () => {
     expect(within(tabla).getByText('Luis Quispe')).toBeInTheDocument()
   })
 
-  it('es de solo lectura: ningún botón de aprobar, rechazar ni cancelar', async () => {
+  it('es de solo lectura: solo hay «Ver detalle», ningún botón de aprobar, rechazar ni cancelar', async () => {
     mostrar()
     await screen.findByRole('table')
     expect(
       screen.queryByRole('button', { name: /Aprobar|Rechazar|Cancelar/ }),
     ).not.toBeInTheDocument()
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    const nombres = screen.getAllByRole('button').map((boton) => boton.textContent)
+    expect(new Set(nombres)).toEqual(new Set(['Ver detalle']))
   })
 
   it('con un solo ambiente no ofrece elegir otro', async () => {

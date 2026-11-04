@@ -179,14 +179,21 @@ export async function recorrer(navegador, ancho, medir) {
   await carla.getByText('Reserva rechazada.').waitFor()
   await medir(carla, '35-detalle-rechazada', 'Detalle, tras rechazar (Rechazada, estado final)')
 
+  // ---------------------------------------------------------------- Solicitante: detalle de una reserva ya Aprobada
+  await abrir(ana, `/reservas/${idA}`, 'heading', 'Detalle de la reserva')
+  await medir(ana, '36-detalle-solicitante-aprobada', 'Detalle, Solicitante dueña con la reserva Aprobada («Cancelar reserva»)')
+
   // ---------------------------------------------------------------- Responsable
   const mario = await nuevaPagina(navegador, ancho, sesiones.mario)
-  await abrir(mario, `/reservas/${idA}`, 'heading', 'Detalle de la reserva')
-  await medir(mario, '40-detalle-responsable', 'Detalle, Responsable (solo consulta)')
   await mario.goto(`${BASE}/mi-ambiente`)
   await mario.getByRole('heading', { name: 'Mi ambiente' }).waitFor()
-  await mario.getByRole('table').waitFor()
-  await medir(mario, '41-mi-ambiente', 'Mi ambiente (Responsable): su ambiente, cuatro indicadores y sus reservas')
+  // Mario tiene tres ambientes y se abre el primero por nombre (el Auditorio): se elige el Laboratorio, que tiene reservas.
+  await mario.getByLabel('Ambiente', { exact: true }).selectOption({ label: 'Laboratorio de Cómputo 2' })
+  await mario.getByRole('button', { name: /^Ver detalle/ }).first().waitFor()
+  await medir(mario, '41-mi-ambiente', 'Mi ambiente (Responsable): su ambiente, cuatro indicadores, sus reservas y «Ver detalle»')
+  await mario.getByRole('button', { name: /^Ver detalle/ }).first().click()
+  await mario.getByRole('heading', { name: 'Detalle de la reserva' }).waitFor()
+  await medir(mario, '40-detalle-responsable', 'Detalle, Responsable (solo lectura; el menú marca Mi ambiente)')
 
 
   // ---------------------------------------------------------------- Administrador: ambientes y usuarios
@@ -201,7 +208,7 @@ export async function recorrer(navegador, ancho, medir) {
   await carla.getByRole('button', { name: 'Nuevo ambiente' }).click()
   await carla.getByRole('heading', { name: 'Registrar ambiente' }).waitFor()
   await medir(carla, '12-ambiente-formulario-vacio', 'Registrar ambiente, estado inicial')
-  await carla.getByRole('button', { name: 'Guardar ambiente' }).click()
+  await carla.getByRole('button', { name: 'Registrar ambiente' }).click()
   await carla.getByText('Ingresa el nombre del ambiente.').waitFor()
   await medir(carla, '13-ambiente-formulario-errores', 'Registrar ambiente, errores de campo')
   await carla.getByLabel('Nombre').fill('Laboratorio de Física')
@@ -210,7 +217,7 @@ export async function recorrer(navegador, ancho, medir) {
   await carla.getByLabel('Ubicación').fill('Pabellón C, piso 1')
   await carla.getByLabel('Estado').selectOption('Disponible')
   await carla.getByLabel('Responsable').selectOption({ label: 'Mario Huamán' })
-  await carla.getByRole('button', { name: 'Guardar ambiente' }).click()
+  await carla.getByRole('button', { name: 'Registrar ambiente' }).click()
   await carla.getByText('Ambiente registrado.').waitFor()
   await medir(carla, '14-ambiente-guardado', 'Ambientes, tras registrar uno (mensaje de éxito)')
 
@@ -220,7 +227,7 @@ export async function recorrer(navegador, ancho, medir) {
   await carla.getByRole('button', { name: 'Nuevo usuario' }).click()
   await carla.getByRole('heading', { name: 'Registrar usuario' }).waitFor()
   await medir(carla, '16-usuario-formulario-vacio', 'Registrar usuario, estado inicial')
-  await carla.getByRole('button', { name: 'Guardar usuario' }).click()
+  await carla.getByRole('button', { name: 'Registrar usuario' }).click()
   await carla.getByText('Ingresa el nombre completo.').waitFor()
   await medir(carla, '17-usuario-formulario-errores', 'Registrar usuario, errores de campo')
   await carla.getByLabel('Contraseña inicial', { exact: true }).fill('abcdefgh')
@@ -231,7 +238,7 @@ export async function recorrer(navegador, ancho, medir) {
   await carla.getByLabel('Correo institucional').fill('luis.quispe@upla.edu.pe')
   await carla.getByLabel('Rol').selectOption('Solicitante')
   await carla.getByLabel('Contraseña inicial', { exact: true }).fill(process.env.CLAVE_PRUEBA)
-  await carla.getByRole('button', { name: 'Guardar usuario' }).click()
+  await carla.getByRole('button', { name: 'Registrar usuario' }).click()
   await carla.getByText('Usuario registrado.').waitFor()
   await medir(carla, '19-usuario-guardado', 'Usuarios, tras registrar uno (mensaje de éxito)')
 

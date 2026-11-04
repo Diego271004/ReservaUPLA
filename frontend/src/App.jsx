@@ -3,6 +3,7 @@ import Layout from './components/Layout/Layout.jsx'
 import { RUTA_INICIAL_POR_ROL } from './constants/navegacion.js'
 import { RUTAS } from './constants/rutas.js'
 import { useAuth } from './context/AuthContext.jsx'
+import { useTituloDelDocumento } from './hooks/useTituloDelDocumento.js'
 import AmbienteFormPage from './pages/AmbienteFormPage.jsx'
 import AmbientesPage from './pages/AmbientesPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
@@ -36,6 +37,7 @@ const PANTALLAS = {
 }
 
 export default function App() {
+  useTituloDelDocumento()
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
