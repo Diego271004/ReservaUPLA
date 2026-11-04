@@ -281,6 +281,13 @@ describe('CardIndicador', () => {
     expect(screen.getByText('Total de reservas')).toBeInTheDocument()
   })
 
+  it('un valor de texto (no un número) usa la letra de texto para caber en la tarjeta', () => {
+    const { rerender } = render(<CardIndicador valor={48} descripcion="Total" />)
+    expect(screen.getByText('48').className).not.toMatch(/valorTexto/)
+    rerender(<CardIndicador valor="Laboratorio de Cómputo 2" descripcion="Más utilizado" />)
+    expect(screen.getByText('Laboratorio de Cómputo 2').className).toMatch(/valorTexto/)
+  })
+
   it('un texto largo se conserva completo (parte en dos líneas, no se corta con "…")', () => {
     render(
       <CardIndicador

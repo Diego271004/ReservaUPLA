@@ -1,0 +1,51 @@
+.ambiente {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: var(--espacio-3);
+  margin-bottom: var(--espacio-3);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.ambiente h2 {
+  margin: 0 0 var(--espacio-1);
+}
+
+.ambiente p {
+  margin: 0;
+  color: var(--color-texto-suave);
+}
+
+.ambiente strong {
+  color: var(--color-marino);
+}
+
+.separador {
+  display: inline-block;
+  width: var(--espacio-3);
+}
+
+.ambiente > :last-child:not(div:first-child) {
+  min-width: 240px;
+}
+
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-3);
+}
+
+.uso {
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.resumen {
+  margin: 0;
+  padding: var(--espacio-2);
+  color: var(--color-texto-suave);
+}

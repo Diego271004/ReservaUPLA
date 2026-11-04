@@ -4,10 +4,11 @@ import { ROLES, RUTA_INICIAL_POR_ROL } from './constants/navegacion.js'
 import { useAuth } from './context/AuthContext.jsx'
 import AmbienteFormPage from './pages/AmbienteFormPage.jsx'
 import AmbientesPage from './pages/AmbientesPage.jsx'
+import DashboardPage from './pages/DashboardPage.jsx'
 import DetalleReservaPage from './pages/DetalleReservaPage.jsx'
 import { NoEncontradaPage } from './pages/ErrorRutaPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
-import PendientePage from './pages/PendientePage.jsx'
+import MiAmbientePage from './pages/MiAmbientePage.jsx'
 import NuevaReservaPage from './pages/NuevaReservaPage.jsx'
 import ReservasPage from './pages/ReservasPage.jsx'
 import UsuarioFormPage from './pages/UsuarioFormPage.jsx'
@@ -31,7 +32,7 @@ export default function App() {
       <Route element={<RutaProtegida />}>
         <Route element={<Layout />}>
           <Route element={<RutaProtegida roles={[administrador]} />}>
-            <Route path="/dashboard" element={<PendientePage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/ambientes" element={<AmbientesPage />} />
             <Route path="/ambientes/nuevo" element={<AmbienteFormPage />} />
             <Route path="/usuarios" element={<UsuariosPage />} />
@@ -45,7 +46,7 @@ export default function App() {
             <Route path="/reservas/:id" element={<DetalleReservaPage />} />
           </Route>
           <Route element={<RutaProtegida roles={[responsable]} />}>
-            <Route path="/mi-ambiente" element={<PendientePage />} />
+            <Route path="/mi-ambiente" element={<MiAmbientePage />} />
           </Route>
           <Route path="*" element={<NoEncontradaPage />} />
         </Route>

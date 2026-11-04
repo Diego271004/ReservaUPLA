@@ -40,10 +40,9 @@ export const MENU_POR_ROL = Object.freeze({
   [ROLES.responsable]: [MI_AMBIENTE],
 })
 
-// Primera pantalla de cada rol. Dashboard, Reservas y Mi ambiente llegan en fases posteriores:
-// hasta entonces cada rol aterriza en una pantalla que ya existe.
+// Primera pantalla de cada rol.
 export const RUTA_INICIAL_POR_ROL = Object.freeze({
-  [ROLES.administrador]: '/ambientes',
+  [ROLES.administrador]: '/dashboard',
   [ROLES.solicitante]: '/reservas/nueva',
   [ROLES.responsable]: '/mi-ambiente',
 })

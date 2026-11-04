@@ -1,9 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MENSAJES, TEXTOS } from './constants/messages.js'
+import { MENSAJES } from './constants/messages.js'
 import { RESULTADO } from './services/llamarApi.js'
-import { listarAmbientes, listarUsuarios, obtenerReserva } from './services/recursosService.js'
+import {
+  listarAmbientes,
+  listarUsuarios,
+  obtenerDashboard,
+  obtenerMiAmbiente,
+  obtenerReserva,
+} from './services/recursosService.js'
 import { SESIONES, renderApp } from './test/utils.jsx'
 
 vi.mock('./services/recursosService.js', () => ({
@@ -14,7 +20,10 @@ vi.mock('./services/recursosService.js', () => ({
   crearReserva: vi.fn(),
   crearUsuario: vi.fn(),
   listarAmbientes: vi.fn(),
+  listarReservas: vi.fn(),
   listarUsuarios: vi.fn(),
+  obtenerDashboard: vi.fn(),
+  obtenerMiAmbiente: vi.fn(),
   obtenerReserva: vi.fn(),
   rechazarReserva: vi.fn(),
 }))
@@ -129,14 +138,18 @@ describe('rutas protegidas por rol', () => {
     expect(listarAmbientes).not.toHaveBeenCalled()
   })
 
-  it('la Solicitante entra a Nueva reserva y la Responsable a Mi ambiente (pantalla en construcción)', async () => {
+  it('cada rol entra a su pantalla: la Solicitante a Nueva reserva, la Responsable a Mi ambiente y el Administrador al Dashboard', async () => {
+    obtenerMiAmbiente.mockReturnValue(new Promise(() => {}))
+    obtenerDashboard.mockReturnValue(new Promise(() => {}))
     await renderApp('/reservas/nueva', SESIONES.solicitante)
     expect(await screen.findByRole('heading', { name: 'Nueva reserva' })).toBeInTheDocument()
     cleanup()
     await renderApp('/mi-ambiente', SESIONES.responsable)
-    expect(screen.getByRole('heading', { name: 'Pantalla en construcción' })).toBeInTheDocument()
-    expect(screen.getByText(TEXTOS.textoEnConstruccion)).toBeInTheDocument()
-    expect(TEXTOS.textoEnConstruccion).not.toMatch(/fase/i) // lenguaje del usuario, no del proyecto
+    expect(screen.getByRole('heading', { name: 'Mi ambiente' })).toBeInTheDocument()
+    cleanup()
+    await renderApp('/', SESIONES.administrador)
+    expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()
+    expect(screen.getByTestId('ubicacion')).toHaveTextContent('/dashboard')
   })
 
   it.each(['administrador', 'solicitante', 'responsable'])(

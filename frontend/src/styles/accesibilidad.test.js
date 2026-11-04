@@ -168,3 +168,25 @@ describe('listados en móvil', () => {
     )
   })
 })
+
+// ---------------------------------------------------------------- Pantallas de la Fase 9 (defectos vistos en las capturas reales)
+describe('Dashboard, Reservas y Mi ambiente', () => {
+  it('un valor de texto de una tarjeta (el nombre de un ambiente) es más chico que un número y parte las palabras largas', () => {
+    const regla1 = regla(css('components/ui/CardIndicador.module.css'), '.valorTexto')
+    expect(regla1).toContain('font-size: 1.25rem')
+    expect(regla1).toContain('overflow-wrap: anywhere')
+  })
+
+  it('los tres botones de cada fila del Dashboard no se parten en dos líneas en escritorio', () => {
+    expect(regla(css('pages/DashboardPage.module.css'), '.acciones')).toContain('flex-wrap: nowrap')
+  })
+
+  it('el pie «Mostrando N de N» tiene margen por todos lados', () => {
+    expect(regla(css('pages/ReservasPage.module.css'), '.resumen')).toMatch(
+      /padding: var\(--espacio-2\)(;|$)/,
+    )
+    expect(regla(css('pages/MiAmbientePage.module.css'), '.resumen')).toMatch(
+      /padding: var\(--espacio-2\)(;|$)/,
+    )
+  })
+})

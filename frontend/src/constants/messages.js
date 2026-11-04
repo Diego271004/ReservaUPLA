@@ -214,8 +214,6 @@ export const TEXTOS = Object.freeze({
   columnaAcciones: 'Acciones',
 
   // Pantallas y errores de ruta
-  pantallaEnConstruccion: 'Pantalla en construcción',
-  textoEnConstruccion: 'Todavía no está disponible. Estará lista en una próxima versión.',
   sinPermisoTitulo: 'Sin permiso',
   paginaNoEncontrada: 'No encontramos esa página.',
   volverAlInicio: 'Volver al inicio',

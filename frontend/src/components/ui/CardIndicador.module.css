@@ -17,6 +17,11 @@
   color: var(--color-marino);
 }
 
+.valorTexto {
+  font-size: 1.25rem;
+  overflow-wrap: anywhere; /* el nombre de un ambiente parte en líneas en vez de salirse de la tarjeta */
+}
+
 .descripcion,
 .detalle {
   margin: 4px 0 0;
