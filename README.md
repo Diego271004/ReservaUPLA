@@ -18,6 +18,9 @@ docs/       análisis, ciclo de vida, estándares, diseño y bitácora
 
 Comprobar: `dotnet --version`, `node --version`, `npm --version`, `psql --version`.
 
+## Orden para empezar de cero
+1. Instalar los requisitos. 2. Crear la base con los scripts (sección siguiente). 3. Guardar los secretos con la **misma** clave del rol. 4. Ejecutar API y frontend. 5. Pruebas, e2e y usabilidad. Las pruebas e2e y de usabilidad leen la clave del rol desde los secretos del paso 3 (sin ellos, `recrear-bd.sh` y `todo` no pueden recrear la base).
+
 ## Base de datos (por terminal)
 Los scripts viven en `database/` y se ejecutan con `psql` desde la raíz del repositorio. Nunca se usan migraciones ni `EnsureCreated`. Ningún script contiene claves: llegan como variables de `psql`.
 
@@ -66,7 +69,7 @@ dotnet user-secrets set "ConnectionStrings:ReservaUPLADB" "Host=localhost;Port=5
 dotnet user-secrets set "Jwt:Key" "<clave aleatoria de 64 caracteres o más>" --project ReservaUPLA.API/ReservaUPLA.API.csproj
 ```
 
-La clave del rol debe ser la misma que se pasó en `02_crear_rol.sql`.
+La clave del rol debe ser la misma que se pasó en `02_crear_rol.sql`. Los secretos se guardan por proyecto (`UserSecretsId`) en tu perfil de usuario, no en la carpeta: dos copias del repositorio en el mismo equipo comparten los mismos secretos. Para comprobarlos: `dotnet user-secrets list --project ReservaUPLA.API/ReservaUPLA.API.csproj`.
 
 ## Ejecutar
 ```bash
@@ -95,7 +98,7 @@ Abre `http://localhost:5180` (puerto fijo: si estuviera ocupado, Vite avisa con 
   cd tools/usabilidad && npm install
   node contraste.mjs                                   # solo el contraste (no necesita la base)
   PGPASSWORD="<clave de postgres>" CLAVE_PRUEBA="<clave de prueba>" ETAPA=despues node accesibilidad.mjs   # recrea la base, arranca la API y el frontend (puertos 5263 y 5180 libres)
-  node analizar.mjs                                    # eficacia, eficiencia y SUS desde docs/usabilidad/resultados-prueba.csv
+  node analizar.mjs                                    # (necesita filas reales en el CSV; con solo el encabezado avisa «no hay resultados que analizar») eficacia, eficiencia y SUS desde docs/usabilidad/resultados-prueba.csv
   npm run pruebas                                      # prueba del analizador con un archivo SINTÉTICO (no son resultados)
   ```
 - **Correcciones** (cada una con su prueba): contraste del límite de los campos, objetivos de 44 px, reflujo a 320 px, movimiento reducido, aviso de «no se puede deshacer» en rechazar y cancelar, aviso de disponibilidad junto a las horas, ayuda del formato de la fecha y separación de los registros en móvil. Ver la bitácora (defectos 26 a 37).
@@ -151,6 +154,7 @@ cd frontend && npm run build && npm run lint && npm run test
   export RESERVAUPLA_PRUEBAS_BD_APP="Host=localhost;Port=5432;Database=ReservaUPLADB;Username=reservaupla_app;Password=<clave del rol reservaupla_app>"
   cd backend && dotnet test ReservaUPLA.sln
   ```
+  En PowerShell: `$env:RESERVAUPLA_PRUEBAS_BD_ADMIN = '…'; $env:RESERVAUPLA_PRUEBAS_BD_APP = '…'` (mismos valores) y luego `dotnet test ReservaUPLA.sln`. Con las variables definidas y la base creada, la suite da 153 + 13 + 60 pruebas sin omitidas; sin ellas se omiten 4 y 11 (153 + 9 + 49 ejecutadas).
   Cada prueba crea datos con nombres únicos (`zz-prueba-…`) y los borra al terminar.
 - La matriz de reglas, con el nombre exacto de la prueba de cada capa, está en `docs/matriz-reglas.md`.
 
@@ -174,6 +178,9 @@ cd tools/e2e && CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run fase7  
 # Todas las fases en orden, cada una con la base recreada y la API reiniciada (arranca y detiene la API y el frontend; los puertos 5263 y 5180 deben estar libres)
 cd tools/e2e && PGPASSWORD="<clave de postgres>" CLAVE_PRUEBA="<clave de los usuarios de prueba>" npm run todo   # salida de referencia: docs/evidencias/e2e-completo.txt
 ```
+- **Windows (PowerShell):** los ejemplos con `VAR=valor comando` no existen allí; define antes `$env:PGPASSWORD='…'; $env:CLAVE_PRUEBA='…'` y ejecuta `npm run todo` (o `npm run fase5`…). `recrear-bd.sh` y `rate-limit.sh` necesitan bash (Git Bash); `npm run todo` y `accesibilidad.mjs` no. `CLAVE_PRUEBA` debe ser la misma que el `password_prueba` con el que se creó la base.
+- Los e2e y la medición de usabilidad **reescriben** las capturas e informes de `docs/evidencias/` (los archivos versionados): tras una corrida de comprobación, `git status` mostrará cambios; descártalos con `git restore docs/evidencias` si no quieres conservarlos.
+- Tiempo de referencia en este equipo: `npm run todo` ≈ 100 s.
 - Si no encuentra Edge ni Chrome, indica el ejecutable con `E2E_NAVEGADOR`. Otras variables: `E2E_BASE_URL` (por defecto `http://localhost:5180`) y `E2E_API_URL`.
 - El login permite 5 intentos por minuto por IP: los guiones inician sesión una vez por rol y reutilizan la sesión en las capturas móviles.
 - `tools/e2e/rate-limit.sh` repite los seis intentos seguidos de login (el sexto debe ser 429) contra una API recién arrancada; su resultado está en `docs/evidencias/fase5-rate-limit.txt`.
