@@ -42,6 +42,33 @@ Se corrigieron al escribirlas; se anotan por transparencia.
 - Dos `render` en la misma prueba dejaban dos aplicaciones en el DOM: se llama a `cleanup()` entre ellos.
 - En el guion de extremo a extremo, `getByLabel('Contraseña inicial')` coincidía con el campo y con su botón "Mostrar contraseña inicial": se usa `exact: true`.
 
+## Fase 6 — Validaciones (2026-11-04)
+
+Cómo se trabajó: cada comportamiento nuevo se escribió primero como prueba y se confirmó en rojo antes de implementarlo.
+
+| Paso | Prueba escrita primero | Resultado en rojo | Resultado en verde |
+|---|---|---|---|
+| Entidad `Reserva` (transiciones y RN-06) | `ReservaTests` | 13 fallaban (`NotImplementedException`) | 13 pasan |
+| `ReservaService` (RN-01, mantenimiento, aprobar, rechazar, cancelar, detalle, disponibilidad) | `ReservaServiceTests`, `ReservaCambioDeEstadoTests`, `ReservaConsultaTests` | 52 fallaban y las 73 anteriores seguían pasando | 125 pasan |
+| Contraseña inicial (U2), backend | `UsuarioServiceTests.U2_…` | 5 fallaban (las que debían rechazarse) | 134 pasan |
+| Endpoints nuevos | `ReservasEndpointsTests` | 22 fallaban | 48 pasan |
+| Base de datos | `07_pruebas_reglas.sql` ampliado | falló en «RN-06 una Rechazada no pasa a Aprobada» y luego en «mantenimiento…» | todas las comprobaciones pasan |
+| Contraseña inicial (U2), frontend | `validators.test.js` | 5 fallaban | 48 pasan |
+| Servicios del frontend (404, 409, rutas nuevas) | `servicios.test.js` | 7 fallaban | 43 pasan |
+| Pantallas (disponibilidad, Ver detalle, ayuda de la contraseña, detalle y modales) | `formulariosRegistro.test.jsx` y `DetalleReservaPage.test.jsx` | 8 fallaban y el detalle ni cargaba (módulo inexistente) | 158 pasan |
+
+### Defectos hallados y corregidos
+| # | Qué falló | Cómo se halló | Cómo se corrigió | Prueba que lo cubre |
+|---|---|---|---|---|
+| 14 | **Dos aprobaciones simultáneas de reservas que se cruzan podían terminar en HTTP 500.** Al comprobar la restricción de exclusión, PostgreSQL detectaba un *deadlock* (SQLSTATE 40P01) y abortaba una de las dos; el código solo traducía 23P01. | `ConcurrenciaAprobacionTests` falló en la vuelta 4 con «se esperaba 200 y 409, pero fue 200 y 500». | `ReservaRepository` traduce 23P01 **y** 40P01 (aunque EF lo envuelva en otra excepción) a `ConflictoDeHorarioException`; el servicio responde 409 con el mensaje de conflicto (con la hora si la ganadora ya confirmó, sin ella si no). | `ConcurrenciaAprobacionTests.RN01_dos_aprobaciones_simultaneas_que_se_cruzan_dan_un_200_y_un_409_y_una_sola_Aprobada` (25 vueltas por ejecución; pasó 4 ejecuciones seguidas con la base real) |
+| 15 | **La base no hacía cumplir RN-06 ni las transiciones.** Un `UPDATE` directo podía pasar una reserva Rechazada a Aprobada, o una Aprobada a Rechazada. | `07_pruebas_reglas.sql`: «la base aceptó lo que debía rechazar». | Trigger `trg_reservas_validar_transicion` (Rechazada y Cancelada no cambian; solo Pendiente → Aprobada, Rechazada o Cancelada y Aprobada → Cancelada). | «RN-06 una Rechazada no pasa a Aprobada» y las demás comprobaciones de RN-06 y transiciones de `07_pruebas_reglas.sql` |
+| 16 | **La base no hacía cumplir RN-05:** cualquiera podía dejar constancia en el historial de haber aprobado o rechazado. | Misma ampliación de `07`. | Trigger `trg_historial_validar_autor` (solo un Administrador registra Aprobada o Rechazada; Cancelada, el dueño o un Administrador). | «RN-05 un Solicitante no registra la aprobación» y «…el rechazo» |
+| 17 | La base aceptaba reservas nuevas en un ambiente en mantenimiento. | `07` ampliado. | Trigger `trg_reservas_validar_ambiente` al insertar. | «mantenimiento: la base no acepta una reserva nueva en un ambiente en mantenimiento» |
+| 18 | La base aceptaba texto plano en `contrasena_hash`. | `07` ampliado. | `CHECK ck_usuarios_hash_bcrypt` (solo hashes `$2a$`, `$2b$`, `$2x$` o `$2y$`). | «la base no acepta una contraseña en texto plano» |
+| 19 | El login no devolvía el id del usuario, y el detalle necesita saber si la solicitante es la dueña de la reserva para mostrarle (o no) "Cancelar solicitud". | Al diseñar `accionesDeReserva`. | `LoginResponseDto` incluye `UsuarioId`; la sesión del frontend lo guarda (una sesión anterior sin id se descarta y hay que iniciar sesión otra vez). | `AuthServiceTests` («Credenciales_correctas_devuelven_token_nombre_y_rol»), `LoginEndpointTests`, `servicios.test.js` («200 sin el id del usuario…») |
+
+Errores de mis pruebas (no del producto): el `vi.mock` de `App.test.jsx` no incluía las funciones nuevas de `recursosService` (Vitest lo avisa al usarlas).
+
 ## Decisiones y diferencias con el diseño
 | Tema | Diseño v2 | Lo construido | Por qué |
 |---|---|---|---|
@@ -50,6 +77,18 @@ Se corrigieron al escribirlas; se anotan por transparencia.
 | Listados | Columna "Acciones" con "Editar". | Sin esa columna. | Editar no está en el alcance de las Fases 5 y 6. |
 | Pantalla inicial | Dashboard para el Administrador. | Administrador: Ambientes; Solicitante: Nueva reserva; Responsable: Mi ambiente (en construcción). | Dashboard y Reservas llegan en fases posteriores; cada rol aterriza en una pantalla que existe. |
 | Insignia de Activo / Inactivo | Punto, como en `07-usuarios.png`. | Punto (igual que el diseño). | Ya estaba anotado como diferencia con el resto de insignias en `docs/diseno/pendientes.md`. |
+
+### Decisiones de la Fase 6
+| Tema | Decisión | Por qué |
+|---|---|---|
+| Mensajes del dominio | Los de RN-06 y las transiciones viven en `MensajesDominio` (Domain) y `MensajesValidacion` los reexpone; la prueba de paridad del frontend resuelve esos alias. | La entidad lanza `DomainException` con el mensaje exacto y Domain no puede depender de Application, pero la lista de mensajes sigue teniendo una sola fuente. |
+| Códigos HTTP | 400 errores por campo; 401 sin sesión; 403 rol sin permiso (RN-05, y cancelar una reserva ajena); 404 reserva inexistente **o que quien consulta no puede ver**; 409 con `{ "mensaje": … }` para RN-01 y RN-06. | No se revela que existe una reserva ajena; el 409 lleva el texto que la pantalla muestra tal cual. |
+| Disponibilidad | `GET /api/reservas/disponibilidad` responde 200 con `{ disponible, mensaje }` también cuando está ocupado o en mantenimiento (no es un error); 400 si faltan o son inválidos los datos. | Es un aviso para la pantalla, no una operación que falla. Solo Administrador y Solicitante (quienes reservan). |
+| Aviso en el frontend | Consulta con una espera de 300 ms cuando están el ambiente, la fecha y las dos horas, y válidos. Si la consulta falla no muestra nada y registrar sigue permitido. | No preguntar en cada tecla; el servidor decide al registrar. |
+| Acciones del detalle | Administrador: Pendiente → Cancelar reserva, Rechazar y Aprobar; Aprobada → solo Cancelar reserva; Rechazada o Cancelada → las tres deshabilitadas con el aviso. Solicitante dueña: "Cancelar solicitud". Responsable: ninguna. | Reglas RN-05 y RN-06 en la interfaz; el backend sigue decidiendo. |
+| Esquema de la base | Tres triggers y un `CHECK` nuevos (hallazgos 15 a 18). | Cada uno nació de una prueba de `07_pruebas_reglas.sql` que mostró el hueco, como pedía el paso 4. |
+| Reservas sin lista | El detalle (`/reservas/:id`) se abre desde "Ver detalle" al registrar y por la dirección; la lista de Reservas sigue en construcción. | La lista no estaba en el alcance de esta fase. |
+| Pruebas con la base real | Se omiten (y lo dicen) si faltan `RESERVAUPLA_PRUEBAS_BD_ADMIN` y `RESERVAUPLA_PRUEBAS_BD_APP`. | Que `dotnet test` siga funcionando en un equipo sin PostgreSQL; la matriz indica cuáles son. |
 
 ## Observaciones sin corregir
 - `npm audit` informa 7 vulnerabilidades moderadas, todas en dependencias de desarrollo (cadena `eslint` / `minimatch`). No llegan al paquete que se compila. Se revisan al cierre del proyecto.
