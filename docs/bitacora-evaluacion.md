@@ -88,6 +88,44 @@ Errores de mis pruebas (no del producto):
 - Segundo intento: sustituir el `TimeProvider` de toda la API por el reloj fijo. Fallaron 34 pruebas porque los tokens JWT se vencían contra la hora real. Quedó el reloj fijo solo en la regla RN-07.
 - Varios comandos de terminal con comillas o `>` crearon archivos vacíos con nombres raros dentro del repositorio; se borraron todos (estaban vacíos) y no entran en el trabajo.
 
+## Fase 8 — Evaluación de usabilidad del sistema construido (2026-11-04)
+
+Evaluación heurística y mediciones sobre el sistema real: `docs/usabilidad/evaluacion-sistema.md` (24 hallazgos), `docs/evidencias/fase8-accesibilidad-antes.txt` y `fase8-accesibilidad.txt` (antes y después), capturas en `docs/evidencias/fase8/antes/` y `despues/`. Cada corrección nació de una prueba en rojo (`frontend/src/styles/accesibilidad.test.js` lee los .css porque Vitest corre con `css: false`; el navegador real lo confirma la medición).
+
+### Defectos hallados y corregidos
+| # | Defecto | Cómo se encontró | Corrección | Prueba |
+|---|---|---|---|---|
+| 26 | **El límite de los campos casi no se veía:** borde `#D1D5DB` a 1,47:1 de la tarjeta blanca (WCAG 1.4.11 pide 3:1). Hallazgo H04. | Medición de contraste de los tokens. | Token `--color-borde-control` (3,9:1) en campos y botón secundario. | `accesibilidad.test.js` («el límite de los campos…», «los campos y el botón secundario…») |
+| 27 | **El spinner seguía girando con `prefers-reduced-motion`:** la regla acortaba la duración a 0,01 ms pero la animación es infinita (medición F: 1 animación infinita activa). H09. | Medición de animaciones con la preferencia activada. | `animation: none` y `transition: none` con la preferencia activada. | `accesibilidad.test.js` («apaga las animaciones…») y medición F (0 animaciones) |
+| 28 | **Scroll horizontal en el login a 320 px** (346 px en 320; WCAG 1.4.10). H05. | Medición de zoom y reflujo. | `grid-template-columns: minmax(0, 1fr)` en móvil. | `accesibilidad.test.js` («la columna del login…») y medición E (0 desbordes a 320 px) |
+| 29 | **20 objetivos táctiles de menos de 44 px** a 375 px: campos de 42 px, «Mostrar» de 36 px, interruptor de 24 px, «Volver al inicio» de 19 px. H10. | Medición de objetivos táctiles. | El control llena la caja de 44 px; mínimos de 44 px en «Mostrar», en el interruptor (área táctil) y en el enlace. | `accesibilidad.test.js` («objetivos táctiles de 44 px») y medición C (0 elementos) |
+| 30 | **Los modales de rechazar y cancelar no avisaban que no se puede deshacer** (RN-06). H03. | Evaluación heurística (N5, S6). | Propiedad `advertencia` en `ModalConfirmacion`: «Esta acción no se puede deshacer.» solo en rechazar y cancelar. | `acciones.test.jsx` (2 pruebas), `DetalleReservaPage.test.jsx` («el modal de … avisa que no se puede deshacer», «el modal de "Aprobar" no dice…») |
+| 31 | **«Volver al inicio» conservaba el estilo del navegador** y medía 19 px. H11. | Captura de «Sin permiso». | Clase `volver` con el estilo de enlace del sistema y 44 px. | `ErrorRutaPage.test.jsx`, `accesibilidad.test.js` |
+| 32 | **El aviso de disponibilidad salía al final del formulario**, debajo de Motivo. H08. | Captura a 375 px del conflicto. | Se coloca justo debajo de las horas. | `formulariosRegistro.test.jsx` («el aviso de disponibilidad aparece junto a las horas…») |
+| 33 | **Cierre de la reserva: botones pegados**, uno partido en dos líneas a 375 px y «Nueva reserva» ambiguo. H07. | Captura del cierre. | Separación, apilado con el primario arriba en móvil y texto «Registrar otra reserva». | `accesibilidad.test.js` («los botones no quedan pegados»), `formulariosRegistro.test.jsx` («…"Registrar otra reserva"…») |
+| 34 | **El icono de calendario sugería un selector inexistente** y no había pista del formato. H12. | Evaluación heurística (NS). | Ayuda «Formato dd/mm/aaaa (por ejemplo, 05/11/2026).» | `formulariosRegistro.test.jsx` («la fecha dice en qué formato se escribe…») |
+| 35 | **Los registros de los listados en móvil se separaban con una línea de 1 px.** H13. | Captura de Usuarios a 375 px. | Banda de 8 px entre registros. | `accesibilidad.test.js` («cada registro se separa…») |
+| 36 | **La ayuda y el error de la contraseña repetían la misma frase.** H17. | Captura del formulario de usuario. | Con error se oculta la ayuda. | `formulariosRegistro.test.jsx` («U2: cuando la contraseña tiene error no se repite la ayuda…») |
+| 37 | **«Se construye en una fase posterior»** usaba vocabulario del proyecto. H06. | Evaluación heurística (N2). | «Todavía no está disponible. Estará lista en una próxima versión.» | `App.test.jsx` |
+| 38 | **El anillo de foco `#3696EA` no llegaba a 3:1 sobre el fondo gris** (2,84:1; WCAG 1.4.11). H18. | Medición de contraste. | Decisión del planificador: el anillo pasa a `#1E73BE` (4,94:1 sobre blanco, 4,49:1 sobre gris); sobre el menú marino, blanco (12,07:1), porque `#1E73BE` da ahí 2,44:1. El celeste queda solo decorativo (`--color-celeste`). **La accesibilidad prevalece sobre ese detalle del diseño de Stitch**; documentado en `docs/diseno/DESIGN.md`. | `accesibilidad.test.js` (3 pruebas del foco); `docs/evidencias/fase8-contraste-foco.txt` |
+
+Errores de mis herramientas (no del producto):
+- Mi primer detector de «foco visible» miraba solo el control, pero el anillo lo dibuja el contenedor (`:focus-within`): informó 85 paradas «sin foco» que eran falsas. Se corrigió para mirar tres niveles y la medición «antes» se repitió.
+- El análisis de contraste marcó como fallo el texto blanco del menú medido contra blanco; se corrigió para medirlo contra el menú marino.
+- Escribir archivos de prueba por la terminal volvió a corromper barras invertidas en un archivo de pruebas; se reescribió con la herramienta de escritura.
+- La comprobación e2e «separación uniforme entre campos» (fase 5) falló al añadir la ayuda del formato bajo la Fecha (24, 62, 24 px) porque medía desde la caja del control y no desde el final del campo con su ayuda. No era un defecto del producto (los campos siguen a 24 px); se corrigió la medición y `tools/e2e/todo.mjs` volvió a pasar las tres fases.
+- `dotnet format --verify-no-changes` salió con código 2 una vez (4 avisos de espacios en `ReservaService.cs` y `AuthController.cs`) tras el merge; al ejecutar `dotnet format` volvió a salir 0 y `git diff` no muestra cambios en el backend (solo cambió el fin de línea del árbol de trabajo, ya que `.gitattributes` fija `eol=lf`). Queda anotado sin causa confirmada.
+
+## Observaciones de la Fase 8 sin corregir
+- **H01 (severidad 4):** no existe la lista de Reservas (alcance de la Fase 9).
+- **H16:** la ayuda de Soporte TI se mantiene genérica, **sin datos de contacto**, por decisión del planificador (no se inventa ninguno); queda como limitación.
+- **H14 (severidad 1):** el mensaje de conflicto al aprobar sigue dirigido a la Solicitante; el planificador decidió no cambiarlo.
+- **H19:** texto de controles deshabilitados a 4,16:1: **exento por WCAG 1.4.3** (decisión del planificador); las mediciones lo marcan EXENTO y no lo cuentan como fallo.
+- A 188 px de ancho (un teléfono con zoom del 200 %) quedan desbordes pequeños; a 320 px, que es lo que exige WCAG, no hay ninguno.
+
+### Finales de línea
+`dotnet format --verify-no-changes` salía con código 2 de forma intermitente: `.gitattributes` deja los `.cs` en LF pero, sin `.editorconfig`, el formateador esperaba CRLF en Windows. Se fijó `end_of_line = lf` en un `.editorconfig` en la raíz (y `*.cs`, `*.csproj` y `.editorconfig` como `eol=lf` en `.gitattributes`). Comprobado: tres ejecuciones seguidas de `dotnet format --verify-no-changes` salen con código 0.
+
 ## Decisiones y diferencias con el diseño
 | Tema | Diseño v2 | Lo construido | Por qué |
 |---|---|---|---|

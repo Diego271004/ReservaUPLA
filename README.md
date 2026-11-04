@@ -82,6 +82,19 @@ npm run dev
 
 Abre `http://localhost:5180` (puerto fijo: si estuviera ocupado, Vite avisa con un error en lugar de cambiar de puerto; CORS solo permite ese origen, configurable en `Cors:OrigenesPermitidos`). El frontend reenvía `/api` a `http://localhost:5263`; si la API usa otra dirección, define `VITE_API_URL` antes de `npm run dev`.
 
+### Qué hay en la Fase 8
+- **Evaluación de usabilidad del sistema construido** (`docs/usabilidad/`): `contexto-de-uso.md` (personas como hipótesis, tareas T01 a T10, mapa de navegación en Mermaid), `evaluacion-sistema.md` (24 hallazgos con severidad y captura), `matriz-principios-final.md`, `cambios-evaluacion-a-final.md` (antes y después) y `plan-prueba-usuarios.md` (la prueba con personas **no está hecha**: ver el plan y qué le toca al estudiante).
+- **Accesibilidad medida** (`tools/usabilidad/`, informes en `docs/evidencias/fase8-accesibilidad*.txt`): axe-core en todas las pantallas y estados a 1280 px y 375 px, contraste WCAG de los tokens, objetivos táctiles, orden de Tab y foco visible, zoom 200 %/reflujo y movimiento reducido.
+  ```bash
+  cd tools/usabilidad && npm install
+  node contraste.mjs                                   # solo el contraste (no necesita la base)
+  PGPASSWORD="<clave de postgres>" CLAVE_PRUEBA="<clave de prueba>" ETAPA=despues node accesibilidad.mjs   # recrea la base, arranca la API y el frontend (puertos 5263 y 5180 libres)
+  node analizar.mjs                                    # eficacia, eficiencia y SUS desde docs/usabilidad/resultados-prueba.csv
+  npm run pruebas                                      # prueba del analizador con un archivo SINTÉTICO (no son resultados)
+  ```
+- **Correcciones** (cada una con su prueba): contraste del límite de los campos, objetivos de 44 px, reflujo a 320 px, movimiento reducido, aviso de «no se puede deshacer» en rechazar y cancelar, aviso de disponibilidad junto a las horas, ayuda del formato de la fecha y separación de los registros en móvil. Ver la bitácora (defectos 26 a 37).
+- Pendiente: la lista de Reservas, Mi ambiente y el dashboard (Fase 9); sin ellas, T03, T04, T08, T09 y T10 no se pueden hacer ni probar.
+
 ### Qué hay en la Fase 7
 - **Reutilización medida:** duplicación de código (jscpd) de 1,38 % a 0,88 % en la medida de referencia; informe y tabla de componentes por pantalla en `docs/reutilizacion.md`. Para repetir la medición y regenerar la tabla: `cd tools/reutilizacion && npm install && node medir-duplicacion.mjs <archivo> <antes|despues> && node componentes-por-pantalla.mjs`.
 - **Nueva reserva:** las opciones del ambiente muestran solo el nombre; al elegir, su capacidad y ubicación aparecen como ayuda bajo el campo.
