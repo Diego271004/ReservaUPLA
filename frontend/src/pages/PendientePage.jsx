@@ -1,10 +1,11 @@
-import { MENSAJES } from '../constants/messages'
+import { TEXTOS } from '../constants/messages.js'
 
+/** Pantallas que llegan en fases posteriores (Dashboard, Reservas, Mi ambiente). */
 export default function PendientePage() {
   return (
     <>
-      <h1>{MENSAJES.pendiente.titulo}</h1>
-      <p>{MENSAJES.pendiente.texto}</p>
+      <h1>{TEXTOS.pantallaEnConstruccion}</h1>
+      <p>{TEXTOS.textoEnConstruccion}</p>
     </>
   )
 }

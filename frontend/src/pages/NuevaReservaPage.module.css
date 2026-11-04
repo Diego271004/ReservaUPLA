@@ -1,0 +1,56 @@
+.horas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 var(--espacio-2); /* cada campo ya trae su margen inferior: sin separación de filas extra */
+}
+
+.ayudaHorario {
+  margin: calc(-1 * var(--espacio-2)) 0 var(--espacio-3);
+  font-size: 0.8125rem;
+  color: var(--color-texto-suave);
+}
+
+.cierre {
+  max-width: 760px;
+  padding: var(--espacio-3);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--espacio-2);
+  margin: var(--espacio-3) 0;
+}
+
+.resumen dt {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-texto-suave);
+}
+
+.resumen dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+  font-weight: 600;
+  color: var(--color-marino);
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--espacio-2);
+  border-top: 1px solid var(--color-borde);
+}
+
+@media (max-width: 767px) {
+  .horas,
+  .resumen {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones > * {
+    width: 100%;
+  }
+}

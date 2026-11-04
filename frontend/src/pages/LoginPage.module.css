@@ -1,0 +1,84 @@
+.pagina {
+  display: grid;
+  grid-template-columns: minmax(280px, 45%) 1fr;
+  min-height: 100vh;
+  background: var(--color-superficie);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--espacio-4);
+  color: var(--color-sobre-oscuro);
+  background: linear-gradient(160deg, var(--color-marino), var(--color-primario));
+}
+
+.marca {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 700;
+}
+
+.lema {
+  max-width: 24ch;
+  margin: var(--espacio-2) 0 0;
+  font-size: 1.25rem;
+}
+
+.universidad {
+  margin: 0;
+}
+
+.contenido {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--espacio-4);
+}
+
+.formulario {
+  width: 100%;
+  max-width: 420px;
+}
+
+.subtitulo {
+  margin: 0 0 var(--espacio-3);
+  color: var(--color-texto-suave);
+}
+
+.boton > button {
+  width: 100%;
+}
+
+.centrado {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--espacio-1);
+}
+
+/* Móvil: una sola columna, la marca arriba como una franja. */
+@media (max-width: 767px) {
+  .pagina {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .panel {
+    padding: var(--espacio-2);
+  }
+
+  .marca {
+    font-size: 1.25rem;
+  }
+
+  .lema,
+  .universidad {
+    display: none;
+  }
+
+  .contenido {
+    align-items: flex-start;
+    padding: var(--espacio-3) var(--espacio-2);
+  }
+}
