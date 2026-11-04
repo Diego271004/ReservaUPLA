@@ -3,7 +3,11 @@
   --color-primario: #0063a8;
   --color-marino: #1f365c;
   --color-titulo: #1e73bf;
-  --color-foco: #3696ea;
+  /* Anillo de foco: #1E73BE llega a 3:1 sobre blanco (4,9) y sobre el fondo gris (4,5). El celeste #3696EA (2,8 sobre gris) queda solo
+     decorativo. Sobre el menú marino se usa el anillo claro, porque #1E73BE solo da 2,4 ahí. */
+  --color-foco: #1e73be;
+  --color-foco-sobre-oscuro: #ffffff;
+  --color-celeste: #3696ea;
   --color-dorado: #eaa658;
 
   --color-texto: #1f365c;
@@ -11,6 +15,8 @@
   --color-fondo: #f3f4f6;
   --color-superficie: #ffffff;
   --color-borde: #d1d5db;
+  /* Límite de un campo o control: 3:1 sobre blanco y sobre el fondo de la página (WCAG 1.4.11). --color-borde queda para divisores. */
+  --color-borde-control: #7b818c;
   --color-sobre-oscuro: #ffffff;
 
   --color-error: #b91c1c;

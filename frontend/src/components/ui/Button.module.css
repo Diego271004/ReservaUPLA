@@ -20,7 +20,7 @@
 .secundario {
   color: var(--color-marino);
   background: var(--color-superficie);
-  border-color: var(--color-borde);
+  border-color: var(--color-borde-control);
 }
 
 .rechazar {

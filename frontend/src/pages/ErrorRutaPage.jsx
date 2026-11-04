@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { MENSAJES, TEXTOS } from '../constants/messages.js'
+import estilos from './ErrorRutaPage.module.css'
 
 /** Estructura común de las páginas de error de ruta: título, texto opcional y el enlace de regreso. */
 function PaginaDeError({ titulo, texto }) {
@@ -7,7 +8,9 @@ function PaginaDeError({ titulo, texto }) {
     <>
       <h1>{titulo}</h1>
       {texto && <p>{texto}</p>}
-      <Link to="/">{TEXTOS.volverAlInicio}</Link>
+      <Link to="/" className={estilos.volver}>
+        {TEXTOS.volverAlInicio}
+      </Link>
     </>
   )
 }

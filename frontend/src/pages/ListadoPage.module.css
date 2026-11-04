@@ -7,10 +7,6 @@
   margin-bottom: var(--espacio-2);
 }
 
-.encabezado > button {
-  white-space: nowrap;
-}
-
 .encabezado h1 {
   margin: 0;
 }

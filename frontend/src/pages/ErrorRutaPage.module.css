@@ -1,0 +1,12 @@
+.volver {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alto-control);
+  font-weight: 600;
+  color: var(--color-primario);
+  text-decoration: none;
+}
+
+.volver:hover {
+  text-decoration: underline;
+}
