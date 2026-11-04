@@ -1,0 +1,66 @@
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-1);
+  min-height: var(--alto-control);
+  padding: 0 var(--espacio-3);
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: var(--radio);
+  cursor: pointer;
+}
+
+.primario {
+  color: var(--color-sobre-oscuro);
+  background: var(--color-primario);
+}
+
+.secundario {
+  color: var(--color-marino);
+  background: var(--color-superficie);
+  border-color: var(--color-borde);
+}
+
+.rechazar {
+  color: var(--color-error);
+  background: var(--color-superficie);
+  border-color: var(--color-error);
+}
+
+.confirmarRechazo {
+  color: var(--color-sobre-oscuro);
+  background: var(--color-error);
+}
+
+.enlace {
+  color: var(--color-primario);
+  background: transparent;
+}
+
+.boton:disabled {
+  color: var(--color-deshabilitado);
+  background: var(--fondo-deshabilitado);
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
+.boton[aria-busy='true'] {
+  cursor: progress;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}

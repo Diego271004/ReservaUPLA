@@ -1,0 +1,78 @@
+.contenedor {
+  overflow-x: auto; /* red de seguridad: un dato excepcionalmente largo desplaza la tabla, no la página */
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* El título sirve a lectores de pantalla; no se muestra porque la pantalla ya tiene su encabezado. */
+.titulo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.tabla th {
+  padding: var(--espacio-2);
+  font-weight: 700;
+  color: var(--color-marino);
+  text-align: left;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.tabla td {
+  padding: var(--espacio-2);
+  color: var(--color-texto-suave);
+  overflow-wrap: break-word; /* una palabra no se parte a mitad salvo que no quepa en la tarjeta */
+  border-bottom: 1px solid var(--fondo-neutro);
+}
+
+.tabla tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.vacio {
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .tabla thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .tabla,
+  .tabla tbody,
+  .tabla tr,
+  .tabla td {
+    display: block;
+    width: 100%;
+  }
+
+  .tabla tr {
+    border-bottom: 1px solid var(--color-borde);
+  }
+
+  .tabla td {
+    display: flex;
+    gap: var(--espacio-1);
+    justify-content: space-between;
+    border-bottom: 0;
+  }
+
+  .tabla td::before {
+    content: attr(data-etiqueta);
+    font-weight: 700;
+    color: var(--color-marino);
+  }
+}

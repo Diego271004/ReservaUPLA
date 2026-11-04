@@ -1,0 +1,129 @@
+.contenedor {
+  display: flex;
+  min-height: 100vh;
+}
+
+.menu {
+  width: var(--ancho-menu);
+  flex-shrink: 0;
+  padding: var(--espacio-3) var(--espacio-2);
+  color: var(--color-sobre-oscuro);
+  background: var(--color-marino);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 2 * var(--espacio-3) - 40px);
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+}
+
+.marca {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.botonMenu {
+  display: none;
+  min-height: var(--alto-control);
+  padding: 0 var(--espacio-2);
+  font: inherit;
+  color: var(--color-sobre-oscuro);
+  background: transparent;
+  border: 1px solid var(--color-sobre-oscuro);
+  border-radius: var(--radio);
+  cursor: pointer;
+}
+
+.persona {
+  padding: var(--espacio-2) 0;
+  border-bottom: 1px solid rgb(255 255 255 / 20%);
+}
+
+.nombre {
+  margin: 0;
+  font-weight: 600;
+}
+
+.rol {
+  margin: 2px 0 0;
+  font-size: 0.875rem;
+  opacity: 0.85;
+}
+
+.navegacion {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+  padding-top: var(--espacio-2);
+}
+
+.opcion {
+  display: flex;
+  align-items: center;
+  min-height: var(--alto-control);
+  padding: 0 var(--espacio-2);
+  font-weight: 500;
+  color: var(--color-sobre-oscuro);
+  text-decoration: none;
+  border-radius: var(--radio);
+}
+
+/* Ítem activo: fondo azul sólido y texto blanco, sin franjas ni transparencias. */
+.activa {
+  font-weight: 700;
+  background: var(--color-primario);
+}
+
+.cerrarSesion {
+  min-height: var(--alto-control);
+  padding: 0 var(--espacio-2);
+  font: inherit;
+  color: var(--color-sobre-oscuro);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid rgb(255 255 255 / 20%);
+  cursor: pointer;
+}
+
+.contenido {
+  flex: 1;
+  min-width: 0;
+  padding: var(--espacio-4);
+}
+
+@media (max-width: 767px) {
+  .contenedor {
+    flex-direction: column;
+  }
+
+  .menu {
+    width: 100%;
+  }
+
+  .botonMenu {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .panel {
+    display: none;
+    min-height: 0;
+  }
+
+  .panel.abierto {
+    display: flex;
+  }
+
+  .contenido {
+    padding: var(--espacio-2);
+  }
+}

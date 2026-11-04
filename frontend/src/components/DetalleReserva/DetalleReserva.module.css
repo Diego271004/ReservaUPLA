@@ -1,0 +1,61 @@
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--alto-control);
+  font-weight: 600;
+  color: var(--color-primario);
+  text-decoration: none;
+}
+
+.tarjeta {
+  padding: var(--espacio-3);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+/* Una sola disposición de los datos (hallazgo E4): rejilla de dos columnas, una en móvil. */
+.datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espacio-2) var(--espacio-3);
+  margin: 0 0 var(--espacio-3);
+}
+
+.datos dt {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-texto-suave);
+}
+
+.datos dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--color-marino);
+}
+
+.historial {
+  padding-left: var(--espacio-3);
+}
+
+.sinHistorial {
+  color: var(--color-texto-suave);
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--espacio-1);
+  padding-top: var(--espacio-2);
+  border-top: 1px solid var(--color-borde);
+}
+
+@media (max-width: 767px) {
+  .datos {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones {
+    flex-direction: column;
+  }
+}

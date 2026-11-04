@@ -1,0 +1,5 @@
+.accion {
+  display: flex;
+  align-items: center;
+  padding-right: var(--espacio-1);
+}

@@ -1,0 +1,9 @@
+/* El icono es decorativo y no intercepta clics: el <select> ocupa toda la caja. */
+.icono {
+  position: absolute;
+  right: var(--espacio-2);
+  width: 18px;
+  height: 18px;
+  color: var(--color-texto);
+  pointer-events: none;
+}
