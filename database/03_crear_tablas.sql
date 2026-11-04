@@ -3,6 +3,10 @@
 -- Comando:
 --   psql -h localhost -p 5432 -U postgres -d ReservaUPLADB -v ON_ERROR_STOP=1 -f database/03_crear_tablas.sql
 
+-- Los scripts están en UTF-8: se fija la codificación del cliente para que psql no use la de la consola (en Windows,
+-- sin esto, "á" se guardaba como "Ã¡").
+\encoding UTF8
+
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
