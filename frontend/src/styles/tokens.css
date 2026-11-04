@@ -1,0 +1,33 @@
+/* Tokens de diseño: paleta de docs/diseno/DESIGN.md. No se usan colores sueltos fuera de este archivo. */
+:root {
+  --color-primario: #0063a8;
+  --color-marino: #1f365c;
+  --color-titulo: #1e73bf;
+  --color-foco: #3696ea;
+  --color-dorado: #eaa658;
+
+  --color-texto: #1f365c;
+  --color-texto-suave: #4f4f4f;
+  --color-fondo: #f3f4f6;
+  --color-superficie: #ffffff;
+  --color-borde: #d1d5db;
+  --color-sobre-oscuro: #ffffff;
+
+  --color-error: #b91c1c;
+  --color-exito: #166534;
+  --color-aviso: #92400e;
+  --color-info: #1e3a8a;
+
+  --fuente-base: 'Montserrat', system-ui, sans-serif;
+  --tamano-texto: 1rem;
+
+  --alto-control: 44px;
+  --radio: 8px;
+  --grosor-foco: 3px;
+  --ancho-menu: 260px;
+
+  --espacio-1: 0.5rem;
+  --espacio-2: 1rem;
+  --espacio-3: 1.5rem;
+  --espacio-4: 2rem;
+}

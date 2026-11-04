@@ -1,0 +1,32 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente-base);
+  font-size: var(--tamano-texto);
+  color: var(--color-texto);
+  background: var(--color-fondo);
+}
+
+h1,
+h2 {
+  color: var(--color-marino);
+}
+
+:focus-visible {
+  outline: var(--grosor-foco) solid var(--color-foco);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
