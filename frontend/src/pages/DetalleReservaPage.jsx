@@ -2,11 +2,10 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import DetalleReserva from '../components/DetalleReserva/DetalleReserva.jsx'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
 import Button from '../components/ui/Button.jsx'
-import ModalConfirmacion from '../components/ui/ModalConfirmacion.jsx'
+import ModalDeReserva from '../components/ModalDeReserva/ModalDeReserva.jsx'
 import { TEXTOS } from '../constants/messages.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { ESTADOS_PAGINA, useDetalleReserva } from '../hooks/useDetalleReserva.js'
-import { MODALES, resumenDe } from '../utils/modalesDeReserva.js'
 import { accionesDeReserva, textoDeEvento } from '../utils/reservas.js'
 import estilos from './DetalleReservaPage.module.css'
 
@@ -43,7 +42,6 @@ export default function DetalleReservaPage() {
 
   const { reserva, historial } = vm.detalle
   const { acciones, aviso } = accionesDeReserva(sesion, reserva)
-  const modal = vm.modal ? MODALES[vm.modal] : null
 
   return (
     <>
@@ -78,16 +76,12 @@ export default function DetalleReservaPage() {
           ) : null
         }
       />
-      <ModalConfirmacion
-        abierto={modal !== null}
-        titulo={modal?.titulo ?? ''}
-        resumen={resumenDe(reserva)}
-        advertencia={modal?.irreversible ? TEXTOS.advertenciaIrreversible : undefined}
-        textoConfirmar={modal?.confirmar ?? ''}
-        variante={modal?.variante}
-        cargando={vm.ejecutando}
-        onConfirmar={vm.confirmar}
-        onVolver={vm.cerrarModal}
+      <ModalDeReserva
+        accion={vm.modal}
+        reserva={reserva}
+        ejecutando={vm.ejecutando}
+        alConfirmar={vm.confirmar}
+        alVolver={vm.cerrarModal}
       />
     </>
   )

@@ -1,19 +1,18 @@
 import { useCallback } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import FiltrosDeReservas from '../components/FiltrosDeReservas/FiltrosDeReservas.jsx'
-import Paginacion from '../components/Paginacion/Paginacion.jsx'
+import PieDeLista from '../components/PieDeLista/PieDeLista.jsx'
 import AvisoDeError from '../components/AvisoDeError/AvisoDeError.jsx'
 import Button from '../components/ui/Button.jsx'
-import Insignia from '../components/ui/Insignia.jsx'
 import TableList from '../components/ui/TableList.jsx'
-import { TEXTOS, textoMostrando } from '../constants/messages.js'
+import { TEXTOS } from '../constants/messages.js'
 import { ROLES } from '../constants/navegacion.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useCarga } from '../hooks/useCarga.js'
 import { listarAmbientes, listarReservas } from '../services/recursosService.js'
 import { isoAFecha } from '../utils/fechas.js'
-import { TIPO_INSIGNIA_DE_ESTADO } from '../utils/reservas.js'
 import { consultaDeFiltros, filtrosDeBusqueda, hayFiltros } from '../utils/filtrosDeReservas.js'
+import { columnasDeReservas } from './columnasDeReservas.jsx'
 import estilos from './ReservasPage.module.css'
 
 const PAGINA_VACIA = Object.freeze({ elementos: [], total: 0, pagina: 1, tamano: 10 })
@@ -47,41 +46,27 @@ export default function ReservasPage() {
   const limpiar = () => setBuscar(new URLSearchParams())
   const irAPagina = (pagina) => setBuscar(consultaDeFiltros({ ...filtros, pagina }))
 
-  const columnas = [
-    { clave: 'fecha', titulo: TEXTOS.columnaFecha, render: (reserva) => isoAFecha(reserva.fecha) },
-    {
-      clave: 'horario',
-      titulo: TEXTOS.columnaHorario,
-      render: (reserva) => `${reserva.horaInicio} – ${reserva.horaFin}`,
-    },
-    { clave: 'ambienteNombre', titulo: TEXTOS.columnaAmbiente },
-    // La Solicitante solo ve las suyas: su propio nombre en cada fila sería ruido.
-    ...(sesion.rol === ROLES.solicitante
-      ? []
-      : [{ clave: 'solicitanteNombre', titulo: TEXTOS.columnaSolicitante }]),
-    {
-      clave: 'estado',
-      titulo: TEXTOS.columnaEstado,
-      render: (reserva) => (
-        <Insignia tipo={TIPO_INSIGNIA_DE_ESTADO[reserva.estado]}>{reserva.estado}</Insignia>
-      ),
-    },
-    {
-      clave: 'acciones',
-      titulo: TEXTOS.columnaAcciones,
-      render: (reserva) => (
-        <Button
-          variante="secundario"
-          aria-label={`${TEXTOS.verDetalle}: ${reserva.ambienteNombre}, ${isoAFecha(reserva.fecha)}`}
-          onClick={() =>
-            navigate(`/reservas/${reserva.id}`, { state: { volverA: `/reservas${search}` } })
-          }
-        >
-          {TEXTOS.verDetalle}
-        </Button>
-      ),
-    },
-  ]
+  const columnas = columnasDeReservas(
+    [
+      'fecha',
+      'horario',
+      'ambiente',
+      ...(sesion.rol === ROLES.solicitante ? [] : ['solicitante']),
+      'estado',
+    ],
+    // La Solicitante solo ve las suyas: su propio nombre en cada fila sería ruido (por eso no lleva la columna Solicitante).
+    (reserva) => (
+      <Button
+        variante="secundario"
+        aria-label={`${TEXTOS.verDetalle}: ${reserva.ambienteNombre}, ${isoAFecha(reserva.fecha)}`}
+        onClick={() =>
+          navigate(`/reservas/${reserva.id}`, { state: { volverA: `/reservas${search}` } })
+        }
+      >
+        {TEXTOS.verDetalle}
+      </Button>
+    ),
+  )
 
   const vacio = hayFiltros(filtros) ? (
     <div className={estilos.vacio}>
@@ -114,17 +99,7 @@ export default function ReservasPage() {
             filas={datos.elementos}
             textoVacio={vacio}
           />
-          {datos.total > 0 && (
-            <p role="status" className={estilos.resumen}>
-              {textoMostrando(datos.elementos.length, datos.total)}
-            </p>
-          )}
-          <Paginacion
-            pagina={datos.pagina}
-            total={datos.total}
-            tamano={datos.tamano}
-            alCambiar={irAPagina}
-          />
+          <PieDeLista pagina={{ ...datos, alCambiar: irAPagina }} />
         </div>
       )}
     </>

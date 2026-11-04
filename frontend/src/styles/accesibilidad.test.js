@@ -182,10 +182,7 @@ describe('Dashboard, Reservas y Mi ambiente', () => {
   })
 
   it('el pie «Mostrando N de N» tiene margen por todos lados', () => {
-    expect(regla(css('pages/ReservasPage.module.css'), '.resumen')).toMatch(
-      /padding: var\(--espacio-2\)(;|$)/,
-    )
-    expect(regla(css('pages/MiAmbientePage.module.css'), '.resumen')).toMatch(
+    expect(regla(css('components/PieDeLista/PieDeLista.module.css'), '.resumen')).toMatch(
       /padding: var\(--espacio-2\)(;|$)/,
     )
   })

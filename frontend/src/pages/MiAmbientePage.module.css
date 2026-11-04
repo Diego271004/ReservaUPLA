@@ -32,20 +32,7 @@
   min-width: 240px;
 }
 
-.indicadores {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: var(--espacio-2);
-  margin-bottom: var(--espacio-3);
-}
-
 .uso {
   background: var(--color-superficie);
   border-radius: var(--radio);
-}
-
-.resumen {
-  margin: 0;
-  padding: var(--espacio-2);
-  color: var(--color-texto-suave);
 }

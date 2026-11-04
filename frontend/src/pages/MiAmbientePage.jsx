@@ -1,17 +1,16 @@
 import { useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import Paginacion from '../components/Paginacion/Paginacion.jsx'
+import GrupoDeIndicadores from '../components/GrupoDeIndicadores/GrupoDeIndicadores.jsx'
+import PieDeLista from '../components/PieDeLista/PieDeLista.jsx'
 import AvisoDeError from '../components/AvisoDeError/AvisoDeError.jsx'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
-import CardIndicador from '../components/ui/CardIndicador.jsx'
-import Insignia from '../components/ui/Insignia.jsx'
 import SelectInput from '../components/ui/SelectInput.jsx'
 import TableList from '../components/ui/TableList.jsx'
-import { TEXTOS, textoMostrando } from '../constants/messages.js'
+import { TEXTOS } from '../constants/messages.js'
 import { useCarga } from '../hooks/useCarga.js'
 import { obtenerMiAmbiente } from '../services/recursosService.js'
-import { isoAFecha } from '../utils/fechas.js'
-import { TIPO_INSIGNIA_DE_ESTADO } from '../utils/reservas.js'
+import { indicadoresDeEstado } from '../utils/indicadores.js'
+import { columnasDeReservas } from './columnasDeReservas.jsx'
 import estilos from './MiAmbientePage.module.css'
 
 const PANEL_VACIO = Object.freeze({
@@ -21,22 +20,7 @@ const PANEL_VACIO = Object.freeze({
   reservas: { elementos: [], total: 0, pagina: 1, tamano: 10 },
 })
 
-const COLUMNAS = [
-  { clave: 'fecha', titulo: TEXTOS.columnaFecha, render: (reserva) => isoAFecha(reserva.fecha) },
-  {
-    clave: 'horario',
-    titulo: TEXTOS.columnaHorario,
-    render: (reserva) => `${reserva.horaInicio} – ${reserva.horaFin}`,
-  },
-  { clave: 'solicitanteNombre', titulo: TEXTOS.columnaSolicitante },
-  {
-    clave: 'estado',
-    titulo: TEXTOS.columnaEstado,
-    render: (reserva) => (
-      <Insignia tipo={TIPO_INSIGNIA_DE_ESTADO[reserva.estado]}>{reserva.estado}</Insignia>
-    ),
-  },
-]
+const COLUMNAS = columnasDeReservas(['fecha', 'horario', 'solicitante', 'estado'])
 
 /**
  * Mi ambiente (Responsable): su ambiente, cuatro indicadores acotados a él y sus reservas, solo para consultar (sin
@@ -99,18 +83,7 @@ export default function MiAmbientePage() {
               />
             )}
           </section>
-          <section className={estilos.indicadores} aria-label="Indicadores">
-            <CardIndicador valor={indicadores.total} descripcion={TEXTOS.indicadorTotal} />
-            <CardIndicador
-              valor={indicadores.pendientes}
-              descripcion={TEXTOS.indicadorPendientes}
-            />
-            <CardIndicador valor={indicadores.aprobadas} descripcion={TEXTOS.indicadorAprobadas} />
-            <CardIndicador
-              valor={indicadores.rechazadas}
-              descripcion={TEXTOS.indicadorRechazadas}
-            />
-          </section>
+          <GrupoDeIndicadores indicadores={indicadoresDeEstado(indicadores)} />
           <div className={estilos.uso}>
             <TableList
               titulo={TEXTOS.usoDelAmbiente}
@@ -118,17 +91,7 @@ export default function MiAmbientePage() {
               filas={reservas.elementos}
               textoVacio={TEXTOS.sinReservas}
             />
-            {reservas.total > 0 && (
-              <p role="status" className={estilos.resumen}>
-                {textoMostrando(reservas.elementos.length, reservas.total)}
-              </p>
-            )}
-            <Paginacion
-              pagina={reservas.pagina}
-              total={reservas.total}
-              tamano={reservas.tamano}
-              alCambiar={irAPagina}
-            />
+            <PieDeLista pagina={{ ...reservas, alCambiar: irAPagina }} />
           </div>
         </>
       )}

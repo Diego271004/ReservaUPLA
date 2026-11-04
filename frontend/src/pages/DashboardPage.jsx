@@ -2,8 +2,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import AvisoDeError from '../components/AvisoDeError/AvisoDeError.jsx'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
 import Button from '../components/ui/Button.jsx'
-import CardIndicador from '../components/ui/CardIndicador.jsx'
-import ModalConfirmacion from '../components/ui/ModalConfirmacion.jsx'
+import GrupoDeIndicadores from '../components/GrupoDeIndicadores/GrupoDeIndicadores.jsx'
+import ModalDeReserva from '../components/ModalDeReserva/ModalDeReserva.jsx'
 import TableList from '../components/ui/TableList.jsx'
 import { TEXTOS, textoMostrando } from '../constants/messages.js'
 import { useCarga } from '../hooks/useCarga.js'
@@ -11,7 +11,8 @@ import { useDecisionDeReserva } from '../hooks/useDecisionDeReserva.js'
 import { obtenerDashboard } from '../services/recursosService.js'
 import { isoAFecha } from '../utils/fechas.js'
 import { ambienteMasUtilizado } from '../utils/filtrosDeReservas.js'
-import { MODALES, resumenDe } from '../utils/modalesDeReserva.js'
+import { indicadoresDeEstado } from '../utils/indicadores.js'
+import { columnasDeReservas } from './columnasDeReservas.jsx'
 import estilos from './DashboardPage.module.css'
 
 const DASHBOARD_VACIO = Object.freeze({
@@ -31,51 +32,39 @@ export default function DashboardPage() {
 
   const { indicadores, ambientesMasUtilizados, pendientesMasAntiguas } = datos
   const masUtilizado = ambienteMasUtilizado(ambientesMasUtilizados)
-  const modal = decision.decision ? MODALES[decision.decision.accion] : null
 
-  const columnas = [
-    { clave: 'fecha', titulo: TEXTOS.columnaFecha, render: (reserva) => isoAFecha(reserva.fecha) },
-    {
-      clave: 'horario',
-      titulo: TEXTOS.columnaHorario,
-      render: (reserva) => `${reserva.horaInicio} – ${reserva.horaFin}`,
+  const columnas = columnasDeReservas(
+    ['fecha', 'horario', 'ambiente', 'solicitante'],
+    (reserva) => {
+      const de = `${reserva.ambienteNombre}, ${isoAFecha(reserva.fecha)}`
+      return (
+        <div className={estilos.acciones}>
+          <Button
+            variante="secundario"
+            aria-label={`${TEXTOS.verDetalle}: ${de}`}
+            onClick={() =>
+              navigate(`/reservas/${reserva.id}`, { state: { volverA: '/dashboard' } })
+            }
+          >
+            {TEXTOS.verDetalle}
+          </Button>
+          <Button
+            variante="rechazar"
+            aria-label={`${TEXTOS.rechazar}: ${de}`}
+            onClick={() => decision.abrir('rechazar', reserva)}
+          >
+            {TEXTOS.rechazar}
+          </Button>
+          <Button
+            aria-label={`${TEXTOS.aprobar}: ${de}`}
+            onClick={() => decision.abrir('aprobar', reserva)}
+          >
+            {TEXTOS.aprobar}
+          </Button>
+        </div>
+      )
     },
-    { clave: 'ambienteNombre', titulo: TEXTOS.columnaAmbiente },
-    { clave: 'solicitanteNombre', titulo: TEXTOS.columnaSolicitante },
-    {
-      clave: 'acciones',
-      titulo: TEXTOS.columnaAcciones,
-      render: (reserva) => {
-        const de = `${reserva.ambienteNombre}, ${isoAFecha(reserva.fecha)}`
-        return (
-          <div className={estilos.acciones}>
-            <Button
-              variante="secundario"
-              aria-label={`${TEXTOS.verDetalle}: ${de}`}
-              onClick={() =>
-                navigate(`/reservas/${reserva.id}`, { state: { volverA: '/dashboard' } })
-              }
-            >
-              {TEXTOS.verDetalle}
-            </Button>
-            <Button
-              variante="rechazar"
-              aria-label={`${TEXTOS.rechazar}: ${de}`}
-              onClick={() => decision.abrir('rechazar', reserva)}
-            >
-              {TEXTOS.rechazar}
-            </Button>
-            <Button
-              aria-label={`${TEXTOS.aprobar}: ${de}`}
-              onClick={() => decision.abrir('aprobar', reserva)}
-            >
-              {TEXTOS.aprobar}
-            </Button>
-          </div>
-        )
-      },
-    },
-  ]
+  )
 
   return (
     <>
@@ -87,23 +76,17 @@ export default function DashboardPage() {
       {cargando && <p role="status">{TEXTOS.cargando}</p>}
       {!error && (
         <>
-          <section className={estilos.indicadores} aria-label="Indicadores">
-            <CardIndicador valor={indicadores.total} descripcion={TEXTOS.indicadorTotal} />
-            <CardIndicador
-              valor={indicadores.pendientes}
-              descripcion={TEXTOS.indicadorPendientes}
-            />
-            <CardIndicador valor={indicadores.aprobadas} descripcion={TEXTOS.indicadorAprobadas} />
-            <CardIndicador
-              valor={indicadores.rechazadas}
-              descripcion={TEXTOS.indicadorRechazadas}
-            />
-            <CardIndicador
-              valor={masUtilizado.valor}
-              descripcion={TEXTOS.indicadorMasUtilizado}
-              detalle={masUtilizado.detalle}
-            />
-          </section>
+          <GrupoDeIndicadores
+            indicadores={[
+              ...indicadoresDeEstado(indicadores),
+              {
+                clave: 'uso',
+                valor: masUtilizado.valor,
+                descripcion: TEXTOS.indicadorMasUtilizado,
+                detalle: masUtilizado.detalle,
+              },
+            ]}
+          />
           <div className={estilos.pendientes}>
             <TableList
               titulo={TEXTOS.solicitudesPendientes}
@@ -127,16 +110,12 @@ export default function DashboardPage() {
           </div>
         </>
       )}
-      <ModalConfirmacion
-        abierto={modal !== null}
-        titulo={modal?.titulo ?? ''}
-        resumen={decision.decision ? resumenDe(decision.decision.reserva) : []}
-        advertencia={modal?.irreversible ? TEXTOS.advertenciaIrreversible : undefined}
-        textoConfirmar={modal?.confirmar ?? ''}
-        variante={modal?.variante}
-        cargando={decision.ejecutando}
-        onConfirmar={decision.confirmar}
-        onVolver={decision.cerrar}
+      <ModalDeReserva
+        accion={decision.decision?.accion}
+        reserva={decision.decision?.reserva}
+        ejecutando={decision.ejecutando}
+        alConfirmar={decision.confirmar}
+        alVolver={decision.cerrar}
       />
     </>
   )

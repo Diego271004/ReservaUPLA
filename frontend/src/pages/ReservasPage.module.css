@@ -3,12 +3,6 @@
   border-radius: var(--radio);
 }
 
-.resumen {
-  margin: 0;
-  padding: var(--espacio-2);
-  color: var(--color-texto-suave);
-}
-
 .vacio {
   display: flex;
   flex-direction: column;
