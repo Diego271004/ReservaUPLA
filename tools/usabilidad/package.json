@@ -8,9 +8,12 @@
     "contraste": "node contraste.mjs",
     "accesibilidad": "node accesibilidad.mjs",
     "analizar": "node analizar.mjs",
-    "pruebas": "node --test pruebas/analizar.test.mjs"
+    "mapa": "node mapa-del-sitio.mjs",
+    "mermaid": "node validar-mermaid.mjs",
+    "pruebas": "node --test pruebas/analizar.test.mjs pruebas/mapa.test.mjs pruebas/mermaid.test.mjs"
   },
   "dependencies": {
-    "axe-core": "4.10.2"
+    "axe-core": "4.10.2",
+    "mermaid": "^11.17.2"
   }
 }

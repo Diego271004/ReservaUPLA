@@ -28,8 +28,8 @@ Proceso de diseño centrado en el usuario (ISO 9241-210), actividades 1 («compr
 | T03 | Administrador | Aprobar una reserva | «Reservas» (1), fila «Ver detalle» (1), «Aprobar» (1), «Sí, aprobar» (1). | **4** por Reservas; **2** desde el Dashboard («Aprobar» + «Sí, aprobar») | **Existe** (Fase 9): por «Reservas» o directo desde el Dashboard (la fila trae «Aprobar») |
 | T04 | Administrador | Rechazar una reserva | «Reservas» (1), «Ver detalle» (1), «Rechazar» (1), «Sí, rechazar» (1). | **4** por Reservas; **2** desde el Dashboard («Rechazar» + «Sí, rechazar») | **Existe** (Fase 9): igual que T03 con «Rechazar» |
 | T05 | Administrador y Solicitante | Detectar un conflicto de horario | Solicitante: elegir ambiente, fecha y horas y ver el aviso rojo con la hora ocupada, sin pulsar nada más. Administrador: al aprobar una reserva que se cruza con una aprobada ve el mismo mensaje (409). | **0** extra para el Solicitante; **0** extra para el Administrador (lo ve al intentar T03) | **Existe** |
-| T06 | Administrador | Registrar un ambiente | «Nuevo ambiente» (1), Nombre (1), Tipo (2), Capacidad (1), Ubicación (1), Estado (2), Responsable (2), «Guardar ambiente» (1). | **11** | **Existe** |
-| T07 | Administrador | Registrar un usuario | «Usuarios» en el menú (1), «Nuevo usuario» (1), Nombre (1), Correo (1), Rol (2), Contraseña inicial (1), «Guardar usuario» (1). «Activo» ya viene encendido. | **8** | **Existe** |
+| T06 | Administrador | Registrar un ambiente | «Nuevo ambiente» (1), Nombre (1), Tipo (2), Capacidad (1), Ubicación (1), Estado (2), Responsable (2), «Registrar ambiente» (1). | **11** | **Existe** |
+| T07 | Administrador | Registrar un usuario | «Usuarios» en el menú (1), «Nuevo usuario» (1), Nombre (1), Correo (1), Rol (2), Contraseña inicial (1), «Registrar usuario» (1). «Activo» ya viene encendido. | **8** | **Existe** |
 | T08 | Responsable | Consultar su ambiente | «Mi ambiente» en el menú (es la pantalla donde aterriza): ambiente, indicadores y reservas; si tiene varios ambientes, elige cuál (1 a 2 interacciones más). | **0** al iniciar sesión (aterriza ahí); **2** para otro ambiente | **Existe** (Fase 9): Mi ambiente, con una extensión del diseño (cuatro indicadores) por revisar con usuarios |
 | T09 | Administrador (y los demás roles) | Filtrar reservas | «Reservas» (1), elegir filtros (Estado 2, Ambiente 2, fechas 1 cada una), «Aplicar filtros» (1). | **4** con un filtro de lista (Reservas + 2 + Aplicar); desde el Dashboard, **1** con «Ver todas» (filtro Pendiente ya aplicado) | **Existe** (Fase 9) |
 | T10 | Administrador y Responsable | Consultar los indicadores del dashboard | El Dashboard es la pantalla donde aterriza el Administrador: leer las cinco tarjetas. | **0** al iniciar sesión (aterriza ahí) | **Existe** (Fase 9) |
@@ -42,50 +42,7 @@ Las cifras marcadas «estimado» son del diseño previsto, no de una pantalla re
 
 ### 3.1 Mapa de navegación por rol
 
-Lo que cada rol ve en el menú lateral hoy (`MENU_POR_ROL` en `frontend/src/constants/navegacion.js`) y a qué pantalla aterriza al iniciar sesión. Desde la Fase 9 todas las pantallas del menú existen.
-
-```mermaid
-flowchart LR
-  L[Login] --> R{Rol}
-  R -->|Administrador| AD
-  R -->|Solicitante| SO
-  R -->|Responsable| RE
-
-  subgraph AD[Administrador]
-    direction TB
-    A1[Ambientes - aterriza aquí]
-    A2[Registrar ambiente]
-    A3[Usuarios]
-    A4[Registrar usuario]
-    A5[Nueva reserva]
-    A6[Detalle de la reserva]
-    A7[Dashboard]
-    A8[Reservas]
-    A1 --> A2
-    A3 --> A4
-    A5 -->|Ver detalle| A6
-    A8 --> A6
-  end
-
-  subgraph SO[Solicitante]
-    direction TB
-    S1[Nueva reserva - aterriza aquí]
-    S2[Detalle de la reserva]
-    S3[Reservas]
-    S1 -->|Ver detalle| S2
-    S3 --> S2
-  end
-
-  subgraph RE[Responsable]
-    direction TB
-    M1[Mi ambiente - aterriza aquí]
-    M2[Detalle de la reserva]
-    M1 --> M2
-  end
-
-```
-
-Menú por rol: Administrador, `Dashboard · Reservas · Nueva reserva · Ambientes · Usuarios`; Solicitante, `Reservas · Nueva reserva`; Responsable, `Mi ambiente`. Cada rol ve solo lo que puede usar; si escribe una dirección que no le corresponde ve «Sin permiso».
+El menú por rol, el mapa del sitio (generado desde las rutas del código), el etiquetado, la navegación, los filtros y la jerarquía de cada pantalla están en [`arquitectura-de-informacion.md`](arquitectura-de-informacion.md). Aquí no se duplican: allí se mantienen al día con el código. Resumen: Administrador, `Dashboard · Reservas · Nueva reserva · Ambientes · Usuarios` (aterriza en Dashboard); Solicitante, `Reservas · Nueva reserva` (aterriza en Nueva reserva); Responsable, `Mi ambiente`. Quien escribe una dirección que no le corresponde ve «Sin permiso».
 
 ### 3.2 Flujos de las tareas principales
 

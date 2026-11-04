@@ -177,6 +177,7 @@ export const TEXTOS = Object.freeze({
 
   // Salida de datos: Reservas, Dashboard y Mi ambiente
   tituloReservas: 'Reservas',
+  tituloDetalleReserva: 'Detalle de la reserva',
   tituloDashboard: 'Dashboard',
   tituloMiAmbiente: 'Mi ambiente',
   etiquetaFiltroEstado: 'Estado',
