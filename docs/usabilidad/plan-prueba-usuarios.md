@@ -11,6 +11,7 @@ La prueba real **la hace el estudiante**, con el sistema ya completo (lista de R
 1. Conseguir de 3 a 5 compañeros (sección 1).
 2. Preparar el entorno (sección 6) y ensayar las tareas uno mismo **tres veces**, cronometrando: esos tiempos son el «tiempo de referencia» de cada tarea (`docs/usabilidad/tiempos-referencia.csv`).
 3. Hacer una sesión por participante de unos 25 minutos (sección 4) y llenar la hoja de observación (sección 5) y el cuestionario SUS (sección 7).
+3b. **Antes de las tareas**, con cada participante, hacer el test de tarjetas inverso de la sección 10 (5 preguntas, unos 5 minutos, sin pantalla).
 4. Pasar los datos al CSV `docs/usabilidad/resultados-prueba.csv` (sección 8), con `origen` = `REAL`.
 5. Ejecutar `node tools/usabilidad/analizar.mjs` desde la carpeta del proyecto y copiar el resultado, con sus limitaciones (muestra muy pequeña), al informe.
 6. Decidir con los resultados qué se corrige (los problemas que vea más de un participante primero) y anotarlo en `docs/bitacora-evaluacion.md`.
@@ -120,3 +121,55 @@ Escala: **1 = Totalmente en desacuerdo … 5 = Totalmente de acuerdo.** Responde
 - Los compañeros no son los usuarios reales (docentes y administrativos de la UPLA): el contexto de uso es una hipótesis (`contexto-de-uso.md`).
 - Los tiempos máximos y los caminos óptimos son decisiones de este plan, no medidas previas.
 - T03, T04, T08, T09 y T10 no se pueden probar hasta la Fase 9.
+
+## 10. Test de tarjetas inverso (tree test) de la estructura de información
+
+**Qué comprueba.** Si la persona encuentra *dónde* está cada cosa solo con los nombres del menú y de las pantallas, sin colores, botones ni capturas. Mide la **estructura y las etiquetas** (`arquitectura-de-informacion.md`), no el diseño. **Estado: SIN EJECUTAR; no hay resultados.**
+
+**Material.** Una hoja impresa o una pantalla con el árbol de **un rol** (el del que se pregunta). Es el árbol real del sistema (menú + lo que hay dentro de cada pantalla), solo texto:
+
+```
+Solicitante                      Administrador                         Responsable de ambiente
+├─ Reservas                      ├─ Dashboard                          └─ Mi ambiente
+│   ├─ Filtros (Estado,          │   ├─ Indicadores (total, pendientes,     ├─ Selector de ambiente
+│   │   Ambiente, fechas)        │   │   aprobadas, rechazadas, más         ├─ Indicadores de mi ambiente
+│   ├─ Lista de mis reservas     │   │   utilizado)                         └─ Reservas de mi ambiente (Ver detalle)
+│   └─ Ver detalle               │   └─ Solicitudes pendientes
+│       └─ Cancelar solicitud    │       (Ver detalle · Rechazar · Aprobar · Ver todas)
+└─ Nueva reserva                 ├─ Reservas (Filtros, lista de todas, Ver detalle → Aprobar · Rechazar · Cancelar reserva)
+    └─ Registrar solicitud       ├─ Nueva reserva
+                                 ├─ Ambientes → Nuevo ambiente → Registrar ambiente
+                                 └─ Usuarios  → Nuevo usuario  → Registrar usuario
+```
+
+**Cómo se hace (por pregunta, sin cronómetro estricto).** Mostrar el árbol del rol, leer la pregunta y decir: «Señala dónde *buscarías* primero y, si no es ahí, dónde después. No hay que acertar: se prueba el menú, no a ti.» Anotar el primer lugar señalado y la ruta completa. El moderador no explica nada ni confirma si acertó.
+
+| # | Rol / árbol | Pregunta (se lee tal cual) | Ruta correcta | También se acepta (con rodeo) |
+|---|---|---|---|---|
+| **A1** | Administrador | «¿Dónde buscarías para **aprobar una reserva**?» | Dashboard → Solicitudes pendientes → Aprobar | Reservas → Ver detalle → Aprobar |
+| **A2** | Solicitante | «Necesitas el laboratorio el viernes. ¿Dónde **pides** el ambiente?» | Nueva reserva | — |
+| **A3** | Solicitante | «Quieres saber si ya respondieron tu solicitud. ¿Dónde **lo ves**?» | Reservas → (fila con su Estado) | Reservas → Ver detalle |
+| **A4** | Administrador | «Se inauguró una sala nueva. ¿Dónde **la das de alta**?» | Ambientes → Nuevo ambiente | — |
+| **A5** | Responsable | «¿Dónde ves **cuántas reservas tiene el laboratorio que tienes a cargo**?» | Mi ambiente → Indicadores | Mi ambiente → Reservas de mi ambiente |
+
+**Hoja de registro** (una por participante; `P1`, `P2`… sin nombres):
+
+| Pregunta | Primer lugar señalado | Ruta completa | Resultado (D = directo, R = con rodeo, X = incorrecto, N = no sabe) | Tiempo aprox. (s) | Lo que dijo en voz alta |
+|---|---|---|---|---|---|
+| A1 | | | | | |
+| A2 | | | | | |
+| A3 | | | | | |
+| A4 | | | | | |
+| A5 | | | | | |
+
+**Cómo leer los resultados.** Por pregunta: éxito = (D + R) / participantes y **directo** = D / participantes. Con 3 a 5 personas son **conteos, no porcentajes con valor estadístico** (3 de 4 es «la mitad falló una vez», no «75 %»). Se mira sobre todo **dónde fue a buscar el que se equivocó** (X): ese primer lugar señalado dice qué etiqueta no se entiende.
+
+**Qué mira cada pregunta** (relación con lo observado en `arquitectura-de-informacion.md`):
+
+- **A1** pone a prueba que haya dos caminos (Dashboard y Reservas) y que «Aprobar» se encuentre sin confundirlo con «Cancelar reserva».
+- **A2** comprueba «Nueva reserva» (tarea) frente a «Reservas» (objeto).
+- **A3** comprueba «Reservas» frente a «Mis reservas» (observación en la sección 2 del documento) para la Solicitante.
+- **A4** comprueba «Nuevo ambiente» dentro de Ambientes y no como opción de menú.
+- **A5** comprueba «Mi ambiente» y los indicadores que son una extensión del diseño.
+
+Con los resultados se decide qué etiqueta cambiar (primero las que fallen en más de una persona) y se anota en `docs/bitacora-evaluacion.md`, con la fecha y la prueba que cubre el cambio.
