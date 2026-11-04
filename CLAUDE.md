@@ -66,7 +66,7 @@ Esquema (tablas y columnas en snake_case, plural): `usuarios`, `ambientes`, `res
 - Los nueve componentes de `docs/diseno/componentes.md` viven en `src/components/ui/` y se usan en **todas** las pantallas: TextInput, SelectInput, DateInput, TimeInput, Button, AlertMessage, ModalConfirmacion, TableList, CardIndicador. Más un único `Layout` con menú lateral, un único `DetalleReserva` y un único icono de error (cierran N1, E4, U3, G1 de `reglas-para-programar.md`).
 - Separación obligatoria como en NovaPortal: `utils/validators.js` (funciones puras) ↔ hooks (`useXxxForm`) ↔ componentes de presentación. `constants/messages.js` es la única fuente de mensajes y es igual a la del backend (`MensajesValidacion`).
 - Fechas como dd/mm/aaaa; horas en lista cerrada 07:00–22:00 cada 30 min; la hora de fin solo ofrece horas posteriores al inicio.
-- Accesibilidad y diseño: foco `#3696EA` de 3 px, controles de 44 px, contraste AA, `prefers-reduced-motion`, sin scroll horizontal en 375 px, sin `alert()` del navegador.
+- Accesibilidad y diseño: foco `#1E73BE` de 3 px (blanco sobre el menú oscuro; el celeste `#3696EA` solo es decorativo, ver `docs/diseno/DESIGN.md`), controles de 44 px, contraste AA, `prefers-reduced-motion`, sin scroll horizontal en 375 px, sin `alert()` del navegador.
 - Tokens en `styles/tokens.css` (paleta de `DESIGN.md`); nada de colores sueltos.
 
 ## Pendientes del planificador (no los inventes)

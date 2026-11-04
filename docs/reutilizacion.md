@@ -59,35 +59,52 @@ La tabla se **genera** con `node tools/reutilizacion/componentes-por-pantalla.mj
 <!-- componentes:inicio -->
 <!-- Generado por tools/reutilizacion/componentes-por-pantalla.mjs a partir de los import y el JSX de frontend/src. No editar a mano. -->
 
-Pantallas recorridas (10): AmbienteFormPage, AmbientesPage, DetalleReservaPage, ErrorRutaPage, ListadoPage, LoginPage, NuevaReservaPage, PendientePage, UsuarioFormPage, UsuariosPage.
+Pantallas recorridas (12): AmbienteFormPage, AmbientesPage, DashboardPage, DetalleReservaPage, ErrorRutaPage, ListadoPage, LoginPage, MiAmbientePage, NuevaReservaPage, ReservasPage, UsuarioFormPage, UsuariosPage.
 
-Componentes recorridos (17): los de `src/components`.
+Componentes recorridos (20): los de `src/components`.
 
-Componentes que ninguna pantalla usa todavía: `CardIndicador`.
+Todos los componentes se usan al menos en una pantalla.
 
 | Componente | De los nueve del diseño | Pantallas que lo escriben (directo) | Pantallas que lo reciben a través de otro componente | Pantallas en total |
 |---|---|---|---|---|
-| `AlertMessage` | sí | AmbienteFormPage, DetalleReservaPage, ListadoPage, LoginPage, NuevaReservaPage | AmbientesPage, UsuarioFormPage, UsuariosPage | 8 |
-| `Button` | sí | DetalleReservaPage, ListadoPage, LoginPage, NuevaReservaPage | AmbienteFormPage, AmbientesPage, UsuarioFormPage, UsuariosPage | 8 |
-| `CampoFormulario` | no | — | AmbienteFormPage, LoginPage, NuevaReservaPage, UsuarioFormPage | 4 |
-| `CardIndicador` | sí | — | — | 0 |
-| `DateInput` | sí | NuevaReservaPage | — | 1 |
+| `AlertMessage` | sí | AmbienteFormPage, DashboardPage, DetalleReservaPage, ListadoPage, LoginPage, MiAmbientePage, NuevaReservaPage | AmbientesPage, ReservasPage, UsuarioFormPage, UsuariosPage | 11 |
+| `AvisoDeError` | no | DashboardPage, MiAmbientePage, ReservasPage | — | 3 |
+| `Button` | sí | DashboardPage, DetalleReservaPage, ListadoPage, LoginPage, NuevaReservaPage, ReservasPage | AmbienteFormPage, AmbientesPage, MiAmbientePage, UsuarioFormPage, UsuariosPage | 11 |
+| `CampoFormulario` | no | — | AmbienteFormPage, LoginPage, MiAmbientePage, NuevaReservaPage, ReservasPage, UsuarioFormPage | 6 |
+| `CardIndicador` | sí | DashboardPage, MiAmbientePage | — | 2 |
+| `DateInput` | sí | NuevaReservaPage | ReservasPage | 2 |
 | `DetalleReserva` | no | DetalleReservaPage | — | 1 |
+| `FiltrosDeReservas` | no | ReservasPage | — | 1 |
 | `FormularioTarjeta` | no | AmbienteFormPage, NuevaReservaPage, UsuarioFormPage | — | 3 |
-| `Icono` | no | — | AmbienteFormPage, AmbientesPage, DetalleReservaPage, ListadoPage, LoginPage, NuevaReservaPage, UsuarioFormPage, UsuariosPage | 8 |
-| `Insignia` | no | AmbientesPage, NuevaReservaPage, UsuariosPage | DetalleReservaPage | 4 |
+| `Icono` | no | — | AmbienteFormPage, AmbientesPage, DashboardPage, DetalleReservaPage, ListadoPage, LoginPage, MiAmbientePage, NuevaReservaPage, ReservasPage, UsuarioFormPage, UsuariosPage | 11 |
+| `Insignia` | no | AmbientesPage, MiAmbientePage, NuevaReservaPage, ReservasPage, UsuariosPage | DetalleReservaPage | 6 |
 | `InterruptorActivo` | no | UsuarioFormPage | — | 1 |
 | `Layout` | no | App.jsx (envuelve todas las rutas protegidas) | — | 1 |
-| `ModalConfirmacion` | sí | DetalleReservaPage | — | 1 |
+| `ModalConfirmacion` | sí | DashboardPage, DetalleReservaPage | — | 2 |
+| `Paginacion` | no | MiAmbientePage, ReservasPage | — | 2 |
 | `PasswordInput` | no | LoginPage, UsuarioFormPage | — | 2 |
-| `SelectInput` | sí | AmbienteFormPage, NuevaReservaPage, UsuarioFormPage | — | 3 |
-| `TableList` | sí | ListadoPage | AmbientesPage, UsuariosPage | 3 |
-| `TextInput` | sí | AmbienteFormPage, LoginPage, NuevaReservaPage, UsuarioFormPage | — | 4 |
+| `SelectInput` | sí | AmbienteFormPage, MiAmbientePage, NuevaReservaPage, UsuarioFormPage | ReservasPage | 5 |
+| `TableList` | sí | DashboardPage, ListadoPage, MiAmbientePage, ReservasPage | AmbientesPage, UsuariosPage | 6 |
+| `TextInput` | sí | AmbienteFormPage, LoginPage, NuevaReservaPage, UsuarioFormPage | ReservasPage | 5 |
 | `TimeInput` | sí | NuevaReservaPage | — | 1 |
 <!-- componentes:fin -->
 
 ### Limitaciones que conviene decir
 
-- `CardIndicador` está construido y probado, pero **ninguna pantalla lo usa todavía**: lo necesita el dashboard, que aún es una pantalla pendiente (`PendientePage`). La afirmación «los nueve componentes se usan en todas las pantallas» solo es cierta para ocho de los nueve.
+- **Fase 9:** `CardIndicador` ya lo usan el Dashboard y Mi ambiente; los **nueve componentes del diseño se usan** (ver la tabla generada). La afirmación se comprueba con el generador, no se escribe a mano.
 - `useCarga` ahora traduce también 409 y 429 con el módulo compartido; antes mostraba un mensaje genérico en ese caso poco frecuente (cambio menor de comportamiento).
 - jscpd mide texto repetido; no ve la repetición «de estructura» (por ejemplo, dos formularios que arman campos de manera parecida con nombres distintos). Esa se atacó a mano, y por eso el avance real es mayor que el número.
+
+## 4. Medición después de la Fase 9
+
+`docs/evidencias/fase9-duplicacion.txt`, mismo método y perfil de referencia (4 líneas y 30 tokens):
+
+| Momento | Duplicación | Bloques |
+|---|---|---|
+| Después de la Fase 7 | **0,88 %** | 9 |
+| Fase 9 al terminar las pantallas | 1,63 % (en la medida intermedia: 1,86 %) | 17 |
+| Fase 9 con los componentes compartidos | **0,93 %** | **11** |
+
+Se crearon `GrupoDeIndicadores` (la fila de tarjetas), `columnasDeReservas` (las columnas de las tablas de Reservas, Dashboard y Mi ambiente, definidas una sola vez), `indicadoresDeEstado` (las cuatro tarjetas por estado), `PieDeLista`, `AvisoDeError`, `ModalDeReserva` y la tabla de insignias por estado. **El código del frontend quedó en 0 bloques duplicados.** Con el umbral estándar de jscpd, 0,40 % antes de esta extracción.
+
+**No se llegó a 0,88 %: quedó en 0,93 %, a 0,05 puntos.** Los 11 bloques que quedan son **todos de C#** (ninguno del frontend): 8 son encabezados de archivo (`using` y `namespace`, que el lenguaje obliga a repetir; dos de ellos aparecen por los archivos nuevos `ConsultaService.cs` y `PanelesController.cs`) y 3 son pequeños (siete líneas de `ReservaService`, tres llamadas a reglas compartidas en dos validadores y los atributos de dos acciones). Quitarlos exigiría `using` globales o cambiar código que ya funciona sin que mejore nada visible; se prefirió no tocarlo.
