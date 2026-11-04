@@ -72,6 +72,7 @@ export default function UsuarioFormPage() {
         id="contrasena"
         nombre="contrasena"
         etiqueta={TEXTOS.etiquetaContrasenaInicial}
+        ayuda={TEXTOS.ayudaContrasenaInicial}
         valor={valores.contrasena}
         error={errores.contrasena}
         onChange={form.handleChange}

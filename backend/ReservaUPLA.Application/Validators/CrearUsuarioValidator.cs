@@ -10,7 +10,9 @@ public sealed class CrearUsuarioValidator : AbstractValidator<CrearUsuarioDto>
 {
     public const int LongitudMaximaNombre = 120;
 
-    // Límite técnico de BCrypt (72 bytes). La política de la contraseña inicial queda pendiente (hallazgo U2).
+    // Política de la contraseña inicial (cierra el hallazgo U2): de 8 a 72 caracteres, con al menos una letra y un número.
+    // El máximo es además el límite técnico de BCrypt (72 bytes).
+    public const int LongitudMinimaContrasena = 8;
     public const int LongitudMaximaContrasena = 72;
 
     public CrearUsuarioValidator(IOptions<OpcionesAutenticacion> opciones)
@@ -37,6 +39,12 @@ public sealed class CrearUsuarioValidator : AbstractValidator<CrearUsuarioDto>
             .Cascade(CascadeMode.Stop)
             .NotEmpty().WithMessage(MensajesValidacion.ContrasenaInicialVacia)
             .MaximumLength(LongitudMaximaContrasena).WithMessage(MensajesValidacion.ContrasenaInicialDemasiadoLarga)
+            .Must(CumpleLaPolitica).WithMessage(MensajesValidacion.ContrasenaInicialRequisitos)
             .OverridePropertyName(CamposFormulario.Contrasena);
     }
+
+    private static bool CumpleLaPolitica(string? contrasena) =>
+        contrasena is { Length: >= LongitudMinimaContrasena }
+        && contrasena.Any(char.IsLetter)
+        && contrasena.Any(char.IsDigit);
 }
