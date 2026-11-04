@@ -1,0 +1,38 @@
+OK  aceptada:  primera Aprobada 10:00-12:00
+OK  rechazada: RN-01 segunda Aprobada que se cruza 11:00-13:00
+OK  aceptada:  Aprobada contigua 12:00-14:00 (no se cruza)
+OK  aceptada:  Pendiente 10:30-11:30 que se cruza con una Aprobada
+OK  aceptada:  otra Pendiente 10:30-11:30 que se cruza con la anterior
+OK  rechazada: RN-03 hora_fin igual a hora_inicio
+OK  rechazada: RN-03 hora_fin menor que hora_inicio
+OK  rechazada: RN-04 inicio antes de las 07:00
+OK  rechazada: RN-04 fin después de las 22:00
+OK  aceptada:  RN-04 límites exactos 07:00-22:00
+OK  rechazada: RN-02 fecha es obligatorio (SQLSTATE 23502)
+OK  rechazada: RN-02 hora_inicio es obligatorio (SQLSTATE 23502)
+OK  rechazada: RN-02 hora_fin es obligatorio (SQLSTATE 23502)
+OK  rechazada: RN-02 motivo es obligatorio (SQLSTATE 23502)
+OK  rechazada: RN-02 usuario_id es obligatorio (SQLSTATE 23502)
+OK  rechazada: RN-02 ambiente_id es obligatorio (SQLSTATE 23502)
+OK  aceptada:  RN-01 Aprobada A1 10:00-12:00 (10/02/2027)
+OK  aceptada:  RN-01 Pendiente P1 11:00-13:00 que se cruza con A1
+OK  rechazada: RN-01 INSERT de otra Aprobada que se cruza (23P01) (SQLSTATE 23P01)
+OK  rechazada: RN-01 UPDATE que aprueba P1 mientras A1 sigue Aprobada (23P01) (SQLSTATE 23P01)
+OK  aceptada:  Cancelar A1 libera el horario
+OK  aceptada:  RN-01 ahora sí se puede aprobar P1
+OK  rechazada: RN-06 una Rechazada no pasa a Aprobada (SQLSTATE P0001)
+OK  rechazada: RN-06 una Rechazada no vuelve a Pendiente (SQLSTATE P0001)
+OK  rechazada: RN-06 una Rechazada no se cancela (SQLSTATE P0001)
+OK  rechazada: RN-06 una Rechazada no cambia ningún dato (motivo) (SQLSTATE P0001)
+OK  rechazada: RN-06 una Cancelada no pasa a Aprobada (SQLSTATE P0001)
+OK  rechazada: transición Aprobada → Rechazada no permitida (SQLSTATE P0001)
+OK  rechazada: transición Aprobada → Pendiente no permitida (SQLSTATE P0001)
+OK  aceptada:  Aprobada → Cancelada sí se permite
+OK  rechazada: RN-05 un Solicitante no registra la aprobación (SQLSTATE P0001)
+OK  rechazada: RN-05 un Solicitante no registra el rechazo (SQLSTATE P0001)
+OK  aceptada:  RN-05 el Administrador sí registra la aprobación
+OK  rechazada: otra Solicitante no cancela una reserva ajena (SQLSTATE P0001)
+OK  aceptada:  el dueño sí cancela su reserva
+OK  rechazada: mantenimiento: la base no acepta una reserva nueva en un ambiente en mantenimiento (SQLSTATE P0001)
+OK  rechazada: la base no acepta una contraseña en texto plano (SQLSTATE 23514)
+OK  aceptada:  la base sí acepta un hash BCrypt

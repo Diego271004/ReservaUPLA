@@ -8,12 +8,32 @@ const RUTA_CS = resolve(
   __dirname,
   '../../../backend/ReservaUPLA.Application/Common/MensajesValidacion.cs',
 )
+// Los mensajes de las reglas del dominio (RN-06) viven en MensajesDominio y MensajesValidacion los reexpone.
+const RUTA_DOMINIO_CS = resolve(
+  __dirname,
+  '../../../backend/ReservaUPLA.Domain/Common/MensajesDominio.cs',
+)
+
+const aMinuscula = (nombre) => nombre.charAt(0).toLowerCase() + nombre.slice(1)
 
 function leerConstantesDelBackend() {
+  const dominio = {}
+  for (const [, nombre, texto] of readFileSync(RUTA_DOMINIO_CS, 'utf8').matchAll(
+    /public const string (\w+)\s*=\s*"([^"]*)";/g,
+  )) {
+    dominio[nombre] = texto
+  }
+
   const codigo = readFileSync(RUTA_CS, 'utf8')
   const constantes = {}
   for (const [, nombre, texto] of codigo.matchAll(/public const string (\w+)\s*=\s*"([^"]*)";/g)) {
-    constantes[nombre.charAt(0).toLowerCase() + nombre.slice(1)] = texto
+    constantes[aMinuscula(nombre)] = texto
+  }
+  // Alias: public const string X = MensajesDominio.Y;
+  for (const [, nombre, origen] of codigo.matchAll(
+    /public const string (\w+)\s*=\s*MensajesDominio\.(\w+);/g,
+  )) {
+    constantes[aMinuscula(nombre)] = dominio[origen]
   }
   return constantes
 }

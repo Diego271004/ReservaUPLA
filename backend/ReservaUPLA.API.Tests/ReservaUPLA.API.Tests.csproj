@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ReservaUPLA.API\ReservaUPLA.API.csproj" />
     <ProjectReference Include="..\ReservaUPLA.Application.Tests\ReservaUPLA.Application.Tests.csproj" />
+    <ProjectReference Include="..\ReservaUPLA.Infrastructure.Tests\ReservaUPLA.Infrastructure.Tests.csproj" />
   </ItemGroup>
 
 </Project>

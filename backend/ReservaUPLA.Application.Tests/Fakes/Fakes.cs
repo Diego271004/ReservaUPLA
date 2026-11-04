@@ -1,3 +1,4 @@
+using ReservaUPLA.Application.Common;
 using ReservaUPLA.Application.DTOs;
 using ReservaUPLA.Application.Interfaces;
 using ReservaUPLA.Domain.Entities;
@@ -31,6 +32,9 @@ public sealed class FakeUsuarioRepository : IUsuarioRepository
     public Task<Usuario?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken) =>
         Task.FromResult(Usuarios.FirstOrDefault(usuario => usuario.Id == id));
 
+    public Task<IReadOnlyList<Usuario>> ObtenerPorIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<Usuario>>(Usuarios.Where(usuario => ids.Contains(usuario.Id)).ToList());
+
     public Task<IReadOnlyList<Usuario>> ListarAsync(RolUsuario? rol, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyList<Usuario>>(Usuarios.Where(usuario => rol is null || usuario.Rol == rol).ToList());
 
@@ -46,7 +50,7 @@ public sealed class FakeAmbienteRepository : IAmbienteRepository
 {
     public List<Ambiente> Ambientes { get; } = new();
 
-    public Ambiente Agregar(string nombre, int? responsableId = null)
+    public Ambiente Agregar(string nombre, int? responsableId = null, EstadoAmbiente estado = EstadoAmbiente.Disponible)
     {
         var ambiente = new Ambiente
         {
@@ -55,6 +59,7 @@ public sealed class FakeAmbienteRepository : IAmbienteRepository
             Tipo = TipoAmbiente.Laboratorio,
             Capacidad = 30,
             Ubicacion = "Pabellón A",
+            Estado = estado,
             ResponsableId = responsableId,
         };
         Ambientes.Add(ambiente);
@@ -78,12 +83,48 @@ public sealed class FakeAmbienteRepository : IAmbienteRepository
     }
 }
 
+/// <summary>
+/// Repositorio de reservas en memoria. Imita lo que hace la base: si al guardar se cruzan dos reservas Aprobadas del
+/// mismo ambiente (la restricción de exclusión de RN-01), lanza <see cref="ConflictoDeHorarioException"/>.
+/// </summary>
 public sealed class FakeReservaRepository : IReservaRepository
 {
     public List<Reserva> Reservas { get; } = new();
     public FiltroReservas? UltimoFiltro { get; private set; }
+    public int Guardados { get; private set; }
 
-    public Task<Reserva?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken) =>
+    /// <summary>Se ejecuta justo antes de guardar: permite simular que otra aprobación se coló entre la comprobación y el guardado.</summary>
+    public Action? AntesDeGuardar { get; set; }
+
+    public Reserva Agregar(
+        int ambienteId,
+        string inicio,
+        string fin,
+        EstadoReserva estado = EstadoReserva.Pendiente,
+        int usuarioId = 1,
+        string fecha = "2026-11-05")
+    {
+        var reserva = Reserva.Crear(
+            DateOnly.Parse(fecha), TimeOnly.Parse(inicio), TimeOnly.Parse(fin), "Motivo", usuarioId, ambienteId,
+            new DateTimeOffset(2026, 11, 3, 9, 0, 0, TimeSpan.Zero));
+        reserva.Id = Reservas.Count + 1;
+        if (estado == EstadoReserva.Aprobada)
+        {
+            reserva.Aprobar(1, new DateTimeOffset(2026, 11, 3, 10, 0, 0, TimeSpan.Zero));
+        }
+        else if (estado == EstadoReserva.Rechazada)
+        {
+            reserva.Rechazar(1, new DateTimeOffset(2026, 11, 3, 10, 0, 0, TimeSpan.Zero));
+        }
+        else if (estado == EstadoReserva.Cancelada)
+        {
+            reserva.Cancelar(usuarioId, new DateTimeOffset(2026, 11, 3, 10, 0, 0, TimeSpan.Zero));
+        }
+        Reservas.Add(reserva);
+        return reserva;
+    }
+
+    public Task<Reserva?> ObtenerConHistorialAsync(int id, CancellationToken cancellationToken) =>
         Task.FromResult(Reservas.FirstOrDefault(reserva => reserva.Id == id));
 
     public Task<IReadOnlyList<ReservaDto>> ListarAsync(FiltroReservas filtro, CancellationToken cancellationToken)
@@ -92,15 +133,45 @@ public sealed class FakeReservaRepository : IReservaRepository
         return Task.FromResult<IReadOnlyList<ReservaDto>>(new List<ReservaDto>());
     }
 
-    public Task<bool> ExisteAprobadaQueSeCruzaAsync(
-        int ambienteId, DateOnly fecha, TimeOnly horaInicio, TimeOnly horaFin, CancellationToken cancellationToken) =>
-        Task.FromResult(false);
+    public Task<Reserva?> BuscarAprobadaQueSeCruzaAsync(
+        int ambienteId, DateOnly fecha, TimeOnly horaInicio, TimeOnly horaFin, int? excluirReservaId, CancellationToken cancellationToken) =>
+        Task.FromResult(Reservas.FirstOrDefault(otra => SeCruzanAprobadas(otra, ambienteId, fecha, horaInicio, horaFin, excluirReservaId)));
 
-    public Task CrearAsync(Reserva reserva, CancellationToken cancellationToken)
+    public Task AgregarAsync(Reserva reserva, CancellationToken cancellationToken)
     {
+        AntesDeGuardar?.Invoke();
+        ExigirSinCruce(reserva);
         reserva.Id = Reservas.Count + 1;
         Reservas.Add(reserva);
+        Guardados++;
         return Task.CompletedTask;
+    }
+
+    public Task GuardarAsync(Reserva reserva, CancellationToken cancellationToken)
+    {
+        AntesDeGuardar?.Invoke();
+        ExigirSinCruce(reserva);
+        Guardados++;
+        return Task.CompletedTask;
+    }
+
+    private static bool SeCruzanAprobadas(
+        Reserva otra, int ambienteId, DateOnly fecha, TimeOnly inicio, TimeOnly fin, int? excluirId) =>
+        otra.Estado == EstadoReserva.Aprobada
+        && otra.AmbienteId == ambienteId
+        && otra.Fecha == fecha
+        && otra.Id != excluirId
+        && otra.HoraInicio < fin
+        && otra.HoraFin > inicio;
+
+    private void ExigirSinCruce(Reserva reserva)
+    {
+        if (reserva.Estado == EstadoReserva.Aprobada
+            && Reservas.Any(otra => !ReferenceEquals(otra, reserva)
+                && SeCruzanAprobadas(otra, reserva.AmbienteId, reserva.Fecha, reserva.HoraInicio, reserva.HoraFin, reserva.Id)))
+        {
+            throw new ConflictoDeHorarioException(new InvalidOperationException("23P01 simulado"));
+        }
     }
 }
 
@@ -133,16 +204,24 @@ public sealed class FakeTokenGenerator : ITokenGenerator
     }
 }
 
-/// <summary>Regla de negocio de prueba para comprobar el punto de extensión de la Fase 6.</summary>
+/// <summary>Reloj fijo para que las fechas de los eventos del historial sean predecibles.</summary>
+public sealed class FakeTimeProvider : TimeProvider
+{
+    public static readonly DateTimeOffset Ahora = new(2026, 11, 3, 12, 0, 0, TimeSpan.Zero);
+
+    public override DateTimeOffset GetUtcNow() => Ahora;
+}
+
+/// <summary>Regla de negocio de prueba para comprobar el punto de extensión.</summary>
 public sealed class FakeReglaReserva : IReglaReserva
 {
-    private readonly KeyValuePair<string, string>? _error;
+    private readonly ViolacionDeRegla? _violacion;
 
-    public FakeReglaReserva(KeyValuePair<string, string>? error)
+    public FakeReglaReserva(ViolacionDeRegla? violacion)
     {
-        _error = error;
+        _violacion = violacion;
     }
 
-    public Task<KeyValuePair<string, string>?> EvaluarAsync(Reserva reserva, CancellationToken cancellationToken) =>
-        Task.FromResult(_error);
+    public Task<ViolacionDeRegla?> EvaluarAsync(Reserva reserva, Ambiente ambiente, CancellationToken cancellationToken) =>
+        Task.FromResult(_violacion);
 }

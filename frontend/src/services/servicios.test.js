@@ -3,11 +3,16 @@ import { ApiError, registrarSesionExpirada, request } from './apiClient.js'
 import { login } from './authService.js'
 import { RESULTADO, llamarApi } from './llamarApi.js'
 import {
+  aprobarReserva,
+  cancelarReserva,
+  consultarDisponibilidad,
   crearAmbiente,
   crearReserva,
   crearUsuario,
   listarAmbientes,
   listarUsuarios,
+  obtenerReserva,
+  rechazarReserva,
 } from './recursosService.js'
 import { borrarSesion, guardarSesion, leerSesion, obtenerToken } from './sesionStorage.js'
 
@@ -17,7 +22,13 @@ const respuesta = (status, cuerpo) => ({
   text: () => Promise.resolve(cuerpo === undefined ? '' : JSON.stringify(cuerpo)),
 })
 
-const sesion = (expiraEn) => ({ token: 't', nombreCompleto: 'Ana', rol: 'Solicitante', expiraEn })
+const sesion = (expiraEn) => ({
+  token: 't',
+  usuarioId: 2,
+  nombreCompleto: 'Ana',
+  rol: 'Solicitante',
+  expiraEn,
+})
 
 beforeEach(() => sessionStorage.clear())
 afterEach(() => {
@@ -46,6 +57,11 @@ describe('sesionStorage', () => {
     sessionStorage.setItem('reservaupla.sesion', '{no es json')
     expect(leerSesion()).toBeNull()
     sessionStorage.setItem('reservaupla.sesion', JSON.stringify({ token: 1 }))
+    expect(leerSesion()).toBeNull()
+    // una sesión guardada antes de que existiera usuarioId se descarta: hay que iniciar sesión otra vez
+    const { usuarioId, ...sinId } = sesion(new Date(Date.now() + 60_000).toISOString())
+    expect(usuarioId).toBe(2)
+    sessionStorage.setItem('reservaupla.sesion', JSON.stringify(sinId))
     expect(leerSesion()).toBeNull()
   })
 
@@ -153,6 +169,17 @@ describe('llamarApi: traducción de respuestas', () => {
     })
   })
 
+  it('409 → conflicto con el mensaje de la regla de negocio', async () => {
+    expect(await llamarConEstado(409, { mensaje: 'Ese ambiente ya tiene una reserva.' })).toEqual({
+      tipo: RESULTADO.conflicto,
+      mensaje: 'Ese ambiente ya tiene una reserva.',
+    })
+  })
+
+  it('409 sin mensaje (fuera de contrato) → errorServidor', async () => {
+    expect(await llamarConEstado(409, {})).toEqual({ tipo: RESULTADO.errorServidor })
+  })
+
   it('400 sin errores por campo (fuera de contrato) → errorServidor', async () => {
     expect(await llamarConEstado(400, {})).toEqual({ tipo: RESULTADO.errorServidor })
   })
@@ -160,10 +187,10 @@ describe('llamarApi: traducción de respuestas', () => {
   it.each([
     [401, RESULTADO.noAutorizado],
     [403, RESULTADO.sinPermiso],
+    [404, RESULTADO.noEncontrado],
     [429, RESULTADO.demasiadosIntentos],
     [500, RESULTADO.errorServidor],
     [503, RESULTADO.errorServidor],
-    [404, RESULTADO.errorServidor],
   ])('%i → %s', async (status, tipo) => {
     expect((await llamarConEstado(status, {})).tipo).toBe(tipo)
   })
@@ -197,12 +224,13 @@ describe('llamarApi: traducción de respuestas', () => {
 describe('authService.login', () => {
   const completo = {
     token: 'tk',
+    usuarioId: 2,
     nombreCompleto: 'Ana Torres',
     rol: 'Solicitante',
     expiraEn: '2026-11-03T13:00:00Z',
   }
 
-  it('200 → éxito con token, nombre, rol y expiración; no envía token de sesión', async () => {
+  it('200 → éxito con token, id, nombre, rol y expiración; no envía token de sesión', async () => {
     guardarSesion(sesion(new Date(Date.now() + 60_000).toISOString()))
     const fetchSimulado = vi.fn().mockResolvedValue(respuesta(200, completo))
     vi.stubGlobal('fetch', fetchSimulado)
@@ -221,6 +249,13 @@ describe('authService.login', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(respuesta(401, { mensaje: 'x' })))
     expect(await login('a@upla.edu.pe', 'x')).toEqual({ tipo: 'credencialesInvalidas' })
     expect(alExpirar).not.toHaveBeenCalled()
+  })
+
+  it('200 sin el id del usuario (fuera de contrato) → errorServidor', async () => {
+    const { usuarioId, ...sinId } = completo
+    expect(usuarioId).toBe(2)
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(respuesta(200, sinId)))
+    expect((await login('a@upla.edu.pe', 'x')).tipo).toBe(RESULTADO.errorServidor)
   })
 
   it('200 con un cuerpo incompleto → errorServidor', async () => {
@@ -262,6 +297,22 @@ describe('recursosService: rutas y métodos', () => {
     ['crearUsuario', () => crearUsuario({}), '/api/usuarios', 'POST'],
     ['crearAmbiente', () => crearAmbiente({}), '/api/ambientes', 'POST'],
     ['crearReserva', () => crearReserva({}), '/api/reservas', 'POST'],
+    ['obtenerReserva', () => obtenerReserva(7), '/api/reservas/7', 'GET'],
+    ['aprobarReserva', () => aprobarReserva(7), '/api/reservas/7/aprobar', 'POST'],
+    ['rechazarReserva', () => rechazarReserva(7), '/api/reservas/7/rechazar', 'POST'],
+    ['cancelarReserva', () => cancelarReserva(7), '/api/reservas/7/cancelar', 'POST'],
+    [
+      'consultarDisponibilidad',
+      () =>
+        consultarDisponibilidad({
+          ambienteId: 1,
+          fecha: '2026-11-05',
+          horaInicio: '10:00',
+          horaFin: '12:00',
+        }),
+      '/api/reservas/disponibilidad?ambienteId=1&fecha=2026-11-05&horaInicio=10%3A00&horaFin=12%3A00',
+      'GET',
+    ],
   ])('%s', async (_nombre, llamar, ruta, metodo) => {
     const fetchSimulado = usar()
     await llamar()

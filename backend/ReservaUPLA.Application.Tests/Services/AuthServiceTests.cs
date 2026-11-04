@@ -118,6 +118,7 @@ public class AuthServiceTests
         Assert.Equal($"token-de-{Correo}", resultado.Respuesta!.Token);
         Assert.Equal(usuario.NombreCompleto, resultado.Respuesta.NombreCompleto);
         Assert.Equal("Administrador", resultado.Respuesta.Rol);
+        Assert.Equal(usuario.Id, resultado.Respuesta.UsuarioId); // el frontend lo usa para saber si la reserva es suya
         Assert.Equal(FakeTokenGenerator.Expiracion, resultado.Respuesta.ExpiraEn);
     }
 

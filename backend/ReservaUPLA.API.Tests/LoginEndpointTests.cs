@@ -38,6 +38,7 @@ public class LoginEndpointTests
         Assert.False(string.IsNullOrWhiteSpace(cuerpo.GetProperty("token").GetString()));
         Assert.Equal(api.Administrador.NombreCompleto, cuerpo.GetProperty("nombreCompleto").GetString());
         Assert.Equal("Administrador", cuerpo.GetProperty("rol").GetString());
+        Assert.Equal(api.Administrador.Id, cuerpo.GetProperty("usuarioId").GetInt32());
     }
 
     [Theory]
