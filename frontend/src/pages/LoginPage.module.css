@@ -60,7 +60,7 @@
 /* Móvil: una sola columna, la marca arriba como una franja. */
 @media (max-width: 767px) {
   .pagina {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 1fr;
   }
 

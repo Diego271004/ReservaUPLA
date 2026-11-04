@@ -25,4 +25,4 @@ Reglas del planificador para los nueve componentes: TextInput, SelectInput, Date
 
 ## Estados comunes
 - **Icono de error:** círculo relleno con exclamación, el mismo en AlertMessage y en los campos.
-- **Foco por teclado:** contorno `#3696EA` de 3 px en todos los controles.
+- **Foco por teclado:** contorno `#1E73BE` de 3 px en todos los controles (blanco sobre el menú marino; ver la decisión de la Fase 8 en `DESIGN.md`).

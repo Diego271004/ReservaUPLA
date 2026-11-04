@@ -148,6 +148,8 @@ export const TEXTOS = Object.freeze({
   personas: 'personas',
   consultandoDisponibilidad: 'Comprobando disponibilidad…',
   verDetalle: 'Ver detalle',
+  registrarOtra: 'Registrar otra reserva',
+  ayudaFecha: 'Formato dd/mm/aaaa (por ejemplo, 05/11/2026).',
 
   // Detalle de la reserva y sus acciones
   cargandoReserva: 'Cargando la reserva…',
@@ -163,10 +165,11 @@ export const TEXTOS = Object.freeze({
   confirmarRechazar: 'Sí, rechazar',
   tituloModalCancelar: '¿Cancelar esta reserva?',
   confirmarCancelar: 'Sí, cancelar reserva',
+  advertenciaIrreversible: 'Esta acción no se puede deshacer.',
 
   // Pantallas y errores de ruta
   pantallaEnConstruccion: 'Pantalla en construcción',
-  textoEnConstruccion: 'Esta pantalla se construye en una fase posterior.',
+  textoEnConstruccion: 'Todavía no está disponible. Estará lista en una próxima versión.',
   sinPermisoTitulo: 'Sin permiso',
   paginaNoEncontrada: 'No encontramos esa página.',
   volverAlInicio: 'Volver al inicio',

@@ -40,6 +40,7 @@
 .acciones {
   display: flex;
   justify-content: flex-end;
+  gap: var(--espacio-1);
   padding-top: var(--espacio-2);
   border-top: 1px solid var(--color-borde);
 }
@@ -48,6 +49,10 @@
   .horas,
   .resumen {
     grid-template-columns: 1fr;
+  }
+
+  .acciones {
+    flex-direction: column-reverse; /* el primario arriba, como en los formularios */
   }
 
   .acciones > * {

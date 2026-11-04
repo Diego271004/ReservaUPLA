@@ -11,6 +11,10 @@
   background: var(--color-marino);
 }
 
+.menu :focus-visible {
+  outline-color: var(--color-foco-sobre-oscuro);
+}
+
 .panel {
   display: flex;
   flex-direction: column;
@@ -19,6 +23,8 @@
 
 .cabecera {
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-1);
   align-items: center;
   justify-content: space-between;
   min-height: 40px;

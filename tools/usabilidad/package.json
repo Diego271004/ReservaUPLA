@@ -1,0 +1,16 @@
+{
+  "name": "reservaupla-usabilidad",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Mediciones de usabilidad y accesibilidad del sistema construido (axe-core, contraste, objetivos táctiles, teclado, zoom, movimiento) y análisis de la prueba con usuarios.",
+  "scripts": {
+    "contraste": "node contraste.mjs",
+    "accesibilidad": "node accesibilidad.mjs",
+    "analizar": "node analizar.mjs",
+    "pruebas": "node --test pruebas/analizar.test.mjs"
+  },
+  "dependencies": {
+    "axe-core": "4.10.2"
+  }
+}

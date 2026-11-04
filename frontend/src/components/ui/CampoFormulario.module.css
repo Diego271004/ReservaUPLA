@@ -16,7 +16,7 @@
   align-items: center;
   min-height: var(--alto-control);
   background: var(--color-superficie);
-  border: 1px solid var(--color-borde);
+  border: 1px solid var(--color-borde-control);
   border-radius: var(--radio);
 }
 
@@ -37,7 +37,9 @@
 .control {
   flex: 1;
   min-width: 0;
-  min-height: calc(var(--alto-control) - 2px);
+  /* El control llena la caja de 44 px, borde incluido: no queda una franja de 1 px que no responde al toque. */
+  min-height: var(--alto-control);
+  margin: -1px;
   padding: 0 var(--espacio-2);
   font: inherit;
   font-size: var(--tamano-texto);

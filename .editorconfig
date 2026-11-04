@@ -1,0 +1,10 @@
+# Finales de línea y codificación fijos: sin esto `dotnet format --verify-no-changes` salía a veces con código 2 en Windows
+# (esperaba CRLF en archivos que Git deja en LF por .gitattributes).
+root = true
+
+[*]
+end_of_line = lf
+charset = utf-8
+
+[*.sln]
+end_of_line = crlf

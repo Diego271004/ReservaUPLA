@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MENSAJES } from '../constants/messages.js'
+import { MENSAJES, TEXTOS } from '../constants/messages.js'
 import { RESULTADO } from '../services/llamarApi.js'
 import {
   aprobarReserva,
@@ -398,6 +398,27 @@ describe('Detalle de reserva: modales y acciones', () => {
     await userEvent.click(boton('Sí, cancelar reserva'))
     expect(await screen.findByText('Reserva cancelada.')).toBeInTheDocument()
     expect(screen.getByText(MENSAJES.reservaCanceladaNoSeModifica)).toBeInTheDocument()
+  })
+
+  it.each([
+    ['Rechazar', '¿Rechazar esta reserva?'],
+    ['Cancelar reserva', '¿Cancelar esta reserva?'],
+  ])(
+    'el modal de "%s" avisa que no se puede deshacer (RN-06: queda en un estado final)',
+    async (abrir, titulo) => {
+      mostrar()
+      await screen.findByText('Laboratorio de Cómputo 2')
+      await userEvent.click(boton(abrir))
+      const dialogo = screen.getByRole('dialog', { name: titulo })
+      expect(within(dialogo).getByText(TEXTOS.advertenciaIrreversible)).toBeInTheDocument()
+    },
+  )
+
+  it('el modal de "Aprobar" no dice que sea irreversible (una aprobada todavía se puede cancelar)', async () => {
+    mostrar()
+    await screen.findByText('Laboratorio de Cómputo 2')
+    await userEvent.click(boton('Aprobar'))
+    expect(screen.queryByText(TEXTOS.advertenciaIrreversible)).not.toBeInTheDocument()
   })
 
   it('un mensaje de éxito anterior desaparece al empezar otra acción', async () => {

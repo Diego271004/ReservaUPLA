@@ -123,7 +123,7 @@ describe('AlertMessage', () => {
 })
 
 describe('ModalConfirmacion', () => {
-  function Prueba({ alConfirmar = () => {}, alVolver = () => {}, cargando = false }) {
+  function Prueba({ alConfirmar = () => {}, alVolver = () => {}, cargando = false, advertencia }) {
     const [abierto, setAbierto] = useState(false)
     return (
       <>
@@ -134,6 +134,7 @@ describe('ModalConfirmacion', () => {
           resumen={['Ambiente: Laboratorio de Cómputo 2', 'Horario: 05/11/2026, 10:00 – 12:00']}
           textoConfirmar="Sí, rechazar"
           variante="rechazo"
+          advertencia={advertencia}
           cargando={cargando}
           onConfirmar={alConfirmar}
           onVolver={() => {
@@ -144,6 +145,20 @@ describe('ModalConfirmacion', () => {
       </>
     )
   }
+
+  it('con advertencia: la muestra dentro del cuadro y la incluye en su descripción accesible', async () => {
+    render(<Prueba advertencia="Esta acción no se puede deshacer." />)
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir' }))
+    const dialogo = screen.getByRole('dialog', { name: '¿Rechazar esta reserva?' })
+    expect(within(dialogo).getByText('Esta acción no se puede deshacer.')).toBeInTheDocument()
+    expect(dialogo).toHaveAccessibleDescription(/no se puede deshacer/)
+  })
+
+  it('sin advertencia: no muestra ninguna', async () => {
+    render(<Prueba />)
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir' }))
+    expect(screen.queryByText(/no se puede deshacer/)).not.toBeInTheDocument()
+  })
 
   it('cerrado: no muestra nada', () => {
     render(<Prueba />)

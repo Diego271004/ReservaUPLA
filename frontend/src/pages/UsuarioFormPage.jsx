@@ -49,7 +49,7 @@ export default function UsuarioFormPage() {
       <PasswordInput
         {...form.campoDeTexto('contrasena')}
         etiqueta={TEXTOS.etiquetaContrasenaInicial}
-        ayuda={TEXTOS.ayudaContrasenaInicial}
+        ayuda={form.errores.contrasena ? undefined : TEXTOS.ayudaContrasenaInicial}
         mostrando={mostrarContrasena}
         onAlternar={() => setMostrarContrasena((visible) => !visible)}
         autoComplete="new-password"

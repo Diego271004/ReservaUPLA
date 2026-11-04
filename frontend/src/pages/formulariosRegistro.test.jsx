@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MENSAJES } from '../constants/messages.js'
+import { MENSAJES, TEXTOS } from '../constants/messages.js'
 import { RESULTADO } from '../services/llamarApi.js'
 import {
   consultarDisponibilidad,
@@ -135,6 +135,15 @@ describe('Registrar usuario', () => {
     await userEvent.paste('a'.repeat(73))
     await userEvent.tab()
     expect(screen.getByText(MENSAJES.contrasenaInicialDemasiadoLarga)).toBeInTheDocument()
+  })
+
+  it('U2: cuando la contraseña tiene error no se repite la ayuda con el mismo texto', async () => {
+    mostrar()
+    expect(screen.getByText(TEXTOS.ayudaContrasenaInicial)).toBeInTheDocument()
+    await userEvent.type(ingresar('Contraseña inicial'), 'abcdefgh')
+    await userEvent.tab()
+    expect(screen.getByText(MENSAJES.contrasenaInicialRequisitos)).toBeInTheDocument()
+    expect(screen.queryByText(TEXTOS.ayudaContrasenaInicial)).not.toBeInTheDocument()
   })
 
   it.each(['Ab1', '12345678', 'abcdefgh'])(
@@ -490,6 +499,13 @@ describe('Nueva reserva', () => {
     await userEvent.type(ingresar('Motivo'), 'Práctica de programación')
   }
 
+  it('la fecha dice en qué formato se escribe (el icono de calendario no abre ningún selector)', async () => {
+    mostrar()
+    expect(ingresar('Fecha')).toHaveAccessibleDescription(TEXTOS.ayudaFecha)
+    expect(TEXTOS.ayudaFecha).toMatch(/dd\/mm\/aaaa/)
+    await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ })
+  })
+
   it('muestra los campos del diseño, la fecha de hoy ya escrita y la ayuda del horario', async () => {
     mostrar()
     expect(screen.getByRole('heading', { name: 'Nueva reserva' })).toBeInTheDocument()
@@ -646,7 +662,7 @@ describe('Nueva reserva', () => {
     mostrar()
     await llenarValido()
     await userEvent.click(boton('Registrar solicitud'))
-    await userEvent.click(await screen.findByRole('button', { name: 'Nueva reserva' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Registrar otra reserva' }))
     expect(ingresar('Motivo')).toHaveValue('')
     expect(ingresar('Hora de inicio')).toHaveValue('')
   })
@@ -753,6 +769,16 @@ describe('Nueva reserva', () => {
     const aviso = await screen.findByText(CONFLICTO)
     expect(aviso.closest('[role="alert"]')).toBeInTheDocument()
     expect(screen.queryByText(MENSAJES.disponible)).not.toBeInTheDocument()
+  })
+
+  it('el aviso de disponibilidad aparece junto a las horas, antes del motivo (no al final del formulario)', async () => {
+    consultarDisponibilidad.mockResolvedValue(exito({ disponible: false, mensaje: CONFLICTO }))
+    mostrar()
+    await elegirHorario()
+    const aviso = (await screen.findByText(CONFLICTO)).closest('[role="alert"]')
+    const siguiente = Node.DOCUMENT_POSITION_FOLLOWING
+    expect(ingresar('Hora de fin').compareDocumentPosition(aviso) & siguiente).toBeTruthy()
+    expect(aviso.compareDocumentPosition(ingresar('Motivo')) & siguiente).toBeTruthy()
   })
 
   it('no consulta mientras falten datos (solo con el ambiente elegido)', async () => {

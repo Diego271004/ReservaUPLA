@@ -8,13 +8,15 @@ const FOCALIZABLES =
 
 /**
  * Confirmación antes de una acción irreversible: título, resumen, "Volver" y el botón de confirmar
- * (`variante="rechazo"` lo pinta rojo sólido). Al abrir, el foco pasa a "Volver" (la opción segura); Tab
+ * (`variante="rechazo"` lo pinta rojo sólido). `advertencia` (opcional) avisa de las consecuencias, p. ej. que no se
+ * puede deshacer. Al abrir, el foco pasa a "Volver" (la opción segura); Tab
  * no sale del cuadro; Escape equivale a "Volver"; al cerrar, el foco regresa a donde estaba.
  */
 export default function ModalConfirmacion({
   abierto,
   titulo,
   resumen = [],
+  advertencia,
   textoConfirmar,
   textoVolver = TEXTOS.volver,
   variante = 'primario',
@@ -24,6 +26,7 @@ export default function ModalConfirmacion({
 }) {
   const idTitulo = useId()
   const idResumen = useId()
+  const idAdvertencia = useId()
   const cuadroRef = useRef(null)
   const botonVolverRef = useRef(null)
 
@@ -62,7 +65,11 @@ export default function ModalConfirmacion({
         role="dialog"
         aria-modal="true"
         aria-labelledby={idTitulo}
-        aria-describedby={resumen.length > 0 ? idResumen : undefined}
+        aria-describedby={
+          [resumen.length > 0 && idResumen, advertencia && idAdvertencia]
+            .filter(Boolean)
+            .join(' ') || undefined
+        }
         className={estilos.cuadro}
         onKeyDown={alPulsarTecla}
       >
@@ -75,6 +82,11 @@ export default function ModalConfirmacion({
               <p key={linea}>{linea}</p>
             ))}
           </div>
+        )}
+        {advertencia && (
+          <p id={idAdvertencia} className={estilos.advertencia}>
+            {advertencia}
+          </p>
         )}
         <div className={estilos.acciones}>
           <button ref={botonVolverRef} type="button" className={estilos.volver} onClick={onVolver}>
