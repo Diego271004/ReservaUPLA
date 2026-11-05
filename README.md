@@ -91,6 +91,11 @@ Abre `http://localhost:5180` (puerto fijo: si estuviera ocupado, Vite avisa con 
 - **Pruebas con la base real:** `ListadoYPanelesConBaseRealTests` compara cada indicador con una consulta SQL directa (variables `RESERVAUPLA_PRUEBAS_BD_*`, ver «Pruebas»).
 - **e2e:** `npm run fase9` en `tools/e2e` (flujo completo, capturas en `docs/evidencias/fase9/`); `npm run todo` ejecuta las fases 5, 6, 7 y 9 y la ampliación de arquitectura de información. Accesibilidad de todas las pantallas: `ETAPA=fase9 node accesibilidad.mjs` en `tools/usabilidad` (`docs/evidencias/fase9-accesibilidad.txt`).
 
+### Identidad visual
+- Pase de estilos (sin cambiar textos ni comportamientos): azul marino plano, acento dorado solo como detalle, **Poppins** (títulos) y **Montserrat** (texto) autoalojadas con `@fontsource`, radios de 4 a 6 px sin sombras, logo y foto de la UPLA en el menú y el login. Detalle, antes y después y mediciones en `docs/diseno/identidad-visual.md`; capturas en `docs/evidencias/identidad/`.
+- El logo y la foto son de la Universidad Peruana Los Andes, se usan con fines académicos y no se redistribuyen. Las versiones del logo que carga la interfaz se generan con `cd tools/usabilidad && npm run imagenes` (usa `sharp`).
+- Mediciones: `ETAPA=identidad node accesibilidad.mjs` (axe, contraste, objetivos de 44 px, teclado, zoom, movimiento reducido y contraste del texto sobre la foto; escribe `docs/evidencias/identidad-accesibilidad.txt` y las capturas) y `node peso-login.mjs --antes <url> --despues <url>` (peso y tiempo de carga del login con dos versiones compiladas servidas con `vite preview`).
+
 ### Ampliación: arquitectura de información
 - `docs/usabilidad/arquitectura-de-informacion.md`: organización, etiquetado (con las incoherencias halladas y corregidas), navegación, filtros, jerarquía por pantalla, modelo mental y mapa del sitio **generado del código** (`node mapa-del-sitio.mjs --escribir` / `--verificar` en `tools/usabilidad`). Las rutas viven en `frontend/src/constants/rutas.js` y `rutas.test.jsx` comprueba menú, roles y «Sin permiso».
 - Test de árbol para ejecutar con compañeros: sección 10 de `docs/usabilidad/plan-prueba-usuarios.md` (sin resultados).

@@ -18,7 +18,7 @@
 .panel {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 2 * var(--espacio-3) - 40px);
+  min-height: calc(100vh - 2 * var(--espacio-3) - var(--alto-logo-menu) - 2 * var(--relleno-logo));
 }
 
 .cabecera {
@@ -27,12 +27,35 @@
   gap: var(--espacio-1);
   align-items: center;
   justify-content: space-between;
-  min-height: 40px;
+  min-height: calc(var(--alto-logo-menu) + 2 * var(--relleno-logo));
+}
+
+.identidad {
+  display: flex;
+  flex-wrap: wrap; /* a 188 px (zoom 200 % en un teléfono) el nombre pasa debajo del logo en vez de desbordar */
+  gap: var(--espacio-1);
+  align-items: center;
+  min-width: 0;
+}
+
+/* El logo es azul: sobre el marino plano no se vería, va en un recuadro blanco de esquinas pequeñas. */
+.logo {
+  display: inline-flex;
+  padding: var(--relleno-logo);
+  background: var(--color-superficie);
+  border-radius: var(--radio-pequeno);
+}
+
+.logo img {
+  display: block;
+  width: auto;
+  height: var(--alto-logo-menu);
 }
 
 .marca {
+  font-family: var(--fuente-titulo);
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Contenedor del botón del menú: solo se muestra en móvil. */
@@ -42,7 +65,7 @@
 
 .persona {
   padding: var(--espacio-2) 0;
-  border-bottom: 1px solid rgb(255 255 255 / 20%);
+  border-bottom: var(--grosor-linea-dorada) solid var(--color-dorado);
 }
 
 .nombre {

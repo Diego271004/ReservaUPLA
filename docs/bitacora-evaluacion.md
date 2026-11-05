@@ -199,6 +199,26 @@ Capturas nuevas en `docs/evidencias/fase-ai/` (1280 px y 375 px, `npm run faseai
 
 Excepción de método: `pruebas/mapa.test.mjs` y `pruebas/mermaid.test.mjs` se escribieron después de sus scripts; compensación: rotura deliberada del diagrama (1 de 12 falló) y de un bloque Mermaid (el validador lo reportó).
 
+## Pase de identidad visual (2026-11-04)
+
+Solo estilos, imágenes y la maquetación del login (`docs/diseno/identidad-visual.md`). Rama `feature/identidad`.
+
+### Defectos hallados y corregidos
+| # | Defecto | Cómo se encontró | Corrección | Prueba |
+|---|---|---|---|---|
+| 57 | **El encabezado del menú (logo + nombre + botón «Menú») desbordaba a 188 px** (zoom del 200 % en un teléfono): 10 de 30 combinaciones con scroll horizontal frente a 4 antes del pase. Lo introduje al añadir el logo. | `accesibilidad.mjs` con `ETAPA=identidad`, sección E. | `.identidad` con `flex-wrap: wrap` y `min-width: 0`: el nombre pasa debajo del logo. Volvió a 4 de 30 (los mismos de siempre). | `identidad.test.js` «reflujo: el logo y el nombre del menú caben a 188 px» (rojo observado antes) |
+| 58 | **La primera medición del contraste sobre la foto daba 1,00:1** en ventanas de 1366x768 y 1024x600. Error de la herramienta (no del producto): la «zona de la foto» incluía el recuadro blanco del logo. | Informe `identidad-accesibilidad.txt`, sección G. | `contraste-foto.mjs` oculta el recuadro del logo antes de medir. Peor caso real: 6,29:1. | `pruebas/contraste-foto.test.mjs` (la caja solo mira dentro de la región pedida) |
+| 59 | **Una prueba suponía una razón de contraste que yo había inventado** (11,3:1 para el blanco sobre el marino; el valor correcto, calculado a mano, es 12,07:1). Error mío al escribir la prueba de la herramienta. | La prueba falló al correrla. | Se corrigió el valor esperado, con el cálculo a mano en la prueba. | `pruebas/contraste-foto.test.mjs` |
+
+### Pruebas ajustadas (legítimo)
+- `LoginPage.test.jsx` «no tiene logotipo, notificaciones ni enlaces…» comprobaba que **no hubiera ninguna imagen**. Se entregó el logo de la universidad a propósito, así que ahora comprueba que el panel tiene **una sola** imagen, con el texto alternativo «Universidad Peruana Los Andes». La regla anterior («sin logo oficial de la UPLA») queda sustituida por esa entrega. Se añadió la prueba equivalente para el menú.
+- Ninguna otra prueba dependía de clases o estilos.
+
+### Notas
+- Se quitaron del `index.html` los enlaces a Google Fonts: las fuentes se alojan con `@fontsource`.
+- Excepción de método: `contraste-foto.mjs`, `peso-login.mjs` y `optimizar-imagenes.mjs` se probaron midiendo (no tienen pruebas automáticas propias salvo las funciones de píxeles de `contraste-foto.mjs`).
+- Las mediciones «antes» son las últimas completas de la Fase 9 (`fase9-accesibilidad.txt`) y las del peso del login (`identidad-peso-login.txt`, compilando `main`).
+
 ## Decisiones y diferencias con el diseño
 | Tema | Diseño v2 | Lo construido | Por qué |
 |---|---|---|---|

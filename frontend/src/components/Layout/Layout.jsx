@@ -4,6 +4,7 @@ import { NOMBRE_DE_ROL, MENU_POR_ROL } from '../../constants/navegacion.js'
 import { TEXTOS } from '../../constants/messages.js'
 import Button from '../ui/Button.jsx'
 import { rutaDeRegreso } from '../../utils/rutaDeRegreso.js'
+import logo from '../../assets/logo-upla-menu.webp'
 import { useAuth } from '../../context/AuthContext.jsx'
 import estilos from './Layout.module.css'
 
@@ -33,7 +34,12 @@ export default function Layout() {
     <div className={estilos.contenedor}>
       <aside className={estilos.menu}>
         <div className={estilos.cabecera}>
-          <span className={estilos.marca}>{TEXTOS.nombreProducto}</span>
+          <div className={estilos.identidad}>
+            <span className={estilos.logo}>
+              <img src={logo} width="69" height="80" alt={TEXTOS.universidad} />
+            </span>
+            <span className={estilos.marca}>{TEXTOS.nombreProducto}</span>
+          </div>
           <div className={estilos.botonMenu}>
             <Button
               variante="sobreOscuro"

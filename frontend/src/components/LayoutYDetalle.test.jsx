@@ -92,6 +92,14 @@ describe('Layout: menú por rol (hallazgo G1: un solo layout)', () => {
     expect(opcionesDelMenu()).toEqual(['Mi ambiente'])
   })
 
+  it('el menú lleva el logo de la universidad con su texto alternativo, junto al nombre del producto', () => {
+    mostrarLayout(SESIONES.administrador)
+    const logo = screen.getByRole('img', { name: 'Universidad Peruana Los Andes' })
+    expect(logo).toHaveAttribute('src', expect.stringContaining('logo-upla-menu'))
+    expect(screen.getAllByRole('img')).toHaveLength(1)
+    expect(screen.getByText('ReservaUPLA')).toBeInTheDocument()
+  })
+
   it('muestra el nombre y el rol de la persona (Responsable de ambiente)', () => {
     mostrarLayout(SESIONES.responsable, '/mi-ambiente')
     expect(screen.getByText('Mario Huamán')).toBeInTheDocument()

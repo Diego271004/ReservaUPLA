@@ -24,6 +24,7 @@
   font-weight: 700;
   color: var(--color-marino);
   text-align: left;
+  background: var(--fondo-encabezado-tabla);
   border-bottom: 1px solid var(--color-borde);
 }
 
@@ -31,7 +32,7 @@
   padding: var(--espacio-2);
   color: var(--color-texto-suave);
   overflow-wrap: break-word; /* una palabra no se parte a mitad salvo que no quepa en la tarjeta */
-  border-bottom: 1px solid var(--fondo-neutro);
+  border-bottom: 1px solid var(--color-borde);
 }
 
 .tabla tbody tr:last-child td {

@@ -33,7 +33,7 @@
   height: 24px;
   content: '';
   background: var(--color-deshabilitado);
-  border-radius: 999px;
+  border-radius: var(--radio-completo);
 }
 
 .interruptor::after {
@@ -44,7 +44,7 @@
   height: 18px;
   content: '';
   background: var(--color-superficie);
-  border-radius: 50%;
+  border-radius: var(--radio-completo);
   transition: transform 0.15s;
 }
 
