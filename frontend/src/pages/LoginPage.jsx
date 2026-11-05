@@ -7,6 +7,7 @@ import { MENSAJES, TEXTOS } from '../constants/messages.js'
 import { RUTA_INICIAL_POR_ROL } from '../constants/navegacion.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLoginForm } from '../hooks/useLoginForm.js'
+import logo from '../assets/logo-upla-login.webp'
 import estilos from './LoginPage.module.css'
 
 export default function LoginPage() {
@@ -22,6 +23,9 @@ export default function LoginPage() {
     <div className={estilos.pagina}>
       <aside className={estilos.panel}>
         <div data-testid="encabezado-panel">
+          <span className={estilos.logo}>
+            <img src={logo} width="138" height="160" alt={TEXTOS.universidad} />
+          </span>
           <p className={estilos.marca}>{TEXTOS.nombreProducto}</p>
           <p className={estilos.lema}>{TEXTOS.lemaLogin}</p>
         </div>

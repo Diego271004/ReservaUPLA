@@ -5,24 +5,48 @@
   background: var(--color-superficie);
 }
 
+/* Panel marino plano. La franja dorada (detalle, sin texto) lo separa del formulario. La foto va solo en pantallas anchas. */
 .panel {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: var(--espacio-4);
+  overflow: hidden;
   color: var(--color-sobre-oscuro);
-  background: linear-gradient(160deg, var(--color-marino), var(--color-primario));
+  background: var(--color-marino);
+  border-right: var(--ancho-franja-dorada) solid var(--color-dorado);
+}
+
+.panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Logo azul sobre un recuadro blanco de esquinas pequeñas: sobre el marino no se vería. */
+.logo {
+  display: inline-flex;
+  padding: var(--relleno-logo);
+  background: var(--color-superficie);
+  border-radius: var(--radio-pequeno);
+}
+
+.logo img {
+  display: block;
+  width: auto;
+  height: var(--alto-logo-login);
 }
 
 .marca {
-  margin: 0;
+  margin: var(--espacio-2) 0 0;
+  font-family: var(--fuente-titulo);
   font-size: 2.25rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .lema {
   max-width: 24ch;
-  margin: var(--espacio-2) 0 0;
+  margin: var(--espacio-1) 0 0;
   font-size: 1.25rem;
 }
 
@@ -57,7 +81,32 @@
   margin-top: var(--espacio-1);
 }
 
-/* Móvil: una sola columna, la marca arriba como una franja. */
+/* Foto del campus (decorativa) anclada abajo, sin estirarla más de 1,5 veces (--alto-foto-maximo); lo que sobra arriba queda marino.
+   La capa plana del marino la deja en segundo plano y garantiza el contraste del texto blanco. Móvil no la descarga. */
+@media (min-width: 768px) {
+  .panel::before,
+  .panel::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: min(100%, var(--alto-foto-maximo));
+    content: '';
+  }
+
+  .panel::before {
+    background-image: url('../assets/campus-upla.webp');
+    background-repeat: no-repeat;
+    background-position: 52% bottom;
+    background-size: cover;
+  }
+
+  .panel::after {
+    background: var(--capa-foto);
+  }
+}
+
+/* Móvil: una sola columna, una franja superior con el logo y el nombre (sin foto). */
 @media (max-width: 767px) {
   .pagina {
     grid-template-columns: minmax(0, 1fr);
@@ -66,9 +115,22 @@
 
   .panel {
     padding: var(--espacio-2);
+    border-right: 0;
+    border-bottom: var(--ancho-franja-dorada) solid var(--color-dorado);
+  }
+
+  .panel > div {
+    display: flex;
+    gap: var(--espacio-2);
+    align-items: center;
+  }
+
+  .logo img {
+    height: var(--alto-logo-login-movil);
   }
 
   .marca {
+    margin: 0;
     font-size: 1.25rem;
   }
 

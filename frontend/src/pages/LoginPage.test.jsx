@@ -58,9 +58,16 @@ describe('Login: contenido', () => {
     expect(encabezado).not.toContainElement(screen.getByText('Universidad Peruana Los Andes'))
   })
 
-  it('no tiene logotipo, notificaciones ni enlaces que no estén en el diseño', () => {
+  it('el panel lleva el logo de la universidad (único logo, con su texto alternativo) junto al nombre', () => {
     mostrar()
-    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+    const logo = screen.getByRole('img', { name: 'Universidad Peruana Los Andes' })
+    expect(screen.getAllByRole('img')).toHaveLength(1)
+    expect(screen.getByTestId('encabezado-panel')).toContainElement(logo)
+    expect(logo).toHaveAttribute('src', expect.stringContaining('logo-upla-login'))
+  })
+
+  it('no tiene notificaciones ni enlaces que no estén en el diseño', () => {
+    mostrar()
     expect(
       screen.queryByText(/notificaciones|tiempo real|términos|privacidad/i),
     ).not.toBeInTheDocument()
