@@ -7,6 +7,8 @@
 // ETAPA=despues → docs/evidencias/fase8-accesibilidad.txt (informe final) y capturas en docs/evidencias/fase8/despues/
 // ETAPA=fase9   → docs/evidencias/fase9-accesibilidad.txt y capturas en docs/evidencias/fase9/estados/ (con las pantallas de la Fase 9)
 // ETAPA=fase-ai → docs/evidencias/fase-ai-accesibilidad.txt y capturas en docs/evidencias/fase-ai/estados/ (solo las pantallas cuyos textos cambiaron en la ampliación de arquitectura de información)
+// ETAPA=identidad → docs/evidencias/identidad-accesibilidad.txt y capturas de TODAS las pantallas y estados en docs/evidencias/identidad/
+//                  (pase de identidad visual; añade la sección G: contraste del texto blanco sobre la foto del login, medido en píxeles)
 // Arranca la base, la API y el frontend por su cuenta (puertos 5263 y 5180 libres).
 import { createRequire } from 'node:module'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -14,14 +16,16 @@ import { resolve } from 'node:path'
 import { BASE, RAIZ, abrirNavegador, api, crearReservaApi, fechaRelativa, iniciarSesion, leerSesion, nuevaPagina, tokenDe } from '../e2e/lib.mjs'
 import { detenerEntorno, iniciarEntorno, reiniciarBaseYApi } from '../e2e/entorno.mjs'
 import { analizarContraste } from './contraste.mjs'
+import { medirContrasteSobreFoto } from './contraste-foto.mjs'
 import { recorrer } from './estados.mjs'
 
 const requerir = createRequire(import.meta.url)
 const RUTA_AXE = requerir.resolve('axe-core/axe.min.js')
-const ETAPA = ['antes', 'despues', 'fase9', 'fase-ai'].includes(process.env.ETAPA) ? process.env.ETAPA : 'antes'
+const ETAPA = ['antes', 'despues', 'fase9', 'fase-ai', 'identidad'].includes(process.env.ETAPA) ? process.env.ETAPA : 'antes'
 const CARPETA_DE_CAPTURAS = {
   fase9: ['fase9', 'estados'],
   'fase-ai': ['fase-ai', 'estados'],
+  identidad: ['identidad'],
   antes: ['fase8', 'antes'],
   despues: ['fase8', 'despues'],
 }
@@ -38,6 +42,7 @@ const INFORME = resolve(
     despues: 'fase8-accesibilidad.txt',
     fase9: 'fase9-accesibilidad.txt',
     'fase-ai': 'fase-ai-accesibilidad.txt',
+    identidad: 'identidad-accesibilidad.txt',
   }[ETAPA],
 )
 const ETIQUETAS_AXE = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice']
@@ -226,7 +231,7 @@ async function extras(navegador) {
 // ---------------------------------------------------------------- Informe
 const unicos = (lista) => [...new Set(lista)]
 
-function informe(contraste, extra) {
+function informe(contraste, extra, foto = null) {
   const L = []
   const rayas = '='.repeat(110)
   L.push(`ACCESIBILIDAD MEDIDA DEL SISTEMA REAL (${ETAPA.toUpperCase()}) — ${new Date().toISOString().slice(0, 10)}`)
@@ -297,6 +302,19 @@ function informe(contraste, extra) {
   }
   const aunMueve = extra.movimiento.find((m) => m.reducido).animaciones.filter((a) => a.iteraciones === 'infinitas' && a.estado === 'running')
   L.push('', `TOTAL: con la preferencia activada quedan ${aunMueve.length} animación(es) infinita(s) en marcha.`)
+
+  // ---- G) texto blanco sobre la foto del login
+  if (foto) {
+    L.push('', rayas, 'G) LOGIN: texto blanco sobre la foto del campus con su capa marina (píxel más claro bajo cada texto; mínimo 4,5:1)', rayas)
+    for (const { ventana, medidas } of foto) {
+      L.push(`  Ventana ${ventana}`)
+      for (const m of medidas) {
+        L.push(`    ${m.razon >= 4.5 ? 'OK   ' : 'FALLA'} ${m.razon.toFixed(2)}:1  ${m.nombre}  (píxel más claro rgb(${m.pixel.join(', ')}))`)
+      }
+    }
+    const peores = foto.flatMap((f) => f.medidas)
+    L.push('', `TOTAL: ${peores.filter((m) => m.razon < 4.5).length} medición(es) por debajo de 4,5:1 sobre la foto; peor caso ${Math.min(...peores.map((m) => m.razon)).toFixed(2)}:1.`)
+  }
   return L.join('\n')
 }
 
@@ -312,7 +330,8 @@ try {
   }
   console.log('\n== Zoom y movimiento reducido')
   const extra = await extras(navegador)
-  const texto = informe(analizarContraste(), extra)
+  const foto = ETAPA === 'identidad' ? await medirContrasteSobreFoto(navegador, BASE) : null
+  const texto = informe(analizarContraste(), extra, foto)
   writeFileSync(INFORME, texto + '\n', 'utf8')
   console.log(`\nInforme escrito en ${INFORME}`)
   console.log(texto.split('\n').filter((l) => l.startsWith('TOTAL')).join('\n'))
