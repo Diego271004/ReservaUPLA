@@ -16,6 +16,10 @@ export function useCarga(cargar, inicial = LISTA_VACIA) {
   const ejecutar = useCallback(async () => {
     setEstado((previo) => ({ ...previo, cargando: true, error: null }))
     const resultado = await cargar()
+    if (!resultado) {
+      setEstado({ datos: inicial, cargando: false, error: MENSAJES.errorConexion })
+      return
+    }
     if (resultado.tipo === RESULTADO.exito) {
       setEstado({ datos: resultado.data ?? inicial, cargando: false, error: null })
     } else {

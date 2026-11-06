@@ -28,8 +28,9 @@
   width: var(--espacio-3);
 }
 
+/* El selector de ambiente pide 240 px como mínimo, pero nunca más que el ancho disponible (a 188 px se salía de la pantalla). */
 .ambiente > :last-child:not(div:first-child) {
-  min-width: 240px;
+  min-width: min(240px, 100%);
 }
 
 .uso {

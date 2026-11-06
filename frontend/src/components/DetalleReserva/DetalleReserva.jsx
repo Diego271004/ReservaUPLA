@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import { TEXTOS } from '../../constants/messages.js'
 import { isoAFecha } from '../../utils/fechas.js'
+import { fechaLarga, textoDeDuracion } from '../../utils/resumenDeSolicitud.js'
 import { textoDeRegreso } from '../../utils/rutaDeRegreso.js'
 import { TIPO_INSIGNIA_DE_ESTADO } from '../../utils/reservas.js'
 import Insignia from '../ui/Insignia.jsx'
+import PageHeader from '../ui/PageHeader.jsx'
 import { Icono } from '../ui/Icono.jsx'
 import estilos from './DetalleReserva.module.css'
 
@@ -19,8 +21,13 @@ export default function DetalleReserva({
   acciones,
   volverA = '/reservas',
 }) {
+  const cuando = [
+    fechaLarga(isoAFecha(reserva.fecha)),
+    textoDeDuracion(reserva.horaInicio, reserva.horaFin),
+  ]
+    .filter(Boolean)
+    .join(' · ')
   const datos = [
-    ['Ambiente', reserva.ambienteNombre],
     ['Solicitante', reserva.solicitanteNombre],
     ['Fecha', isoAFecha(reserva.fecha)],
     ['Horario', `${reserva.horaInicio} – ${reserva.horaFin}`],
@@ -33,9 +40,17 @@ export default function DetalleReserva({
         <Icono nombre="flechaIzquierda" />
         {textoDeRegreso(volverA)}
       </Link>
-      <h1 id="titulo-detalle-reserva">{TEXTOS.tituloDetalleReserva}</h1>
+      <PageHeader titulo={TEXTOS.tituloDetalleReserva} idTitulo="titulo-detalle-reserva" />
       {alerta}
       <div className={estilos.tarjeta}>
+        <div className={estilos.hero}>
+          <div>
+            <p className={estilos.sobretitulo}>Reserva de</p>
+            <p className={estilos.ambiente}>{reserva.ambienteNombre}</p>
+            <p className={estilos.cuando}>{cuando}</p>
+          </div>
+          <Insignia tipo={TIPO_INSIGNIA_DE_ESTADO[reserva.estado]}>{reserva.estado}</Insignia>
+        </div>
         <dl className={estilos.datos}>
           {datos.map(([etiqueta, valor]) => (
             <div key={etiqueta}>
@@ -43,22 +58,36 @@ export default function DetalleReserva({
               <dd>{valor}</dd>
             </div>
           ))}
-          <div>
-            <dt>Estado</dt>
-            <dd>
-              <Insignia tipo={TIPO_INSIGNIA_DE_ESTADO[reserva.estado]}>{reserva.estado}</Insignia>
-            </dd>
-          </div>
         </dl>
         <h2>Historial</h2>
         {historial.length === 0 ? (
           <p className={estilos.sinHistorial}>Todavía no hay eventos.</p>
         ) : (
-          <ul className={estilos.historial}>
-            {historial.map((evento) => (
-              <li key={evento.id}>{evento.texto}</li>
-            ))}
-          </ul>
+          <ol className={estilos.historial} aria-label="Historial de la reserva">
+            {historial.map((evento, indice) => {
+              const esActual = indice === historial.length - 1
+              return (
+                <li
+                  key={evento.id}
+                  className={esActual ? estilos.actual : estilos.pasado}
+                  aria-current={esActual ? 'step' : undefined}
+                >
+                  <div className={estilos.eventoContenido}>
+                    <span className={estilos.eventoTexto}>{evento.texto}</span>
+                    {evento.fechaRelativa && (
+                      <time
+                        dateTime={evento.fecha}
+                        aria-label={evento.fechaAbsoluta}
+                        className={estilos.eventoFecha}
+                      >
+                        ({evento.fechaRelativa})
+                      </time>
+                    )}
+                  </div>
+                </li>
+              )
+            })}
+          </ol>
         )}
         {acciones && (
           <div className={estilos.acciones} data-testid="acciones-reserva">

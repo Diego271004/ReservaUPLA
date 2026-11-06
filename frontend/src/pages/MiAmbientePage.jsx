@@ -4,6 +4,7 @@ import GrupoDeIndicadores from '../components/GrupoDeIndicadores/GrupoDeIndicado
 import PieDeLista from '../components/PieDeLista/PieDeLista.jsx'
 import AvisoDeError from '../components/AvisoDeError/AvisoDeError.jsx'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
+import PageHeader from '../components/ui/PageHeader.jsx'
 import Button from '../components/ui/Button.jsx'
 import SelectInput from '../components/ui/SelectInput.jsx'
 import TableList from '../components/ui/TableList.jsx'
@@ -67,7 +68,7 @@ export default function MiAmbientePage() {
 
   return (
     <>
-      <h1>{TEXTOS.tituloMiAmbiente}</h1>
+      <PageHeader titulo={TEXTOS.tituloMiAmbiente} />
       {error && <AvisoDeError mensaje={error} alReintentar={recargar} />}
       {cargando && <p role="status">{TEXTOS.cargando}</p>}
       {!cargando && !error && ambiente === null && (

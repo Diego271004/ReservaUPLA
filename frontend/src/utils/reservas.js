@@ -1,5 +1,6 @@
 import { MENSAJES, TEXTOS } from '../constants/messages.js'
 import { ROLES } from '../constants/navegacion.js'
+import { tiempoRelativo } from './fechas.js'
 
 const dosDigitos = (numero) => String(numero).padStart(2, '0')
 
@@ -17,6 +18,22 @@ export function textoDeEvento({ estadoAnterior, estadoNuevo, usuarioNombre, fech
     return `Solicitud registrada por ${usuarioNombre}, ${cuando}`
   }
   return `Reserva ${estadoNuevo.toLowerCase()} por ${usuarioNombre}, ${cuando}`
+}
+
+/** Objeto enriquecido para la línea de tiempo vertical con fecha relativa y absoluta. */
+export function eventoFormateado(evento) {
+  const accion =
+    evento.estadoAnterior === null || evento.estadoAnterior === undefined
+      ? `Solicitud registrada por ${evento.usuarioNombre}`
+      : `Reserva ${evento.estadoNuevo?.toLowerCase()} por ${evento.usuarioNombre}`
+  return {
+    id: evento.id,
+    descripcion: accion,
+    fecha: evento.fecha,
+    fechaAbsoluta: fechaHoraLocal(evento.fecha),
+    fechaRelativa: tiempoRelativo(evento.fecha),
+    texto: textoDeEvento(evento),
+  }
 }
 
 const AVISO_POR_ESTADO_FINAL = {
@@ -69,3 +86,13 @@ export const TIPO_INSIGNIA_DE_ESTADO = Object.freeze({
   Rechazada: 'rechazada',
   Cancelada: 'cancelada',
 })
+
+/** La línea bajo el título de Reservas: «6 reservas · 2 pendientes» (null mientras se cuentan o si falló). */
+export function resumenDeReservas(conteos) {
+  if (!conteos) return null
+  const total = Object.values(conteos).reduce((suma, cantidad) => suma + cantidad, 0)
+  const pendientes = conteos.Pendiente ?? 0
+  const reservas = total === 1 ? '1 reserva' : `${total} reservas`
+  const pendientesTexto = pendientes === 1 ? '1 pendiente' : `${pendientes} pendientes`
+  return `${reservas} · ${pendientesTexto}`
+}

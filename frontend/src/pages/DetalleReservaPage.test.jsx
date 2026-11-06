@@ -6,6 +6,7 @@ import { RESULTADO } from '../services/llamarApi.js'
 import {
   aprobarReserva,
   cancelarReserva,
+  obtenerDisponibilidadDia,
   obtenerReserva,
   rechazarReserva,
 } from '../services/recursosService.js'
@@ -15,6 +16,7 @@ import DetalleReservaPage from './DetalleReservaPage.jsx'
 vi.mock('../services/recursosService.js', () => ({
   aprobarReserva: vi.fn(),
   cancelarReserva: vi.fn(),
+  obtenerDisponibilidadDia: vi.fn(),
   obtenerReserva: vi.fn(),
   rechazarReserva: vi.fn(),
 }))
@@ -223,11 +225,11 @@ describe('Detalle de reserva: acciones según el rol y el estado (RN-05 y RN-06)
     sinBoton('Cancelar solicitud')
   })
 
-  it('"Volver a Reservas" es el enlace de regreso', async () => {
+  it('"Volver a Inicio" es el enlace de regreso sin origen', async () => {
     mostrar()
-    expect(await screen.findByRole('link', { name: 'Volver a Reservas' })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: 'Volver a Inicio' })).toHaveAttribute(
       'href',
-      '/reservas',
+      '/dashboard',
     )
   })
 })
@@ -248,11 +250,11 @@ describe('Detalle de la reserva para la Responsable: solo lectura', () => {
     )
   })
 
-  it('sin origen vuelve a Mi ambiente, no a una lista que su menú no tiene', async () => {
+  it('sin origen vuelve a Inicio, el retorno único de cada rol', async () => {
     mostrarComoResponsable()
-    expect(await screen.findByRole('link', { name: 'Volver a Mi ambiente' })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: 'Volver a Inicio' })).toHaveAttribute(
       'href',
-      '/mi-ambiente',
+      '/dashboard',
     )
     expect(screen.queryByRole('link', { name: 'Volver a Reservas' })).not.toBeInTheDocument()
   })
@@ -469,16 +471,16 @@ describe('Detalle de reserva: modales y acciones', () => {
     expect(screen.queryByText(TEXTOS.advertenciaIrreversible)).not.toBeInTheDocument()
   })
 
-  it('un mensaje de éxito anterior desaparece al empezar otra acción', async () => {
+  it('el éxito se muestra como un aviso que se puede cerrar, sin dejar una alerta fija en la pantalla', async () => {
     aprobarReserva.mockResolvedValue(exito(detalle('Aprobada')))
-    cancelarReserva.mockReturnValue(pendiente())
     mostrar()
     await screen.findByText('Laboratorio de Cómputo 2')
     await userEvent.click(boton('Aprobar'))
     await userEvent.click(boton('Sí, aprobar'))
-    await screen.findByText('Reserva aprobada.')
-    await userEvent.click(boton('Cancelar reserva'))
-    await userEvent.click(boton('Sí, cancelar reserva'))
+    const aviso = (await screen.findByText('Reserva aprobada.')).closest('[role="status"]')
+    expect(aviso).not.toBeNull()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    await userEvent.click(within(aviso).getByRole('button', { name: 'Cerrar aviso' }))
     await waitFor(() => expect(screen.queryByText('Reserva aprobada.')).not.toBeInTheDocument())
   })
 })
@@ -500,5 +502,116 @@ describe('Detalle de reserva: solo con teclado', () => {
     await userEvent.keyboard('{Enter}')
     expect(await screen.findByText('Reserva aprobada.')).toBeInTheDocument()
     expect(aprobarReserva).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('Detalle de reserva: encabezado y línea de tiempo', () => {
+  it('el encabezado dice el ambiente, cuándo (en letras y con la duración) y el estado', async () => {
+    mostrar()
+    expect(await screen.findByText('jueves, 5 de noviembre de 2026 · 2 h')).toBeInTheDocument()
+    expect(screen.getByText('Reserva de')).toBeInTheDocument()
+    expect(screen.getAllByText('Laboratorio de Cómputo 2')).toHaveLength(1)
+    expect(screen.getAllByText('Pendiente').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('el estado aparece una sola vez como insignia, en el encabezado', async () => {
+    obtenerReserva.mockResolvedValue(exito(detalle('Aprobada')))
+    mostrar()
+    await screen.findByText('Reserva de')
+    expect(screen.queryByRole('term', { name: 'Estado' })).not.toBeInTheDocument()
+    expect(screen.getAllByText('Aprobada')).toHaveLength(1)
+  })
+
+  it('el historial es una lista ordenada con nombre y marca el último evento como el actual', async () => {
+    obtenerReserva.mockResolvedValue(
+      exito(
+        detalle('Aprobada', [
+          {
+            id: 2,
+            estadoAnterior: 'Pendiente',
+            estadoNuevo: 'Aprobada',
+            usuarioNombre: 'Carla Rojas',
+            fecha: FECHA_EVENTO,
+          },
+        ]),
+      ),
+    )
+    mostrar()
+    const lista = await screen.findByRole('list', { name: 'Historial de la reserva' })
+    expect(lista.tagName).toBe('OL')
+    const eventos = within(lista).getAllByRole('listitem')
+    expect(eventos).toHaveLength(2)
+    expect(eventos[0]).not.toHaveAttribute('aria-current')
+    expect(eventos[1]).toHaveAttribute('aria-current', 'step')
+    expect(eventos[1]).toHaveTextContent('Carla Rojas')
+  })
+
+  it('con un solo evento ese evento es el actual', async () => {
+    mostrar()
+    const lista = await screen.findByRole('list', { name: 'Historial de la reserva' })
+    expect(within(lista).getByRole('listitem')).toHaveAttribute('aria-current', 'step')
+  })
+
+  it('si aprobar causaría choque con otra aprobada, muestra la tarjeta de conflicto y deshabilita Aprobar', async () => {
+    obtenerDisponibilidadDia.mockResolvedValue(
+      exito({
+        fecha: '2026-11-05',
+        ambientes: [
+          {
+            id: 1,
+            bloques: [
+              {
+                id: 12,
+                horaInicio: '10:00',
+                horaFin: '12:00',
+                estado: 'Aprobada',
+              },
+            ],
+          },
+        ],
+      }),
+    )
+
+    mostrar(SESIONES.administrador)
+    await screen.findByRole('heading', { name: 'Detalle de la reserva' })
+
+    const alertaConflicto = await screen.findByRole('alert')
+    expect(alertaConflicto).toHaveTextContent('Se cruza con la reserva #12 de 10:00 a 12:00.')
+    expect(within(alertaConflicto).getByRole('link', { name: 'Ver reserva #12' })).toHaveAttribute(
+      'href',
+      '/reservas/12',
+    )
+
+    const botonAprobar = screen.getByRole('button', { name: 'Aprobar' })
+    expect(botonAprobar).toBeDisabled()
+  })
+
+  it('si el backend responde 409 al aprobar (conflicto concurrente), muestra el mensaje de error y no se rompe', async () => {
+    obtenerDisponibilidadDia.mockResolvedValue(
+      exito({
+        fecha: '2026-11-05',
+        ambientes: [{ id: 1, bloques: [] }],
+      }),
+    )
+    aprobarReserva.mockResolvedValue({
+      tipo: RESULTADO.conflicto,
+      mensaje: 'Ya existe una reserva aprobada en ese horario.',
+    })
+
+    mostrar(SESIONES.administrador)
+    await screen.findByRole('heading', { name: 'Detalle de la reserva' })
+
+    const botonAprobar = screen.getByRole('button', { name: 'Aprobar' })
+    await userEvent.click(botonAprobar)
+
+    const modal = screen.getByRole('dialog', { name: '¿Aprobar esta reserva?' })
+    await userEvent.click(within(modal).getByRole('button', { name: 'Sí, aprobar' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Ya existe una reserva aprobada en ese horario.',
+    )
+    expect(
+      screen.getByRole('heading', { name: 'Detalle de la reserva' }),
+    ).toBeInTheDocument()
   })
 })

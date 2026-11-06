@@ -3,11 +3,16 @@ import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MENSAJES, TEXTOS } from '../constants/messages.js'
 import { RESULTADO } from '../services/llamarApi.js'
-import { listarAmbientes, listarReservas } from '../services/recursosService.js'
+import {
+  contarReservasPorEstado,
+  listarAmbientes,
+  listarReservas,
+} from '../services/recursosService.js'
 import { SESIONES, renderEnRuta } from '../test/utils.jsx'
 import ReservasPage from './ReservasPage.jsx'
 
 vi.mock('../services/recursosService.js', () => ({
+  contarReservasPorEstado: vi.fn(),
   listarAmbientes: vi.fn(),
   listarReservas: vi.fn(),
 }))
@@ -35,6 +40,8 @@ const pagina = (elementos, total = elementos.length, numero = 1) => ({
   tamano: 10,
 })
 
+const CONTEOS = { Pendiente: 6, Aprobada: 3, Rechazada: 2, Cancelada: 2 }
+
 const AMBIENTES = [
   { id: 1, nombre: 'Laboratorio de Cómputo 2' },
   { id: 2, nombre: 'Auditorio Principal' },
@@ -45,10 +52,12 @@ const mostrar = (ruta = '/reservas', sesion = SESIONES.administrador) =>
 
 const ultimaConsulta = () => listarReservas.mock.calls.at(-1)[0]
 const control = (etiqueta) => screen.getByLabelText(etiqueta, { exact: true })
+const pestana = (nombre) => screen.getByRole('tab', { name: nombre })
 
 beforeEach(() => {
   vi.resetAllMocks()
   listarAmbientes.mockResolvedValue(exito(AMBIENTES))
+  contarReservasPorEstado.mockResolvedValue(exito(CONTEOS))
   listarReservas.mockResolvedValue(exito(pagina([reserva(7), reserva(8, { estado: 'Aprobada' })])))
 })
 
@@ -107,14 +116,12 @@ describe('Reservas: la lista', () => {
 })
 
 describe('Reservas: los filtros', () => {
-  it('muestra Estado, Ambiente, Fecha desde y Fecha hasta, con «Todos» y los ambientes de la API', async () => {
+  it('muestra Ambiente, Fecha desde y Fecha hasta, con «Todos» y los ambientes de la API (el estado lo eligen las pestañas)', async () => {
     mostrar()
     await screen.findByRole('table')
-    expect(control('Estado')).toHaveValue('')
-    expect(within(control('Estado')).getByRole('option', { name: 'Todos' })).toBeInTheDocument()
-    for (const estado of ['Pendiente', 'Aprobada', 'Rechazada', 'Cancelada']) {
-      expect(within(control('Estado')).getByRole('option', { name: estado })).toBeInTheDocument()
-    }
+    expect(screen.queryByRole('combobox', { name: 'Estado' })).not.toBeInTheDocument()
+    expect(control('Ambiente')).toHaveValue('')
+    expect(within(control('Ambiente')).getByRole('option', { name: 'Todos' })).toBeInTheDocument()
     expect(
       await within(control('Ambiente')).findByRole('option', { name: 'Auditorio Principal' }),
     ).toBeInTheDocument()
@@ -138,14 +145,13 @@ describe('Reservas: los filtros', () => {
     mostrar()
     await screen.findByRole('table')
     await within(control('Ambiente')).findByRole('option', { name: 'Auditorio Principal' })
-    await userEvent.selectOptions(control('Estado'), 'Aprobada')
     await userEvent.selectOptions(control('Ambiente'), 'Auditorio Principal')
     await userEvent.type(control('Fecha desde'), '05112026')
     await userEvent.type(control('Fecha hasta'), '30112026')
     await userEvent.click(screen.getByRole('button', { name: 'Aplicar filtros' }))
     await waitFor(() =>
       expect(ultimaConsulta()).toEqual({
-        estado: 'Aprobada',
+        estado: '',
         ambienteId: '2',
         desde: '05/11/2026',
         hasta: '30/11/2026',
@@ -164,8 +170,9 @@ describe('Reservas: los filtros', () => {
   it('lo que se escribe no consulta hasta aplicar', async () => {
     mostrar()
     await screen.findByRole('table')
+    await within(control('Ambiente')).findByRole('option', { name: 'Auditorio Principal' })
     const antes = listarReservas.mock.calls.length
-    await userEvent.selectOptions(control('Estado'), 'Rechazada')
+    await userEvent.selectOptions(control('Ambiente'), 'Auditorio Principal')
     expect(listarReservas.mock.calls).toHaveLength(antes)
   })
 
@@ -202,7 +209,7 @@ describe('Reservas: los filtros', () => {
   it('«Limpiar» borra los filtros y vuelve a consultar sin ellos', async () => {
     mostrar('/reservas?estado=Pendiente&desde=2026-11-05')
     await screen.findByRole('table')
-    expect(control('Estado')).toHaveValue('Pendiente')
+    expect(pestana(/Pendientes/)).toHaveAttribute('aria-selected', 'true')
     expect(control('Fecha desde')).toHaveValue('05/11/2026')
     await userEvent.click(screen.getByRole('button', { name: 'Limpiar' }))
     await waitFor(() =>
@@ -214,7 +221,7 @@ describe('Reservas: los filtros', () => {
         pagina: 1,
       }),
     )
-    expect(control('Estado')).toHaveValue('')
+    expect(pestana(/Todas/)).toHaveAttribute('aria-selected', 'true')
     expect(control('Fecha desde')).toHaveValue('')
   })
 
@@ -222,7 +229,7 @@ describe('Reservas: los filtros', () => {
     mostrar('/reservas?estado=Pendiente')
     await screen.findByRole('table')
     expect(ultimaConsulta().estado).toBe('Pendiente')
-    expect(control('Estado')).toHaveValue('Pendiente')
+    expect(pestana(/Pendientes/)).toHaveAttribute('aria-selected', 'true')
   })
 })
 
@@ -235,7 +242,7 @@ describe('Reservas: filtros plegables en móvil', () => {
     await screen.findByRole('table')
     expect(botonFiltros()).toHaveTextContent(/^Filtros$/)
     expect(botonFiltros()).toHaveAttribute('aria-expanded', 'false')
-    expect(panel()).toContainElement(control('Estado'))
+    expect(panel()).toContainElement(control('Ambiente'))
     expect(panel().className).toMatch(/cerrado/)
   })
 
@@ -252,9 +259,9 @@ describe('Reservas: filtros plegables en móvil', () => {
 
   it.each([
     ['', 'Filtros'],
-    ['?estado=Pendiente', 'Filtros (1)'],
-    ['?estado=Pendiente&desde=2026-11-05', 'Filtros (2)'],
-    ['?estado=Pendiente&ambienteId=1&desde=2026-11-05&hasta=2026-11-30', 'Filtros (4)'],
+    ['?estado=Pendiente', 'Filtros'],
+    ['?estado=Pendiente&desde=2026-11-05', 'Filtros (1)'],
+    ['?estado=Pendiente&ambienteId=1&desde=2026-11-05&hasta=2026-11-30', 'Filtros (3)'],
   ])(
     'con la dirección %j el botón dice «%s» (cuenta solo los filtros aplicados)',
     async (consulta, texto) => {
@@ -268,7 +275,8 @@ describe('Reservas: filtros plegables en móvil', () => {
     mostrar()
     await screen.findByRole('table')
     await userEvent.click(botonFiltros())
-    await userEvent.selectOptions(control('Estado'), 'Aprobada')
+    await within(control('Ambiente')).findByRole('option', { name: 'Auditorio Principal' })
+    await userEvent.selectOptions(control('Ambiente'), 'Auditorio Principal')
     expect(botonFiltros()).toHaveAccessibleName('Filtros')
   })
 
@@ -276,7 +284,8 @@ describe('Reservas: filtros plegables en móvil', () => {
     mostrar()
     await screen.findByRole('table')
     await userEvent.click(botonFiltros())
-    await userEvent.selectOptions(control('Estado'), 'Aprobada')
+    await within(control('Ambiente')).findByRole('option', { name: 'Auditorio Principal' })
+    await userEvent.selectOptions(control('Ambiente'), 'Auditorio Principal')
     await userEvent.click(screen.getByRole('button', { name: 'Aplicar filtros' }))
     await waitFor(() => expect(botonFiltros()).toHaveAccessibleName('Filtros (1)'))
     expect(botonFiltros()).toHaveAttribute('aria-expanded', 'false')
@@ -295,6 +304,8 @@ describe('Reservas: filtros plegables en móvil', () => {
   it('solo con teclado: Tab llega al botón antes que a los campos y Enter y Espacio lo alternan', async () => {
     mostrar()
     await screen.findByRole('table')
+    await userEvent.tab() // «Reservar un ambiente» (cabecera)
+    await userEvent.tab() // la pestaña activa
     await userEvent.tab()
     expect(botonFiltros()).toHaveFocus()
     await userEvent.keyboard('{Enter}')
@@ -367,12 +378,13 @@ describe('Reservas: estados vacío y de error', () => {
 })
 
 describe('Reservas: solo con teclado', () => {
-  it('Tab recorre Estado, Ambiente, las dos fechas, Limpiar, Aplicar filtros y luego «Ver detalle»', async () => {
+  it('Tab recorre «Reservar un ambiente», la pestaña activa, Filtros, Ambiente, las dos fechas, Limpiar, Aplicar filtros y luego «Ver detalle»', async () => {
     mostrar()
     await screen.findByRole('table')
     const orden = [
+      screen.getByRole('button', { name: 'Reservar un ambiente' }),
+      pestana(/Todas/),
       screen.getByRole('button', { name: /^Filtros/ }),
-      control('Estado'),
       control('Ambiente'),
       control('Fecha desde'),
       control('Fecha hasta'),
@@ -392,5 +404,147 @@ describe('Reservas: solo con teclado', () => {
     boton.focus()
     await userEvent.keyboard('{Enter}')
     expect(screen.getByTestId('ubicacion')).toHaveTextContent('/reservas/7')
+  })
+})
+
+describe('Reservas: pestañas por estado', () => {
+  it('hay cinco pestañas con su número: Todas es la suma de los estados', async () => {
+    mostrar()
+    await screen.findByRole('table')
+    const lista = screen.getByRole('tablist', { name: 'Estado' })
+    const nombres = within(lista)
+      .getAllByRole('tab')
+      .map((tab) => tab.textContent)
+    await waitFor(() =>
+      expect(
+        within(lista)
+          .getAllByRole('tab')
+          .map((tab) => tab.textContent),
+      ).toEqual(['Todas13', 'Pendientes6', 'Aprobadas3', 'Rechazadas2', 'Canceladas2']),
+    )
+    expect(nombres).toHaveLength(5)
+    expect(contarReservasPorEstado).toHaveBeenCalledWith(
+      expect.objectContaining({ ambienteId: '', desde: '', hasta: '' }),
+    )
+  })
+
+  it('mientras se cuentan muestra «…» en lugar de un número falso', async () => {
+    contarReservasPorEstado.mockReturnValue(new Promise(() => {}))
+    mostrar()
+    await screen.findByRole('table')
+    expect(pestana(/Pendientes/)).toHaveTextContent('Pendientes…')
+  })
+
+  it('el subtítulo resume el total y las pendientes: «13 reservas · 6 pendientes»', async () => {
+    mostrar()
+    expect(await screen.findByText('13 reservas · 6 pendientes')).toBeInTheDocument()
+  })
+
+  it('con una sola reserva y una pendiente el subtítulo va en singular', async () => {
+    contarReservasPorEstado.mockResolvedValue(
+      exito({ Pendiente: 1, Aprobada: 0, Rechazada: 0, Cancelada: 0 }),
+    )
+    mostrar()
+    expect(await screen.findByText('1 reserva · 1 pendiente')).toBeInTheDocument()
+  })
+
+  it('la pestaña de la dirección está seleccionada y las demás no', async () => {
+    mostrar('/reservas?estado=Aprobada')
+    await screen.findByRole('table')
+    expect(pestana(/Aprobadas/)).toHaveAttribute('aria-selected', 'true')
+    expect(pestana(/Todas/)).toHaveAttribute('aria-selected', 'false')
+    expect(pestana(/Aprobadas/)).toHaveAttribute('tabindex', '0')
+    expect(pestana(/Todas/)).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('elegir una pestaña consulta ese estado, vuelve a la página 1 y conserva los demás filtros', async () => {
+    mostrar('/reservas?ambienteId=1&pagina=3')
+    await screen.findByRole('table')
+    await userEvent.click(pestana(/Rechazadas/))
+    await waitFor(() =>
+      expect(ultimaConsulta()).toMatchObject({ estado: 'Rechazada', ambienteId: '1', pagina: 1 }),
+    )
+    expect(pestana(/Rechazadas/)).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('los números no cambian con el estado elegido: se cuentan con los demás filtros', async () => {
+    mostrar('/reservas?estado=Aprobada&ambienteId=2')
+    await screen.findByRole('table')
+    expect(contarReservasPorEstado).toHaveBeenLastCalledWith(
+      expect.objectContaining({ estado: '', ambienteId: '2' }),
+    )
+  })
+
+  it('las flechas mueven y activan la pestaña; Fin y Inicio saltan a los extremos', async () => {
+    mostrar()
+    await screen.findByRole('table')
+    pestana(/Todas/).focus()
+    await userEvent.keyboard('{ArrowRight}')
+    expect(pestana(/Pendientes/)).toHaveFocus()
+    await waitFor(() => expect(ultimaConsulta().estado).toBe('Pendiente'))
+    await userEvent.keyboard('{End}')
+    expect(pestana(/Canceladas/)).toHaveFocus()
+    await waitFor(() => expect(ultimaConsulta().estado).toBe('Cancelada'))
+    await userEvent.keyboard('{ArrowRight}')
+    expect(pestana(/Todas/)).toHaveFocus()
+    await userEvent.keyboard('{ArrowLeft}')
+    expect(pestana(/Canceladas/)).toHaveFocus()
+    await userEvent.keyboard('{Home}')
+    expect(pestana(/Todas/)).toHaveFocus()
+  })
+
+  it('el resultado queda dentro del panel de las pestañas (aria-controls)', async () => {
+    mostrar()
+    const tabla = await screen.findByRole('table')
+    const panel = screen.getByRole('tabpanel')
+    expect(pestana(/Todas/)).toHaveAttribute('aria-controls', panel.id)
+    expect(panel).toContainElement(tabla)
+  })
+
+  it('si falla el conteo, las pestañas siguen sirviendo y muestran «…»', async () => {
+    contarReservasPorEstado.mockResolvedValue({ tipo: RESULTADO.errorServidor })
+    mostrar()
+    await screen.findByRole('table')
+    expect(pestana(/Pendientes/)).toHaveTextContent('Pendientes…')
+    await userEvent.click(pestana(/Pendientes/))
+    await waitFor(() => expect(ultimaConsulta().estado).toBe('Pendiente'))
+  })
+})
+
+describe('Reservas: cabecera, fila y estado vacío', () => {
+  it('el Administrador y la Solicitante tienen «Reservar un ambiente» en la cabecera; lleva a Nueva reserva', async () => {
+    mostrar()
+    await screen.findByRole('table')
+    await userEvent.click(screen.getByRole('button', { name: 'Reservar un ambiente' }))
+    expect(screen.getByTestId('ubicacion')).toHaveTextContent('/reservas/nueva')
+  })
+
+  it('la Solicitante también lo tiene', async () => {
+    mostrar('/reservas', SESIONES.solicitante)
+    await screen.findByRole('table')
+    expect(screen.getByRole('button', { name: 'Reservar un ambiente' })).toBeInTheDocument()
+  })
+
+  it('un clic en cualquier parte de la fila abre la reserva y recuerda la lista', async () => {
+    mostrar('/reservas?estado=Pendiente')
+    const tabla = await screen.findByRole('table')
+    await userEvent.click(within(tabla).getAllByText('Ana Torres')[0])
+    expect(screen.getByTestId('ubicacion')).toHaveTextContent('/reservas/7')
+  })
+
+  it('el clic en el botón de la fila abre la reserva una sola vez', async () => {
+    mostrar()
+    const boton = (await screen.findAllByRole('button', { name: /Ver detalle/ }))[0]
+    await userEvent.click(boton)
+    expect(screen.getByTestId('ubicacion')).toHaveTextContent('/reservas/7')
+  })
+
+  it('el estado vacío trae una ilustración decorativa y un siguiente paso: reservar', async () => {
+    listarReservas.mockResolvedValue(exito(pagina([])))
+    mostrar()
+    const tabla = await screen.findByRole('table')
+    expect(tabla.querySelector('svg[aria-hidden="true"]')).toBeInTheDocument()
+    await userEvent.click(within(tabla).getByRole('button', { name: 'Reservar un ambiente' }))
+    expect(screen.getByTestId('ubicacion')).toHaveTextContent('/reservas/nueva')
   })
 })

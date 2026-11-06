@@ -1,13 +1,24 @@
 .filtros {
-  padding: var(--espacio-3);
+  padding: var(--espacio-2) var(--espacio-3) 0;
   margin-bottom: var(--espacio-3);
   background: var(--color-superficie);
-  border-radius: var(--radio);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--elevacion-tarjeta);
+}
+
+/* En escritorio los filtros forman una sola barra: los campos y, a su derecha, «Limpiar» y «Aplicar filtros». */
+.panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--espacio-3);
+  align-items: flex-end;
 }
 
 .campos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  flex: 1 1 520px;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
   gap: 0 var(--espacio-2); /* cada campo ya trae su margen inferior */
 }
 
@@ -15,6 +26,7 @@
   display: flex;
   gap: var(--espacio-1);
   justify-content: flex-end;
+  margin-bottom: var(--espacio-3);
 }
 
 /* El botón «Filtros» solo existe en móvil: en escritorio los filtros siempre están a la vista. */
@@ -34,6 +46,14 @@
 
   .cerrado {
     display: none;
+  }
+
+  .panel {
+    display: block;
+  }
+
+  .acciones {
+    margin-bottom: var(--espacio-2);
   }
 
   .acciones {

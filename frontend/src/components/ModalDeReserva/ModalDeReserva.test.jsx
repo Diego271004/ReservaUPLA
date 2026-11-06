@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -17,6 +18,96 @@ describe('ModalDeReserva', () => {
       <ModalDeReserva accion={null} reserva={null} alConfirmar={() => {}} alVolver={() => {}} />,
     )
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('foco atrapado: Tab cicla dentro del modal', async () => {
+    render(
+      <div>
+        <button type="button">Afuera</button>
+        <ModalDeReserva
+          accion="aprobar"
+          reserva={reserva}
+          alConfirmar={() => {}}
+          alVolver={() => {}}
+        />
+      </div>,
+    )
+    const volver = screen.getByRole('button', { name: 'Volver' })
+    const confirmar = screen.getByRole('button', { name: 'Sí, aprobar' })
+
+    expect(volver).toHaveFocus()
+    await userEvent.tab()
+    expect(confirmar).toHaveFocus()
+    await userEvent.tab()
+    expect(volver).toHaveFocus()
+    await userEvent.tab({ shift: true })
+    expect(confirmar).toHaveFocus()
+  })
+
+  it('tecla Esc cierra el modal y regresa el foco al elemento que abrió', async () => {
+    const alVolver = vi.fn()
+    function Contenedor() {
+      const [abierto, setAbierto] = useState(false)
+      return (
+        <div>
+          <button type="button" onClick={() => setAbierto(true)}>
+            Abrir modal
+          </button>
+          {abierto && (
+            <ModalDeReserva
+              accion="rechazar"
+              reserva={reserva}
+              alConfirmar={() => {}}
+              alVolver={() => {
+                alVolver()
+                setAbierto(false)
+              }}
+            />
+          )}
+        </div>
+      )
+    }
+    render(<Contenedor />)
+    const botonAbrir = screen.getByRole('button', { name: 'Abrir modal' })
+    await userEvent.click(botonAbrir)
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    await userEvent.keyboard('{Escape}')
+    expect(alVolver).toHaveBeenCalledTimes(1)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(botonAbrir).toHaveFocus()
+  })
+
+  it('el botón principal lleva el verbo exacto según la acción', () => {
+    const { rerender } = render(
+      <ModalDeReserva
+        accion="aprobar"
+        reserva={reserva}
+        alConfirmar={() => {}}
+        alVolver={() => {}}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Sí, aprobar' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Volver' })).toBeInTheDocument()
+
+    rerender(
+      <ModalDeReserva
+        accion="rechazar"
+        reserva={reserva}
+        alConfirmar={() => {}}
+        alVolver={() => {}}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Sí, rechazar' })).toBeInTheDocument()
+
+    rerender(
+      <ModalDeReserva
+        accion="cancelar"
+        reserva={reserva}
+        alConfirmar={() => {}}
+        alVolver={() => {}}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Sí, cancelar reserva' })).toBeInTheDocument()
   })
 
   it.each([

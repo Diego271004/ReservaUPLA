@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MENSAJES, TEXTOS } from '../constants/messages.js'
@@ -47,18 +47,38 @@ const panel = ({
 
 const mostrar = () =>
   renderEnRuta(<DashboardPage />, { ruta: '/dashboard', sesionInicial: SESIONES.administrador })
-const fila = (numero) => within(screen.getByRole('table')).getAllByRole('row')[numero]
+const tarjetasDecision = () =>
+  screen
+    .getAllByRole('article')
+    .filter(
+      (elemento) =>
+        elemento.textContent.includes('Ana Torres') || elemento.textContent.includes('Luis Quispe'),
+    )
 
 beforeEach(() => {
   vi.resetAllMocks()
   obtenerDashboard.mockResolvedValue(exito(panel()))
 })
 
+describe('Dashboard: saludo contextual', () => {
+  afterEach(() => vi.useRealTimers())
+
+  it.each([
+    ['2026-11-04T13:00:00Z', 'Buenos días, Carla'],
+    ['2026-11-04T19:00:00Z', 'Buenas tardes, Carla'],
+    ['2026-11-05T02:00:00Z', 'Buenas noches, Carla'],
+  ])('a las %s dice «%s»', async (instante, saludo) => {
+    vi.useFakeTimers({ toFake: ['Date'], now: new Date(instante) })
+    mostrar()
+    expect(await screen.findByText(saludo)).toBeInTheDocument()
+  })
+})
+
 describe('Dashboard: indicadores', () => {
   it('muestra el título y mientras carga «Cargando…»', () => {
     obtenerDashboard.mockReturnValue(new Promise(() => {}))
     mostrar()
-    expect(screen.getByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Inicio' })).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(TEXTOS.cargando)
   })
 
@@ -110,15 +130,16 @@ describe('Dashboard: indicadores', () => {
 })
 
 describe('Dashboard: pendientes', () => {
-  it('lista las pendientes con Ver detalle, Rechazar y Aprobar en cada fila', async () => {
+  it('lista las pendientes como tarjetas con Ver detalle, Rechazar y Aprobar', async () => {
     mostrar()
-    await screen.findByRole('table', { name: TEXTOS.solicitudesPendientes })
-    expect(within(fila(1)).getByText('05/11/2026')).toBeInTheDocument()
-    expect(within(fila(1)).getByText('Ana Torres')).toBeInTheDocument()
-    expect(within(fila(1)).getByRole('button', { name: /Ver detalle/ })).toBeInTheDocument()
-    expect(within(fila(1)).getByRole('button', { name: /Rechazar/ })).toBeInTheDocument()
-    expect(within(fila(1)).getByRole('button', { name: /Aprobar/ })).toBeInTheDocument()
-    expect(within(fila(2)).getByText('Luis Quispe')).toBeInTheDocument()
+    await screen.findByRole('heading', { name: TEXTOS.requierenDecision })
+    const tarjetas = tarjetasDecision()
+    expect(tarjetas).toHaveLength(2)
+    expect(within(tarjetas[0]).getByText('05/11/2026')).toBeInTheDocument()
+    expect(within(tarjetas[0]).getByText('Ana Torres')).toBeInTheDocument()
+    expect(within(tarjetas[0]).getByRole('button', { name: /Ver detalle/ })).toBeInTheDocument()
+    expect(within(tarjetas[0]).getByRole('button', { name: /Rechazar/ })).toBeInTheDocument()
+    expect(within(tarjetas[0]).getByRole('button', { name: /Aprobar/ })).toBeInTheDocument()
   })
 
   it('«Mostrando 5 de 7» y «Ver todas las pendientes» lleva a Reservas con el filtro Pendiente', async () => {
@@ -223,9 +244,7 @@ describe('Dashboard: aprobar y rechazar con el modal', () => {
     expect(aprobarReserva).toHaveBeenCalledWith(7)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     await waitFor(() => expect(obtenerDashboard).toHaveBeenCalledTimes(2))
-    await waitFor(() =>
-      expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(2),
-    )
+    await waitFor(() => expect(tarjetasDecision()).toHaveLength(1))
   })
 
   it('confirmar rechazar: llama a rechazarReserva y muestra «Reserva rechazada.»', async () => {
@@ -268,17 +287,18 @@ describe('Dashboard: aprobar y rechazar con el modal', () => {
 })
 
 describe('Dashboard: solo con teclado', () => {
-  it('Tab llega a Ver detalle, Rechazar y Aprobar de la primera fila; Enter abre el modal, Tab cicla dentro y Escape lo cierra', async () => {
+  it('Tab llega a Rechazar, Aprobar y Ver detalle de la primera tarjeta; Enter abre el modal, Tab cicla dentro y Escape lo cierra', async () => {
     mostrar()
-    await screen.findByRole('table')
-    const botones = within(fila(1)).getAllByRole('button')
+    await screen.findByRole('heading', { name: TEXTOS.requierenDecision })
+    const botones = within(tarjetasDecision()[0]).getAllByRole('button')
     for (const boton of botones) {
       await userEvent.tab()
       // los enlaces y botones anteriores de la página no cambian el orden: se recorre hasta llegar
       while (document.activeElement !== boton) await userEvent.tab()
       expect(boton).toHaveFocus()
     }
-    expect(botones.map((b) => b.textContent)).toEqual(['Ver detalle', 'Rechazar', 'Aprobar'])
+    expect(botones.map((b) => b.textContent)).toEqual(['Rechazar', 'Aprobar', 'Ver detalle'])
+    botones[1].focus()
     await userEvent.keyboard('{Enter}')
     const modal = screen.getByRole('dialog')
     expect(within(modal).getByRole('button', { name: 'Volver' })).toHaveFocus()
@@ -288,5 +308,150 @@ describe('Dashboard: solo con teclado', () => {
     expect(within(modal).getByRole('button', { name: 'Volver' })).toHaveFocus()
     await userEvent.keyboard('{Escape}')
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+})
+
+describe('Dashboard por rol', () => {
+  it('Solicitante muestra su próxima reserva y resumen de estados con enlaces', async () => {
+    obtenerDashboard.mockResolvedValue(
+      exito({
+        ...panel(),
+        inicioSolicitante: {
+          proximaReserva: pendiente(21, {
+            estado: 'Aprobada',
+            ambienteNombre: 'Auditorio Principal',
+          }),
+          solicitudes: [pendiente(21, { estado: 'Aprobada' })],
+          resumenPorEstado: [
+            { estado: 'Pendiente', total: 1 },
+            { estado: 'Aprobada', total: 2 },
+          ],
+        },
+      }),
+    )
+    renderEnRuta(<DashboardPage />, { ruta: '/dashboard', sesionInicial: SESIONES.solicitante })
+    expect(await screen.findByRole('heading', { name: 'Tu próxima reserva' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Cancelar reserva/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Ver solicitudes aprobada: 2/i })).toBeInTheDocument()
+  })
+
+  it('Solicitante vacío ofrece reservar un ambiente', async () => {
+    obtenerDashboard.mockResolvedValue(
+      exito({
+        ...panel(),
+        inicioSolicitante: { proximaReserva: null, solicitudes: [], resumenPorEstado: [] },
+      }),
+    )
+    renderEnRuta(<DashboardPage />, { ruta: '/dashboard', sesionInicial: SESIONES.solicitante })
+    expect(await screen.findByText('No tienes una próxima reserva.')).toBeInTheDocument()
+    expect(
+      screen.getAllByRole('button', { name: 'Reservar un ambiente' }).length,
+    ).toBeGreaterThanOrEqual(2)
+  })
+
+  it('Responsable muestra agenda de hoy y próximas reservas', async () => {
+    obtenerDashboard.mockResolvedValue(
+      exito({
+        ...panel(),
+        inicioResponsable: {
+          ambientes: [],
+          hoy: [pendiente(31, { estado: 'Aprobada' })],
+          proximas: [pendiente(32)],
+        },
+      }),
+    )
+    renderEnRuta(<DashboardPage />, { ruta: '/dashboard', sesionInicial: SESIONES.responsable })
+    expect(await screen.findByRole('heading', { name: 'Hoy en tu ambiente' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Próximas reservas' })).toBeInTheDocument()
+  })
+
+  it('Responsable vacío muestra siguiente paso vacío', async () => {
+    obtenerDashboard.mockResolvedValue(
+      exito({ ...panel(), inicioResponsable: { ambientes: [], hoy: [], proximas: [] } }),
+    )
+    renderEnRuta(<DashboardPage />, { ruta: '/dashboard', sesionInicial: SESIONES.responsable })
+    expect(await screen.findByText('No hay reservas para hoy.')).toBeInTheDocument()
+    expect(screen.getByText('No hay próximas reservas.')).toBeInTheDocument()
+  })
+
+  it('cada vista muestra carga al iniciar', async () => {
+    obtenerDashboard.mockReturnValue(new Promise(() => {}))
+    renderEnRuta(<DashboardPage />, { ruta: '/dashboard', sesionInicial: SESIONES.solicitante })
+    expect(await screen.findByText('Iniciando tu dashboard…')).toBeInTheDocument()
+  })
+})
+
+describe('Dashboard Administrador: agenda y gráficos accesibles', () => {
+  const hoy = (ambientes) => ({ ...panel(), hoyEnLosAmbientes: ambientes })
+
+  it('coloca la hora actual en su propio carril y separa el eje de las barras', async () => {
+    obtenerDashboard.mockResolvedValue(
+      exito(hoy([{ id: 1, nombre: 'Auditorio', estado: 'Disponible', reservas: [] }])),
+    )
+    renderEnRuta(<DashboardPage ahora={new Date('2026-11-05T16:00:00Z')} />, {
+      ruta: '/dashboard',
+      sesionInicial: SESIONES.administrador,
+    })
+    expect(await screen.findByLabelText('Carril del eje de horas')).toBeInTheDocument()
+    expect(screen.getByLabelText('Carril de la hora actual')).toBeInTheDocument()
+    expect(screen.getByLabelText('Ahora 11:00')).toBeInTheDocument()
+  })
+
+  it('muestra eje de 07:00 a 22:00 y línea de hora actual de Lima con etiqueta', async () => {
+    obtenerDashboard.mockResolvedValue(
+      exito(hoy([{ id: 1, nombre: 'Auditorio', estado: 'Disponible', reservas: [] }])),
+    )
+    renderEnRuta(<DashboardPage ahora={new Date('2026-11-05T20:00:00Z')} />, {
+      ruta: '/dashboard',
+      sesionInicial: SESIONES.administrador,
+    })
+    const eje = await screen.findByLabelText('Carril del eje de horas')
+    expect(within(eje).getByText('07:00')).toBeInTheDocument()
+    expect(within(eje).getByText('21:00')).toBeInTheDocument()
+    expect(screen.getByLabelText('Carril de la hora actual')).toBeInTheDocument()
+    expect(screen.getByLabelText('Ahora 15:00')).toBeInTheDocument()
+    vi.useRealTimers()
+  })
+
+  it('indica sin reservas aprobadas hoy por ambiente y muestra una reserva accesible', async () => {
+    obtenerDashboard.mockResolvedValue(
+      exito(
+        hoy([
+          { id: 1, nombre: 'Sala vacía', estado: 'Disponible', reservas: [] },
+          {
+            id: 2,
+            nombre: 'Laboratorio',
+            estado: 'Disponible',
+            reservas: [
+              {
+                id: 44,
+                horaInicio: '10:00',
+                horaFin: '12:00',
+                solicitanteNombre: 'Ana Torres',
+              },
+            ],
+          },
+        ]),
+      ),
+    )
+    mostrar()
+    expect(await screen.findByText('Sin reservas aprobadas hoy')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: '10:00 a 12:00, Ana Torres' })).toBeInTheDocument()
+  })
+
+  it('muestra mantenimiento con icono y texto', async () => {
+    obtenerDashboard.mockResolvedValue(
+      exito(hoy([{ id: 1, nombre: 'Sala 3', estado: 'En mantenimiento', reservas: [] }])),
+    )
+    mostrar()
+    expect(await screen.findByText('Mantenimiento')).toBeInTheDocument()
+  })
+
+  it('saca las etiquetas de estado a una leyenda legible y conserva la tabla alternativa', async () => {
+    mostrar()
+    const leyenda = await screen.findByRole('list', { name: 'Leyenda de reservas por estado' })
+    expect(within(leyenda).getByText('Pendiente')).toBeInTheDocument()
+    expect(within(leyenda).getByText('Aprobada')).toBeInTheDocument()
+    expect(within(leyenda).getByText('Rechazada')).toBeInTheDocument()
   })
 })

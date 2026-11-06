@@ -1,0 +1,397 @@
+.esqueleto {
+  display: grid;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-3);
+}
+
+.textoCarga {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-texto-suave);
+}
+
+.cajaEsqueleto {
+  height: 100px;
+  background: var(--fondo-neutro);
+  border-radius: var(--radio-tarjeta);
+  animation: pulso 1.5s ease-in-out infinite;
+}
+
+@keyframes pulso {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.portada {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--espacio-4);
+  margin-bottom: var(--espacio-3);
+  overflow: hidden;
+  color: var(--color-sobre-oscuro);
+  background: var(--color-marino);
+  border-radius: var(--radio-tarjeta);
+}
+
+.portada > * {
+  position: relative;
+  z-index: 1;
+}
+
+.marca {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 0;
+  fill: none;
+  stroke: var(--trazo-marca);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.textoPortada {
+  max-width: 48ch;
+}
+
+.fechaPortada {
+  margin: 0 0 var(--espacio-1);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.tituloPortada {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  color: var(--color-sobre-oscuro);
+}
+
+.detallePortada {
+  margin: var(--espacio-1) 0 0;
+  font-size: 1rem;
+}
+
+.accionPortada {
+  width: auto;
+}
+
+.portada :focus-visible {
+  outline-color: var(--color-foco-sobre-oscuro);
+}
+
+.seccion {
+  padding: var(--espacio-3);
+  margin-top: var(--espacio-3);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--elevacion-tarjeta);
+}
+
+.cabeceraSeccion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--espacio-2);
+}
+
+.cabeceraSeccion h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--color-marino);
+}
+
+.enlaceVerTodas {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alto-control);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primario);
+  text-decoration: none;
+}
+
+.enlaceVerTodas:hover {
+  text-decoration: underline;
+}
+
+.tarjetaProxima {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  padding: var(--espacio-3);
+  background: var(--fondo-info);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+}
+
+.cuerpoProxima {
+  display: flex;
+  gap: var(--espacio-2);
+  align-items: flex-start;
+}
+
+.iconoAmbiente {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--color-primario);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+  flex-shrink: 0;
+}
+
+.infoProxima {
+  flex: 1;
+}
+
+.nombreAmbiente {
+  margin: 0 0 var(--espacio-1);
+  font-size: 1.25rem;
+  color: var(--color-marino);
+}
+
+.datosReserva {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+  font-size: 0.9375rem;
+  color: var(--color-texto-suave);
+}
+
+.datosReserva span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-1);
+}
+
+.motivoReserva {
+  font-style: italic;
+}
+
+.accionesReserva {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-1);
+}
+
+.vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  padding: var(--espacio-3);
+  text-align: center;
+  color: var(--color-texto-suave);
+  background: var(--color-fondo);
+  border: 1px dashed var(--color-borde-control);
+  border-radius: var(--radio-tarjeta);
+}
+
+.vacioTitulo {
+  margin: var(--espacio-1) 0 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-marino);
+}
+
+.vacioTexto {
+  max-width: 44ch;
+  margin: var(--espacio-1) 0 var(--espacio-3);
+  font-size: 0.9375rem;
+  color: var(--color-texto-suave);
+}
+
+.resumenEstados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: var(--espacio-2);
+}
+
+.resumenCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 120px;
+  height: 100%;
+  padding: var(--espacio-2);
+  text-align: left;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--elevacion-tarjeta);
+  transition:
+    border-color var(--duracion-transicion) ease-out,
+    transform var(--duracion-transicion) ease-out;
+}
+
+.resumenCard:hover {
+  border-color: var(--color-primario);
+  transform: translateY(-2px);
+}
+
+.tarjetaHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: var(--espacio-1);
+}
+
+.iconoEstado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radio);
+}
+
+.flechaTarjeta {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--color-texto-suave);
+}
+
+.info {
+  color: var(--color-info);
+  background: var(--fondo-info);
+}
+
+.aviso {
+  color: var(--color-aviso);
+  background: var(--fondo-aviso);
+}
+
+.exito {
+  color: var(--color-exito);
+  background: var(--fondo-exito);
+}
+
+.error {
+  color: var(--color-error);
+  background: var(--fondo-error);
+}
+
+.neutro {
+  color: var(--color-texto-suave);
+  background: var(--fondo-neutro);
+}
+
+.numeroResumen {
+  display: block;
+  font-family: var(--fuente-titulo);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-marino);
+}
+
+.etiquetaResumen {
+  display: block;
+  margin-top: var(--espacio-1);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-texto-suave);
+}
+
+.bloqueSolicitudes {
+  margin-top: var(--espacio-3);
+  border-top: 1px solid var(--color-borde);
+  padding-top: var(--espacio-3);
+}
+
+.subtituloSolicitudes {
+  margin: 0 0 var(--espacio-2);
+  font-size: 1.0625rem;
+  color: var(--color-marino);
+}
+
+.listaSolicitudes {
+  display: grid;
+  gap: var(--espacio-1);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.itemSolicitud {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--espacio-2);
+  min-height: var(--alto-control);
+  padding: var(--espacio-1) var(--espacio-2);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+}
+
+.columnaAmbiente {
+  display: flex;
+  flex-direction: column;
+}
+
+.datosFecha {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-1);
+  font-size: 0.8125rem;
+  color: var(--color-texto-suave);
+}
+
+.botonDetalleItem {
+  width: auto;
+}
+
+@media (max-width: 640px) {
+  .portada {
+    padding: var(--espacio-3) var(--espacio-2);
+  }
+
+  .tituloPortada {
+    font-size: 1.375rem;
+  }
+
+  .accionPortada {
+    width: 100%;
+  }
+
+  .itemSolicitud {
+    grid-template-columns: 1fr;
+    gap: var(--espacio-1);
+    padding: var(--espacio-2);
+  }
+
+  .botonDetalleItem {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cajaEsqueleto {
+    animation: none;
+  }
+
+  .resumenCard:hover {
+    transform: none;
+  }
+}

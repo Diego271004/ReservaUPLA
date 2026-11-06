@@ -3,14 +3,15 @@ import DetalleReserva from '../components/DetalleReserva/DetalleReserva.jsx'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
 import Button from '../components/ui/Button.jsx'
 import ModalDeReserva from '../components/ModalDeReserva/ModalDeReserva.jsx'
+import { Icono } from '../components/ui/Icono.jsx'
 import { TEXTOS } from '../constants/messages.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { ESTADOS_PAGINA, useDetalleReserva } from '../hooks/useDetalleReserva.js'
-import { accionesDeReserva, textoDeEvento } from '../utils/reservas.js'
+import { accionesDeReserva, eventoFormateado } from '../utils/reservas.js'
 import { rutaDeRegreso, textoDeRegreso } from '../utils/rutaDeRegreso.js'
 import estilos from './DetalleReservaPage.module.css'
 
-const VARIANTE_DE_BOTON = { cancelar: 'secundario', rechazar: 'rechazar', aprobar: 'primario' }
+const VARIANTE_DE_BOTON = { cancelar: 'destructivo', rechazar: 'rechazar', aprobar: 'primario' }
 
 export default function DetalleReservaPage() {
   const { id } = useParams()
@@ -44,23 +45,40 @@ export default function DetalleReservaPage() {
 
   const { reserva, historial } = vm.detalle
   const { acciones, aviso } = accionesDeReserva(sesion, reserva)
+  const accionesConConflicto = acciones.map((acc) =>
+    acc.id === 'aprobar' && vm.conflicto ? { ...acc, habilitada: false } : acc,
+  )
 
   return (
     <>
       <DetalleReserva
         reserva={reserva}
         volverA={volverA}
-        historial={historial.map((evento) => ({ id: evento.id, texto: textoDeEvento(evento) }))}
+        historial={historial.map(eventoFormateado)}
         alerta={
           <>
             {vm.alerta && <AlertMessage tipo={vm.alerta.tipo}>{vm.alerta.mensaje}</AlertMessage>}
             {aviso && <AlertMessage tipo="info">{aviso}</AlertMessage>}
+            {vm.conflicto && (
+              <div className={estilos.tarjetaConflicto} role="alert">
+                <Icono nombre="aviso" tamano={18} />
+                <div className={estilos.textoConflicto}>
+                  <span>
+                    Se cruza con la reserva #{vm.conflicto.id} de {vm.conflicto.horaInicio} a{' '}
+                    {vm.conflicto.horaFin}.
+                  </span>
+                  <Link to={`/reservas/${vm.conflicto.id}`} className={estilos.enlaceConflicto}>
+                    Ver reserva #{vm.conflicto.id}
+                  </Link>
+                </div>
+              </div>
+            )}
           </>
         }
         acciones={
-          acciones.length > 0 ? (
+          accionesConConflicto.length > 0 ? (
             <>
-              {acciones.map((accion) => (
+              {accionesConConflicto.map((accion) => (
                 <div
                   key={accion.id}
                   className={accion.id === 'cancelar' ? estilos.separada : undefined}

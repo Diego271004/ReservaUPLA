@@ -1,6 +1,6 @@
 .grupo {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
   gap: var(--espacio-2);
   margin-bottom: var(--espacio-3);
 }

@@ -6,13 +6,8 @@ import DateInput from '../ui/DateInput.jsx'
 import SelectInput from '../ui/SelectInput.jsx'
 import estilos from './FiltrosDeReservas.module.css'
 
-const OPCIONES_ESTADO = ['Pendiente', 'Aprobada', 'Rechazada', 'Cancelada'].map((valor) => ({
-  valor,
-  etiqueta: valor,
-}))
-
 /**
- * Los filtros de la lista de Reservas: Estado, Ambiente y las fechas desde/hasta, con «Aplicar filtros» y «Limpiar».
+ * Los filtros de la lista de Reservas: Ambiente y las fechas desde/hasta (el estado lo eligen las pestañas), con «Aplicar filtros» y «Limpiar».
  * Lo que se escribe es un borrador: solo se aplica al pulsar «Aplicar filtros» (o Enter) y si las fechas son válidas.
  * La pantalla lo vuelve a montar con otra `key` cuando cambian los filtros aplicados (atrás/adelante, «Ver todas»).
  */
@@ -27,9 +22,7 @@ export default function FiltrosDeReservas({ aplicados, ambientes, alAplicar, alL
   // En móvil los filtros se pliegan detrás de un botón; en escritorio siempre están a la vista (lo decide el CSS).
   const [abierto, setAbierto] = useState(false)
   const idPanel = useId()
-  const activos = ['estado', 'ambienteId', 'desde', 'hasta'].filter(
-    (clave) => aplicados[clave],
-  ).length
+  const activos = ['ambienteId', 'desde', 'hasta'].filter((clave) => aplicados[clave]).length
 
   const cambiar = (evento) => {
     const { name, value } = evento.target
@@ -56,17 +49,8 @@ export default function FiltrosDeReservas({ aplicados, ambientes, alAplicar, alL
           {activos > 0 ? `${TEXTOS.filtros} (${activos})` : TEXTOS.filtros}
         </Button>
       </div>
-      <div id={idPanel} className={abierto ? undefined : estilos.cerrado}>
+      <div id={idPanel} className={`${estilos.panel} ${abierto ? '' : estilos.cerrado}`}>
         <div className={estilos.campos}>
-          <SelectInput
-            id="filtro-estado"
-            nombre="estado"
-            etiqueta={TEXTOS.etiquetaFiltroEstado}
-            valor={borrador.estado}
-            opciones={OPCIONES_ESTADO}
-            textoVacio={TEXTOS.todos}
-            onChange={cambiar}
-          />
           <SelectInput
             id="filtro-ambienteId"
             nombre="ambienteId"

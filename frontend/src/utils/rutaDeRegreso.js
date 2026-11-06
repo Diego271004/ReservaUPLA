@@ -8,13 +8,13 @@ const enElMenu = (rol, direccion) =>
 
 /**
  * A dónde regresa el detalle de una reserva: la lista o el panel de donde se vino (con sus filtros y su página) si está
- * en el menú de quien mira y es una de las pantallas desde las que se llega al detalle; si no, la primera pantalla de origen de su menú (Reservas, o Mi ambiente para la Responsable).
+ * en el menú de quien mira y es una de las pantallas desde las que se llega al detalle; si no, vuelve a Inicio.
  * El menú lateral marca esa misma sección (sin migas de pan).
  */
 export function rutaDeRegreso(rol, origen) {
   const { desde } = RUTAS.find((r) => r.ruta === '/reservas/:id')
   if (origen && desde.includes(solaRuta(origen)) && enElMenu(rol, origen)) return origen
-  return desde.find((ruta) => enElMenu(rol, ruta)) ?? '/'
+  return '/dashboard'
 }
 
 const TEXTO_POR_RUTA = {

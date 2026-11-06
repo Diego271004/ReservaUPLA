@@ -11,10 +11,30 @@ describe('indicadoresDeEstado', () => {
         valor: 48,
         descripcion: 'Total de reservas',
         detalle: 'Incluye canceladas',
+        icono: 'reservas',
+        tono: 'info',
       },
-      { clave: 'pendientes', valor: 7, descripcion: 'Reservas pendientes' },
-      { clave: 'aprobadas', valor: 31, descripcion: 'Reservas aprobadas' },
-      { clave: 'rechazadas', valor: 10, descripcion: 'Reservas rechazadas' },
+      {
+        clave: 'pendientes',
+        valor: 7,
+        descripcion: 'Reservas pendientes',
+        icono: 'reloj',
+        tono: 'aviso',
+      },
+      {
+        clave: 'aprobadas',
+        valor: 31,
+        descripcion: 'Reservas aprobadas',
+        icono: 'marca',
+        tono: 'exito',
+      },
+      {
+        clave: 'rechazadas',
+        valor: 10,
+        descripcion: 'Reservas rechazadas',
+        icono: 'equis',
+        tono: 'error',
+      },
     ])
   })
 })

@@ -55,3 +55,7 @@ export function ambienteMasUtilizado(ambientes) {
     detalle: `${cantidad} ${unidad}${ambientes.length > 1 ? ' cada uno' : ''}`,
   }
 }
+
+/** La clave de los demás filtros (sin estado ni página): lo que hace cambiar los números de las pestañas. */
+export const claveDeConteo = (filtros) =>
+  consultaDeFiltros({ ...filtros, estado: '', pagina: 1 }).toString()

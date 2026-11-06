@@ -1,0 +1,98 @@
+.portada {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--espacio-4);
+  margin-bottom: var(--espacio-3);
+  overflow: hidden;
+  color: var(--color-sobre-oscuro);
+  background: var(--degradado-portada);
+  border-radius: var(--radio-tarjeta);
+}
+
+.portada > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Marca decorativa: tres hexágonos (el del logo) en trazo claro; no lleva texto ni significado. */
+.marca {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 0;
+  fill: none;
+  stroke: var(--trazo-marca);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.texto {
+  max-width: 46ch;
+}
+
+.fecha {
+  margin: 0 0 var(--espacio-1);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  color: var(--color-sobre-oscuro);
+}
+
+.detalle {
+  margin: var(--espacio-1) 0 0;
+  font-size: 1rem;
+}
+
+.accion {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alto-control);
+  padding: 0 var(--espacio-3);
+  font-weight: 700;
+  color: var(--color-marino);
+  text-decoration: none;
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+  transition: transform var(--duracion-transicion) ease-out;
+}
+
+.accion:hover {
+  transform: translateY(-1px);
+}
+
+.portada :focus-visible {
+  outline-color: var(--color-foco-sobre-oscuro);
+}
+
+@media (max-width: 767px) {
+  .portada {
+    padding: var(--espacio-3) var(--espacio-2);
+  }
+
+  .titulo {
+    font-size: 1.375rem;
+  }
+
+  .accion {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accion:hover {
+    transform: none;
+  }
+}

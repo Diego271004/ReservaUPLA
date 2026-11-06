@@ -6,6 +6,10 @@
   padding: var(--espacio-2);
 }
 
+.paginacion button {
+  min-width: var(--alto-control);
+}
+
 .hueco {
   min-width: var(--alto-control);
   text-align: center;
