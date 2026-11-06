@@ -1,6 +1,6 @@
 // Utilidades comunes de las pruebas de extremo a extremo. Las claves llegan por variables de entorno.
 import { existsSync, mkdirSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
+import { dirname, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright-core'
 
@@ -30,8 +30,17 @@ const NAVEGADORES = [
 export const paso = (texto) => console.log(`\n== ${texto}`)
 export const ok = (texto) => console.log(`   OK  ${texto}`)
 
+export const CARPETA_EXPERIENCIAS = resolve(RAIZ, 'docs/evidencias/experiencia')
+
+export function destinoSeguro(partes) {
+  const solicitada = resolve(RAIZ, ...(Array.isArray(partes) ? partes : [partes]))
+  const permitida = resolve(CARPETA_EXPERIENCIAS)
+  if (solicitada === permitida || solicitada.startsWith(`${permitida}${sep}`)) return solicitada
+  return permitida
+}
+
 export function carpeta(...partes) {
-  const ruta = resolve(RAIZ, ...partes)
+  const ruta = destinoSeguro(partes)
   mkdirSync(ruta, { recursive: true })
   return ruta
 }
@@ -60,6 +69,12 @@ export async function iniciarSesion(pagina, correo, clave = CLAVE) {
   await pagina.getByRole('button', { name: 'Ingresar' }).click()
 }
 
+/** Cierra la sesión por el menú de usuario de la barra superior (el botón lleva el nombre y el rol de la persona). */
+export async function cerrarSesionPorMenu(pagina) {
+  await pagina.getByRole('button', { name: /, (Administrador|Solicitante|Responsable de ambiente)$/ }).click()
+  await pagina.getByRole('button', { name: 'Cerrar sesión' }).click()
+}
+
 /** La sesión guardada (para reutilizarla en otras páginas sin gastar intentos del límite de login). */
 export const leerSesion = (pagina) => pagina.evaluate(() => sessionStorage.getItem('reservaupla.sesion'))
 
@@ -79,7 +94,9 @@ export async function capturar(pagina, destino, nombre, ancho) {
   await pagina.waitForTimeout(150) // deja terminar transiciones
   const medida = await medirDesbordamiento(pagina)
   const desborda = medida.ancho > medida.visible
-  await pagina.screenshot({ path: resolve(destino, `${nombre}-${ancho}.png`), fullPage: true })
+  const destinoPermitido = destinoSeguro(destino)
+  mkdirSync(destinoPermitido, { recursive: true })
+  await pagina.screenshot({ path: resolve(destinoPermitido, `${nombre}-${ancho}.png`), fullPage: true })
   resultados.push({ nombre: `${nombre}-${ancho}`, desborda })
   const detalle = `${medida.ancho}px de contenido en ${medida.visible}px visibles`
   if (desborda) console.log(`   FALLO  ${nombre}-${ancho}: scroll horizontal (${detalle})`)

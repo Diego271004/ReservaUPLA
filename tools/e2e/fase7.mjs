@@ -38,7 +38,7 @@ try {
   paso('Inicio de sesión de Ana (Solicitante) y Carla (Administrador)')
   const ana = await nuevaPagina(navegador, 'escritorio')
   await iniciarSesion(ana, 'ana.torres@upla.edu.pe')
-  await ana.waitForURL('**/reservas/nueva')
+  await ana.waitForURL('**/dashboard')
   const sesionAna = await leerSesion(ana)
   const carla = await nuevaPagina(navegador, 'escritorio')
   await iniciarSesion(carla, 'carla.rojas@upla.edu.pe')
@@ -52,18 +52,15 @@ try {
     const pagina = ancho === 'movil' ? await nuevaPagina(navegador, 'movil', sesionAna) : ana
 
     // ------------------------------------------------------------ Corrección (a): ayuda del ambiente
-    paso(`Nueva reserva · el ambiente muestra solo el nombre y su detalle va como ayuda${sufijo}`)
+    paso(`Nueva reserva · elección del ambiente con tarjetas seleccionables${sufijo}`)
     await pagina.goto(`${BASE}/reservas/nueva`)
-    await pagina.getByRole('option', { name: 'Laboratorio de Cómputo 2', exact: true }).waitFor({ state: 'attached' })
-    const etiquetas = await pagina.getByLabel('Ambiente').locator('option').allTextContents()
-    esperar(
-      etiquetas.every((texto) => !texto.includes('personas')),
-      `ninguna opción del ambiente lleva capacidad ni ubicación: ${JSON.stringify(etiquetas)}`,
-    )
+    const radioLab = pagina.getByRole('radio', { name: /Laboratorio de Cómputo 2/ })
+    await radioLab.waitFor({ state: 'attached' })
     await capturar(pagina, destino, '01-nueva-reserva-vacia', ancho)
-    await pagina.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Cómputo 2' })
-    await pagina.getByText(DETALLE_LABORATORIO).waitFor()
-    ok(`al elegir el laboratorio aparece la ayuda «${DETALLE_LABORATORIO}»`)
+    await radioLab.click()
+    // La ayuda/detalle aparece en la tarjeta y en el resumen de la solicitud: basta con la primera.
+    await pagina.getByText(DETALLE_LABORATORIO).first().waitFor()
+    ok(`al elegir el laboratorio aparece el detalle «${DETALLE_LABORATORIO}»`)
     await capturar(pagina, destino, '02-ambiente-elegido-con-ayuda', ancho)
 
     // ------------------------------------------------------------ Corrección (b): RN-07

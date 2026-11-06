@@ -9,6 +9,8 @@
 // ETAPA=fase-ai → docs/evidencias/fase-ai-accesibilidad.txt y capturas en docs/evidencias/fase-ai/estados/ (solo las pantallas cuyos textos cambiaron en la ampliación de arquitectura de información)
 // ETAPA=identidad → docs/evidencias/identidad-accesibilidad.txt y capturas de TODAS las pantallas y estados en docs/evidencias/identidad/
 //                  (pase de identidad visual; añade la sección G: contraste del texto blanco sobre la foto del login, medido en píxeles)
+// ETAPA=experiencia → docs/evidencias/experiencia-accesibilidad.txt y capturas de todos los estados en docs/evidencias/experiencia/medicion/
+//                  (rediseño de experiencia; añade la sección H «Sub-fase A»: contador, menú contraído, menú de usuario, panel móvil, zoom y movimiento)
 // Arranca la base, la API y el frontend por su cuenta (puertos 5263 y 5180 libres).
 import { createRequire } from 'node:module'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -17,15 +19,17 @@ import { BASE, RAIZ, abrirNavegador, api, crearReservaApi, fechaRelativa, inicia
 import { detenerEntorno, iniciarEntorno, reiniciarBaseYApi } from '../e2e/entorno.mjs'
 import { analizarContraste } from './contraste.mjs'
 import { medirContrasteSobreFoto } from './contraste-foto.mjs'
+import { medirSubfaseA } from './subfase-a.mjs'
 import { recorrer } from './estados.mjs'
 
 const requerir = createRequire(import.meta.url)
 const RUTA_AXE = requerir.resolve('axe-core/axe.min.js')
-const ETAPA = ['antes', 'despues', 'fase9', 'fase-ai', 'identidad'].includes(process.env.ETAPA) ? process.env.ETAPA : 'antes'
+const ETAPA = ['antes', 'despues', 'fase9', 'fase-ai', 'identidad', 'experiencia'].includes(process.env.ETAPA) ? process.env.ETAPA : 'antes'
 const CARPETA_DE_CAPTURAS = {
   fase9: ['fase9', 'estados'],
   'fase-ai': ['fase-ai', 'estados'],
   identidad: ['identidad'],
+  experiencia: ['experiencia', 'medicion'],
   antes: ['fase8', 'antes'],
   despues: ['fase8', 'despues'],
 }
@@ -43,6 +47,7 @@ const INFORME = resolve(
     fase9: 'fase9-accesibilidad.txt',
     'fase-ai': 'fase-ai-accesibilidad.txt',
     identidad: 'identidad-accesibilidad.txt',
+    experiencia: 'experiencia-accesibilidad.txt',
   }[ETAPA],
 )
 const ETIQUETAS_AXE = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice']
@@ -225,13 +230,13 @@ async function extras(navegador) {
     movimiento.push({ estado: 'Login verificando credenciales (spinner)', reducido: reducir, animaciones })
     await contexto.close()
   }
-  return { zoom, movimiento, control }
+  return { zoom, movimiento, control, sesiones }
 }
 
 // ---------------------------------------------------------------- Informe
 const unicos = (lista) => [...new Set(lista)]
 
-function informe(contraste, extra, foto = null) {
+function informe(contraste, extra, foto = null, subfaseA = null) {
   const L = []
   const rayas = '='.repeat(110)
   L.push(`ACCESIBILIDAD MEDIDA DEL SISTEMA REAL (${ETAPA.toUpperCase()}) — ${new Date().toISOString().slice(0, 10)}`)
@@ -315,6 +320,13 @@ function informe(contraste, extra, foto = null) {
     const peores = foto.flatMap((f) => f.medidas)
     L.push('', `TOTAL: ${peores.filter((m) => m.razon < 4.5).length} medición(es) por debajo de 4,5:1 sobre la foto; peor caso ${Math.min(...peores.map((m) => m.razon)).toFixed(2)}:1.`)
   }
+  // ---- H) rediseño de experiencia, sub-fase A
+  if (subfaseA) {
+    L.push('', rayas, 'H) SUB-FASE A (layout): antes y después', rayas)
+    L.push('ANTES (línea base: docs/evidencias/identidad-accesibilidad.txt, pase de identidad): axe 0 violaciones en 87 mediciones; 0 pares de contraste bajo el umbral; 0 objetivos menores de 44 px;')
+    L.push('0 paradas sin foco visible; zoom 200 % en 188 px: 4 de 30 con desborde; 0 animaciones infinitas con movimiento reducido. Sin contador, menú contraído, barra superior ni menú de usuario.')
+    L.push('DESPUÉS: las secciones A a F de este informe son la medición completa con el layout nuevo; lo siguiente mide de forma dirigida lo que antes no existía.', '', ...subfaseA.lineas)
+  }
   return L.join('\n')
 }
 
@@ -331,7 +343,8 @@ try {
   console.log('\n== Zoom y movimiento reducido')
   const extra = await extras(navegador)
   const foto = ETAPA === 'identidad' ? await medirContrasteSobreFoto(navegador, BASE) : null
-  const texto = informe(analizarContraste(), extra, foto)
+  const subfaseA = ETAPA === 'experiencia' ? await medirSubfaseA(navegador, extra.sesiones.carla) : null
+  const texto = informe(analizarContraste(), extra, foto, subfaseA)
   writeFileSync(INFORME, texto + '\n', 'utf8')
   console.log(`\nInforme escrito en ${INFORME}`)
   console.log(texto.split('\n').filter((l) => l.startsWith('TOTAL')).join('\n'))

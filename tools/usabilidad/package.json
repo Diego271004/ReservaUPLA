@@ -12,7 +12,8 @@
     "mermaid": "node validar-mermaid.mjs",
     "imagenes": "node optimizar-imagenes.mjs",
     "peso-login": "node peso-login.mjs",
-    "pruebas": "node --test pruebas/analizar.test.mjs pruebas/mapa.test.mjs pruebas/mermaid.test.mjs pruebas/contraste-foto.test.mjs"
+    "verificar-tabla": "node verificar-tabla-pruebas.mjs",
+    "pruebas": "node --test pruebas/analizar.test.mjs pruebas/mapa.test.mjs pruebas/mermaid.test.mjs pruebas/contraste-foto.test.mjs && node verificar-tabla-pruebas.mjs"
   },
   "dependencies": {
     "axe-core": "4.10.2",

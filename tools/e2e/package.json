@@ -10,6 +10,8 @@
     "fase7": "node fase7.mjs",
     "fase9": "node fase9.mjs",
     "faseai": "node fase-ai.mjs",
+    "experiencia-b": "node experiencia-b.mjs",
+    "experiencia-c": "node experiencia-c.mjs",
     "todo": "node todo.mjs"
   },
   "dependencies": {

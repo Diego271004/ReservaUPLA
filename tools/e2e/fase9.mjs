@@ -39,8 +39,8 @@ async function indicador(pagina, descripcion) {
 
 async function registrarComoSolicitante(pagina, fecha) {
   await pagina.goto(`${BASE}/reservas/nueva`)
-  await pagina.getByRole('option', { name: 'Laboratorio de Cómputo 2', exact: true }).waitFor({ state: 'attached' })
-  await pagina.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Cómputo 2' })
+  await pagina.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).waitFor({ state: 'attached' })
+  await pagina.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).click()
   await pagina.getByLabel('Fecha').fill('')
   await pagina.getByLabel('Fecha').pressSequentially(fecha.digitos)
   await pagina.getByLabel('Hora de inicio').selectOption('14:00')
@@ -63,7 +63,7 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   const carla = await nuevaPagina(navegador, ancho, sesiones.carla)
   await carla.goto(`${BASE}/dashboard`)
   await carla.getByRole('region', { name: 'Indicadores' }).waitFor()
-  const fila = carla.locator('tr', { hasText: fecha.texto }).filter({ hasText: 'Ana Torres' })
+  const fila = carla.locator('article', { hasText: fecha.texto }).filter({ hasText: 'Ana Torres' })
   await fila.waitFor()
   const pendientesAntes = await indicador(carla, 'Reservas pendientes')
   const aprobadasAntes = await indicador(carla, 'Reservas aprobadas')
@@ -88,13 +88,16 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   paso(`Aparece Aprobada en Reservas con el filtro Estado${sufijo}`)
   await carla.goto(`${BASE}/reservas`)
   await carla.getByRole('table').waitFor()
-  await abrirFiltros(carla)
-  await carla.getByLabel('Estado', { exact: true }).selectOption('Aprobada')
-  await carla.getByRole('button', { name: 'Aplicar filtros' }).click()
+  // El estado se elige con las pestañas (cada una con su número), no con un selector.
+  await carla.getByRole('tab', { name: /Aprobadas/ }).click()
   await carla.waitForURL('**/reservas?estado=Aprobada')
   const aprobada = carla.locator('tr', { hasText: fecha.texto }).filter({ hasText: 'Aprobada' })
   await aprobada.waitFor()
-  esperar((await carla.locator('tbody tr').filter({ hasText: 'Pendiente' }).count()) === 0, 'con el filtro Aprobada no aparece ninguna Pendiente')
+  // La lista anterior sigue en pantalla hasta que responde la API con el filtro: se espera a que se cambie (carrera del guion, no de la app).
+  const sinPendientes = await carla
+    .waitForFunction(() => ![...document.querySelectorAll('tbody tr')].some((fila) => fila.textContent.includes('Pendiente')), null, { timeout: 5000 })
+    .then(() => true, () => false)
+  esperar(sinPendientes, 'con el filtro Aprobada no aparece ninguna Pendiente')
   await capturar(carla, destino, '04-reservas-filtro-aprobada', ancho)
 
   paso(`«Volver a Reservas» conserva el filtro${sufijo}`)
@@ -102,7 +105,7 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   await carla.getByRole('heading', { name: 'Detalle de la reserva' }).waitFor()
   await carla.getByRole('link', { name: 'Volver a Reservas' }).click()
   await carla.waitForURL('**/reservas?estado=Aprobada')
-  esperar((await carla.getByLabel('Estado', { exact: true }).inputValue()) === 'Aprobada', 'al volver, el filtro Estado sigue en Aprobada')
+  esperar((await carla.getByRole('tab', { name: /Aprobadas/ }).getAttribute('aria-selected')) === 'true', 'al volver, la pestaña Aprobadas sigue seleccionada')
   await aprobada.waitFor()
 
   paso(`La Responsable la ve en Mi ambiente${sufijo}`)
@@ -110,7 +113,7 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   await mario.goto(`${BASE}/mi-ambiente`)
   await mario.getByRole('table').waitFor()
   // Mario está a cargo de varios ambientes: Mi ambiente abre el primero por nombre y él elige el Laboratorio.
-  await mario.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Cómputo 2' })
+  await mario.getByLabel('Ambiente', { exact: true }).selectOption({ label: 'Laboratorio de Cómputo 2' })
   await mario.getByRole('heading', { name: 'Laboratorio de Cómputo 2' }).waitFor()
   await mario.locator('tr', { hasText: fecha.texto }).filter({ hasText: 'Aprobada' }).waitFor()
   esperar((await mario.getByRole('main').getByRole('button').filter({ hasNotText: /^Ver detalle/ }).count()) === 0, 'Mi ambiente es de solo lectura: solo hay «Ver detalle», ningún botón de decidir')
@@ -124,9 +127,9 @@ try {
   paso('Inicio de sesión de Ana, Carla y Mario (una vez; las páginas móviles reutilizan la sesión)')
   const sesiones = {}
   for (const [rol, correo, destinoUrl] of [
-    ['ana', 'ana.torres@upla.edu.pe', '**/reservas/nueva'],
+    ['ana', 'ana.torres@upla.edu.pe', '**/dashboard'],
     ['carla', 'carla.rojas@upla.edu.pe', '**/dashboard'],
-    ['mario', 'mario.huaman@upla.edu.pe', '**/mi-ambiente'],
+    ['mario', 'mario.huaman@upla.edu.pe', '**/dashboard'],
   ]) {
     const pagina = await nuevaPagina(navegador, 'escritorio')
     await iniciarSesion(pagina, correo)
@@ -134,7 +137,7 @@ try {
     sesiones[rol] = await leerSesion(pagina)
     await pagina.context().close()
   }
-  ok('el Administrador aterriza en el Dashboard, la Solicitante en Nueva reserva y la Responsable en Mi ambiente')
+  ok('los tres roles aterrizan en Inicio (/dashboard)')
   const tokenCarla = tokenDe(sesiones.carla)
   const tokenAna = tokenDe(sesiones.ana)
 
@@ -159,7 +162,7 @@ try {
   await carla.getByRole('link', { name: 'Ver todas las pendientes' }).click()
   await carla.waitForURL('**/reservas?estado=Pendiente')
   await carla.getByRole('table').waitFor()
-  esperar((await carla.getByLabel('Estado', { exact: true }).inputValue()) === 'Pendiente', '«Ver todas» abre Reservas con el filtro Pendiente aplicado')
+  esperar((await carla.getByRole('tab', { name: /Pendientes/ }).getAttribute('aria-selected')) === 'true', '«Ver todas» abre Reservas con la pestaña Pendientes seleccionada')
   await carla.getByText(`Mostrando ${Math.min(total, 10)} de ${total}`).waitFor()
   await capturar(carla, destino, '07-reservas-ver-todas-pendientes', 'escritorio')
 
@@ -173,7 +176,9 @@ try {
   await capturar(carla, destino, '08-reservas-paginacion', 'escritorio')
   await carla.getByRole('button', { name: 'Siguiente' }).click()
   await carla.waitForURL('**/reservas?pagina=2')
-  esperar(await carla.getByRole('button', { name: 'Siguiente' }).isDisabled() || (await carla.getByRole('button', { name: 'Anterior' }).isEnabled()), 'la página 2 permite volver con «Anterior»')
+  // La lista anterior sigue en pantalla hasta que responde la API con la página 2: se espera a que «Anterior» esté habilitado.
+  await carla.locator('button:enabled', { hasText: 'Anterior' }).waitFor()
+  esperar(await carla.getByRole('button', { name: 'Anterior' }).isEnabled(), 'la página 2 permite volver con «Anterior»')
 
   const desbordadas = capturasConDesbordamiento()
   if (desbordadas.length > 0) {

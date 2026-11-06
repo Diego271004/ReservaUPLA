@@ -35,7 +35,7 @@ const esperar = (condicion, mensaje) => {
 }
 
 async function elegirHorario(pagina, fecha, inicio, fin) {
-  await pagina.getByLabel('Ambiente').selectOption({ label: LABORATORIO })
+  await pagina.getByRole('radio', { name: new RegExp(LABORATORIO) }).click()
   await pagina.getByLabel('Fecha').fill('')
   await pagina.getByLabel('Fecha').pressSequentially(fecha.replaceAll('/', ''))
   await pagina.getByLabel('Hora de inicio').selectOption(inicio)
@@ -49,7 +49,7 @@ try {
   paso('Inicio de sesión de Ana (Solicitante), Carla (Administrador) y Mario (Responsable)')
   const ana = await nuevaPagina(navegador, 'escritorio')
   await iniciarSesion(ana, 'ana.torres@upla.edu.pe')
-  await ana.waitForURL('**/reservas/nueva')
+  await ana.waitForURL('**/dashboard')
   const sesionAna = await leerSesion(ana)
 
   const carla = await nuevaPagina(navegador, 'escritorio')
@@ -59,7 +59,7 @@ try {
 
   const mario = await nuevaPagina(navegador, 'escritorio')
   await iniciarSesion(mario, 'mario.huaman@upla.edu.pe')
-  await mario.waitForURL('**/mi-ambiente')
+  await mario.waitForURL('**/dashboard')
   const sesionMario = await leerSesion(mario)
   const tokenAna = tokenDe(sesionAna)
   const tokenCarla = tokenDe(sesionCarla)
@@ -74,7 +74,8 @@ try {
 
   // ============================ Nueva reserva: disponibilidad (04, 04e, 04f) ============================
   paso('Escritorio · Ana: aviso de disponibilidad en Nueva reserva')
-  await ana.getByRole('option', { name: /Laboratorio de Cómputo 2/ }).waitFor({ state: 'attached' })
+  await ana.goto(`${BASE}/reservas/nueva`)
+  await ana.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).waitFor({ state: 'attached' })
   await elegirHorario(ana, LIBRE.texto, '14:00', '16:00')
   await ana.getByText('Disponible: no hay reservas aprobadas en ese horario').waitFor()
   await capturar(ana, destino, '01-nueva-reserva-disponible', 'escritorio')
@@ -90,9 +91,9 @@ try {
   await ana.getByText(CONFLICTO_10_12).first().waitFor()
   esperar((await ana.getByRole('button', { name: 'Registrar solicitud' }).getAttribute('aria-busy')) === null, 'al registrar con conflicto el servidor responde 409 y el formulario queda libre con sus datos')
 
-  const enMantenimiento = await ana.getByRole('option', { name: /Sala de Reuniones A/ }).evaluate((o) => o.disabled)
+  const enMantenimiento = (await ana.getByRole('radio', { name: /Sala de Reuniones A/ }).getAttribute('aria-disabled')) === 'true'
   esperar(enMantenimiento, '04f: "Sala de Reuniones A · En mantenimiento (no disponible)" está deshabilitada en la lista')
-  await ana.getByLabel('Ambiente').focus()
+  await ana.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).focus()
   await capturar(ana, destino, '03-nueva-reserva-mantenimiento', 'escritorio')
 
   paso('Escritorio · Ana registra una reserva libre y abre su detalle')
@@ -133,9 +134,15 @@ try {
 
   paso('Escritorio · Carla intenta aprobar la reserva B, que se cruza con la A (RN-01)')
   await carla.goto(`${BASE}/reservas/${pendienteB.id}`)
-  await carla.getByRole('button', { name: 'Aprobar' }).click()
-  await carla.getByRole('button', { name: 'Sí, aprobar' }).click()
-  await carla.getByText(CONFLICTO_10_12).waitFor()
+  const botonAprobar = carla.getByRole('button', { name: 'Aprobar' })
+  if (await botonAprobar.isDisabled()) {
+    esperar(await botonAprobar.isDisabled(), 'el botón Aprobar está deshabilitado por conflicto preventivo')
+    await carla.getByText(/Se cruza con la reserva/).waitFor()
+  } else {
+    await botonAprobar.click()
+    await carla.getByRole('button', { name: 'Sí, aprobar' }).click()
+    await carla.getByText(CONFLICTO_10_12).waitFor()
+  }
   esperar((await carla.getByText('Pendiente', { exact: true }).count()) > 0, 'la reserva B sigue Pendiente tras el conflicto')
   await capturar(carla, destino, '11-detalle-conflicto-al-aprobar', 'escritorio')
 
@@ -205,7 +212,7 @@ try {
 
   const anaMovil = await nuevaPagina(navegador, 'movil', sesionAna)
   await anaMovil.goto(`${BASE}/reservas/nueva`)
-  await anaMovil.getByRole('option', { name: /Laboratorio de Cómputo 2/ }).waitFor({ state: 'attached' })
+  await anaMovil.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).waitFor({ state: 'attached' })
   await elegirHorario(anaMovil, LIBRE.texto, '17:00', '18:00')
   await anaMovil.getByText('Disponible: no hay reservas aprobadas en ese horario').waitFor()
   await capturar(anaMovil, destino, '01-nueva-reserva-disponible', 'movil')

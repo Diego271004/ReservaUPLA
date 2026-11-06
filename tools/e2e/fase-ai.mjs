@@ -3,7 +3,7 @@
 //   formulario y cierre de Nueva reserva («Limpiar formulario», «Registrar otra solicitud»), detalle de la Solicitante en
 //   Pendiente («Cancelar solicitud») y Aprobada («Cancelar reserva»), Mi ambiente con «Ver detalle», detalle de la Responsable
 //   (solo lectura, el menú marca Mi ambiente, «Volver a Mi ambiente» conserva ambiente y página), detalle desde el Dashboard
-//   («Volver al Dashboard», el menú marca Dashboard) y formularios de Ambientes y Usuarios («Volver», «Registrar …»).
+//   («Volver a Inicio», el menú marca Inicio) y formularios de Ambientes y Usuarios («Volver», «Registrar …»).
 // Requisitos: base recién creada, API en :5263 y frontend en :5180 (o `npm run todo`, que los arranca).
 // Uso: CLAVE_PRUEBA="<clave de prueba>" npm run faseai   (desde tools/e2e)
 import {
@@ -44,7 +44,7 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   const sufijo = ancho === 'movil' ? ' (375 px)' : ' (1280 px)'
   const fecha = fechaRelativa(diasAdelante)
   const llenar = async (pagina) => {
-    await pagina.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Cómputo 2' })
+    await pagina.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).click()
     await pagina.getByLabel('Fecha').fill('')
     await pagina.getByLabel('Fecha').pressSequentially(fecha.digitos)
     await pagina.getByLabel('Hora de inicio').selectOption('14:00')
@@ -55,8 +55,8 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   paso(`Nueva reserva: formulario y cierre${sufijo}`)
   const ana = await nuevaPagina(navegador, ancho, sesiones.ana)
   await ana.goto(`${BASE}/reservas/nueva`)
-  await ana.getByRole('option', { name: 'Laboratorio de Cómputo 2', exact: true }).waitFor({ state: 'attached' })
-  await ana.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Cómputo 2' })
+  await ana.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).waitFor({ state: 'attached' })
+  await ana.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).click()
   const botonesForm = await botonesDe(ana)
   esperar(botonesForm.includes('Limpiar formulario') && botonesForm.includes('Registrar solicitud'), 'el formulario ofrece «Limpiar formulario» y «Registrar solicitud»')
   esperar(!botonesForm.includes('Cancelar'), 'ningún botón del formulario dice «Cancelar»')
@@ -104,7 +104,7 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   await mario.getByRole('table').waitFor()
   esperar(mario.url() === origen, `«Volver a Mi ambiente» regresa a ${new URL(origen).search} (ambiente conservado)`)
 
-  paso(`Detalle desde el Dashboard: «Volver al Dashboard» y el menú marca Dashboard${sufijo}`)
+  paso(`Detalle desde Inicio: «Volver a Inicio» y el menú marca Inicio${sufijo}`)
   const carla = await nuevaPagina(navegador, ancho, sesiones.carla)
   const ambientes = (await api('/api/ambientes', { token: tokenCarla })).data
   const laboratorio = ambientes.find((x) => x.nombre === 'Laboratorio de Cómputo 2').id
@@ -116,8 +116,8 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   await capturar(carla, destino, '07-dashboard-pendientes', ancho)
   await carla.getByRole('button', { name: /^Ver detalle/ }).first().click()
   await carla.getByRole('heading', { name: 'Detalle de la reserva' }).waitFor()
-  esperar(await carla.getByRole('link', { name: 'Volver al Dashboard' }).isVisible(), 'el enlace de regreso dice «Volver al Dashboard»')
-  esperar((await opcionesMarcadas(carla)).join() === 'Dashboard', 'el menú marca «Dashboard»')
+  esperar(await carla.getByRole('link', { name: 'Volver a Inicio' }).isVisible(), 'el enlace de regreso dice «Volver a Inicio»')
+  esperar((await opcionesMarcadas(carla)).join() === 'Inicio', 'el menú marca «Inicio»')
   await capturar(carla, destino, '08-detalle-desde-dashboard', ancho)
 
   paso(`Formularios de Ambientes y Usuarios: «Volver» y «Registrar …»${sufijo}`)
@@ -141,9 +141,9 @@ try {
   paso('Inicio de sesión de Ana, Carla y Mario (una vez; las páginas móviles reutilizan la sesión)')
   const sesiones = {}
   for (const [rol, correo, destinoUrl] of [
-    ['ana', 'ana.torres@upla.edu.pe', '**/reservas/nueva'],
+    ['ana', 'ana.torres@upla.edu.pe', '**/dashboard'],
     ['carla', 'carla.rojas@upla.edu.pe', '**/dashboard'],
-    ['mario', 'mario.huaman@upla.edu.pe', '**/mi-ambiente'],
+    ['mario', 'mario.huaman@upla.edu.pe', '**/dashboard'],
   ]) {
     const pagina = await nuevaPagina(navegador, 'escritorio')
     await iniciarSesion(pagina, correo)

@@ -22,7 +22,7 @@ async function abrir(pagina, ruta, esperaRol, esperaNombre) {
 }
 
 async function llenarReserva(pagina, { fecha, inicio, fin, motivo }) {
-  await pagina.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Cómputo 2' })
+  await pagina.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).click()
   await pagina.getByLabel('Fecha').fill('')
   await pagina.getByLabel('Fecha').pressSequentially(fecha.digitos)
   await pagina.getByLabel('Hora de inicio').selectOption(inicio)
@@ -92,9 +92,9 @@ export async function recorrer(navegador, ancho, medir) {
   // ---------------------------------------------------------------- Solicitante: Nueva reserva
   const ana = await nuevaPagina(navegador, ancho, sesiones.ana)
   await abrir(ana, '/reservas/nueva', 'heading', 'Nueva reserva')
-  await ana.getByRole('option', { name: 'Laboratorio de Cómputo 2', exact: true }).waitFor({ state: 'attached' })
+  await ana.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).waitFor({ state: 'attached' })
   await medir(ana, '20-nueva-reserva-vacia', 'Nueva reserva, estado inicial')
-  await ana.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Cómputo 2' })
+  await ana.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).click()
   await medir(ana, '21-nueva-reserva-ambiente-elegido', 'Nueva reserva, ambiente elegido con su ayuda')
   await ana.getByRole('button', { name: 'Registrar solicitud' }).click()
   await ana.getByText('Ingresa el motivo de la reserva.').waitFor()
@@ -127,7 +127,7 @@ export async function recorrer(navegador, ancho, medir) {
 
   // ---------------------------------------------------------------- Administrador: Dashboard y lista de Reservas
   const carla = await nuevaPagina(navegador, ancho, sesiones.carla)
-  await abrir(carla, '/dashboard', 'heading', 'Dashboard')
+  await abrir(carla, '/dashboard', 'heading', 'Inicio')
   await carla.getByRole('region', { name: 'Indicadores' }).waitFor()
   await carla.getByRole('table').waitFor()
   await medir(carla, '60-dashboard', 'Dashboard (Administrador): cinco indicadores y las pendientes más antiguas')
@@ -168,9 +168,14 @@ export async function recorrer(navegador, ancho, medir) {
   await carla.getByText('Reserva aprobada.').waitFor()
   await medir(carla, '32-detalle-aprobada', 'Detalle, tras aprobar (Aprobada, con historial)')
   await abrir(carla, `/reservas/${idB}`, 'heading', 'Detalle de la reserva')
-  await carla.getByRole('button', { name: 'Aprobar' }).click()
-  await carla.getByRole('button', { name: 'Sí, aprobar' }).click()
-  await carla.getByText(CONFLICTO).waitFor()
+  const botonAprobarB = carla.getByRole('button', { name: 'Aprobar' })
+  if (await botonAprobarB.isDisabled()) {
+    await carla.getByText(/Se cruza con la reserva/).waitFor()
+  } else {
+    await botonAprobarB.click()
+    await carla.getByRole('button', { name: 'Sí, aprobar' }).click()
+    await carla.getByText(CONFLICTO).waitFor()
+  }
   await medir(carla, '33-detalle-conflicto-al-aprobar', 'Detalle, aprobar una reserva que se cruza (409)')
   await carla.getByRole('button', { name: 'Rechazar' }).click()
   await carla.getByRole('dialog').waitFor()
@@ -198,12 +203,12 @@ export async function recorrer(navegador, ancho, medir) {
 
   // ---------------------------------------------------------------- Administrador: ambientes y usuarios
   await abrir(carla, '/ambientes', 'heading', 'Ambientes')
-  await carla.getByRole('cell', { name: 'Laboratorio de Cómputo 2' }).waitFor()
+  await carla.getByRole('cell', { name: 'Laboratorio de Cómputo 2 Laboratorio' }).waitFor()
   await medir(carla, '10-ambientes-listado', 'Ambientes, listado')
   if (movil) {
-    await carla.getByRole('button', { name: 'Menú' }).click()
+    await carla.getByRole('button', { name: 'Menú', exact: true }).click()
     await medir(carla, '11-ambientes-menu-movil-abierto', 'Menú lateral abierto en móvil')
-    await carla.getByRole('button', { name: 'Menú' }).click()
+    await carla.getByRole('button', { name: 'Cerrar menú' }).click()
   }
   await carla.getByRole('button', { name: 'Nuevo ambiente' }).click()
   await carla.getByRole('heading', { name: 'Registrar ambiente' }).waitFor()

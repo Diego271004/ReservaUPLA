@@ -159,7 +159,7 @@ describe('listados en móvil', () => {
   })
 
   it('el botón del encabezado de un listado puede partir su texto en lugar de salirse de la pantalla', () => {
-    expect(css('pages/ListadoPage.module.css')).not.toMatch(/white-space:\s*nowrap/)
+    expect(css('components/ui/PageHeader.module.css')).not.toMatch(/white-space:\s*nowrap/)
   })
 
   it('el interruptor Activo pasa su texto a otra línea cuando no cabe', () => {
@@ -177,8 +177,9 @@ describe('Dashboard, Reservas y Mi ambiente', () => {
     expect(regla1).toContain('overflow-wrap: anywhere')
   })
 
-  it('los tres botones de cada fila del Dashboard no se parten en dos líneas en escritorio', () => {
-    expect(regla(css('pages/DashboardPage.module.css'), '.acciones')).toContain('flex-wrap: nowrap')
+  it('las acciones de cada tarjeta del Dashboard pasan a otra línea si no caben, en vez de desbordar la página (defecto visto con 6 solicitudes pendientes)', () => {
+    expect(regla(css('pages/DashboardPage.module.css'), '.acciones')).toContain('flex-wrap: wrap')
+    expect(regla(css('pages/DashboardPage.module.css'), '.acciones')).not.toContain('nowrap')
   })
 
   it('el pie «Mostrando N de N» tiene margen por todos lados', () => {
@@ -198,6 +199,106 @@ describe('Dashboard, Reservas y Mi ambiente', () => {
   it('«Ver detalle», «Rechazar» y «Aprobar» del Dashboard no parten su texto', () => {
     expect(regla(css('pages/DashboardPage.module.css'), '.acciones > *')).toContain(
       'white-space: nowrap',
+    )
+  })
+})
+
+describe('migas de pan: objetivo táctil', () => {
+  it('cada enlace de las migas mide al menos 44 x 44 px, también uno corto como «Inicio» (medido: 40 x 44 antes)', () => {
+    const migas = regla(css('components/Layout/Topbar.module.css'), '.migas a')
+    expect(migas).toContain('min-width: var(--alto-control)')
+    expect(migas).toContain('min-height: var(--alto-control)')
+  })
+})
+
+describe('reflujo a 188 px (zoom del 200 %): textos largos y migas', () => {
+  const campo = css('components/ui/CampoFormulario.module.css')
+
+  it('la ayuda, el error y el aviso de un campo parten las palabras largas (el ejemplo del correo desbordaba el login a 188 px)', () => {
+    expect(regla(campo, '.ayuda')).toContain('overflow-wrap: anywhere')
+    // «.error» y «.aviso» comparten una regla de lista de selectores: se comprueba su texto.
+    expect(campo).toMatch(/\.error,\s*\.aviso\s*\{[^}]*overflow-wrap:\s*anywhere/)
+  })
+
+  it('en móvil el enlace de una miga no se encoge (medía 15 px) y el recorte con puntos suspensivos es del nombre de la página actual', () => {
+    const topbar = css('components/Layout/Topbar.module.css')
+    const enlace = regla(topbar, '.migas a', '@media (max-width: 767px)')
+    expect(enlace).toContain('flex-shrink: 0')
+    expect(enlace).not.toContain('min-width: 0')
+    expect(regla(topbar, '.migas li span', '@media (max-width: 767px)')).toContain(
+      'text-overflow: ellipsis',
+    )
+  })
+
+  it('el login reduce el relleno de la tarjeta en pantallas de 480 px o menos', () => {
+    const login = css('pages/LoginPage.module.css')
+    expect(regla(login, '.tarjeta', '@media (max-width: 480px)')).toContain(
+      'padding: var(--espacio-2) var(--espacio-1)',
+    )
+  })
+})
+
+describe('reflujo a 188 px: la agenda de hoy del inicio', () => {
+  it('en móvil el encabezado del eje y cada fila se apilan (la columna fija de 180 px desbordaba la página)', () => {
+    const dashboard = css('pages/DashboardPage.module.css')
+    const media = dashboard.slice(dashboard.indexOf('@media (max-width: 767px)'))
+    expect(media).toMatch(
+      /\.filaAgenda,\s*\.agendaEncabezado\s*\{[^}]*grid-template-columns:\s*1fr/,
+    )
+    expect(media).toMatch(/\.carrilAhora\s*\{[^}]*grid-column:\s*1/)
+  })
+
+  it('con 480 px o menos el eje solo muestra dos etiquetas de hora', () => {
+    expect(css('pages/DashboardPage.module.css')).toMatch(
+      /@media \(max-width: 480px\)\s*\{\s*\.etiquetaHora:not\(:nth-child\(1\), :nth-child\(5\)\)\s*\{\s*display: none/,
+    )
+  })
+})
+
+describe('reflujo a 188 px: tarjetas de decisión y barras de uso del inicio', () => {
+  const dashboard = css('pages/DashboardPage.module.css')
+
+  it('en móvil la rejilla de tarjetas usa minmax(0, 1fr) y el encabezado de la sección puede partirse en dos líneas', () => {
+    const media = dashboard.slice(dashboard.indexOf('@media (max-width: 767px)'))
+    expect(media).toMatch(/\.tarjetasDecision\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/)
+    expect(media).toMatch(/\.encabezadoSeccion\s*\{[^}]*flex-wrap:\s*wrap/)
+  })
+
+  it('con 480 px o menos cada barra de uso apila la barra debajo del nombre', () => {
+    expect(dashboard).toMatch(
+      /@media \(max-width: 480px\)\s*\{\s*\.filaBarra\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) auto/,
+    )
+  })
+})
+
+describe('reflujo a 188 px: Mi ambiente', () => {
+  it('el selector de ambiente pide hasta 240 px pero nunca más que el ancho disponible', () => {
+    expect(css('pages/MiAmbientePage.module.css')).toContain('min-width: min(240px, 100%)')
+  })
+})
+
+describe('reflujo a 188 px: Nueva reserva y línea de tiempo del detalle', () => {
+  it('las horas, el resumen y los tramos de la franja usan minmax(0, 1fr) en móvil y el texto de un tramo puede partirse', () => {
+    const nueva = css('pages/NuevaReservaPage.module.css')
+    expect(nueva).toMatch(/\.horas,\s*\.resumen\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/)
+    const franja = css('components/Disponibilidad/FranjaNuevaReserva.module.css')
+    expect(franja).toMatch(/\.tramos\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/)
+    expect(regla(franja, '.tramo', '@media (max-width: 767px)')).toContain('white-space: normal')
+  })
+
+  it('el punto del estado actual del historial no repite su color en el borde (la medición de contraste lo contaba como 1:1)', () => {
+    const detalle = css('components/DetalleReserva/DetalleReserva.module.css')
+    expect(regla(detalle, '.historial .actual::before')).toContain('border-color: transparent')
+  })
+})
+
+describe('reflujo a 188 px: rejillas con mínimo de columna', () => {
+  it('los indicadores y los filtros nunca piden una columna más ancha que el espacio disponible (min(180px, 100%))', () => {
+    expect(css('components/GrupoDeIndicadores/GrupoDeIndicadores.module.css')).toContain(
+      'minmax(min(180px, 100%), 1fr)',
+    )
+    expect(css('components/FiltrosDeReservas/FiltrosDeReservas.module.css')).toContain(
+      'minmax(min(180px, 100%), 1fr)',
     )
   })
 })

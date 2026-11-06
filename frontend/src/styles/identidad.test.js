@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -9,9 +9,9 @@ const sinComentarios = (texto) => texto.replace(/\/\*[\s\S]*?\*\//g, '')
 const leer = (ruta) => sinComentarios(readFileSync(join(SRC, ruta), 'utf8'))
 
 function archivos(carpeta, extension) {
-  return readdirSync(carpeta).flatMap((nombre) => {
-    const ruta = join(carpeta, nombre)
-    if (statSync(ruta).isDirectory()) return nombre === 'assets' ? [] : archivos(ruta, extension)
+  return readdirSync(carpeta, { withFileTypes: true }).flatMap((entrada) => {
+    const ruta = join(carpeta, entrada.name)
+    if (entrada.isDirectory()) return entrada.name === 'assets' ? [] : archivos(ruta, extension)
     return ruta.endsWith(extension) ? [relative(SRC, ruta).replaceAll('\\', '/')] : []
   })
 }
@@ -23,13 +23,41 @@ const token = (nombre) =>
     .trim()
 const pixeles = (texto) => Number.parseFloat(texto)
 
-describe('formas sobrias: sin degradados ni sombras', () => {
-  it.each(TODOS_LOS_CSS)('%s no usa degradados ni box-shadow', (ruta) => {
+describe('formas: tarjetas con radio de 12 px y elevación suave; degradados solo en tokens', () => {
+  it.each(TODOS_LOS_CSS)('%s no usa degradados', (ruta) => {
     expect(leer(ruta)).not.toMatch(/gradient\(/)
-    expect(leer(ruta)).not.toMatch(/box-shadow/)
   })
 
-  it('los radios de los tokens van de 4 a 6 px', () => {
+  // Dos niveles de elevación, siempre a través de su token (ninguna hoja escribe su propia sombra): `flotante` para avisos y menús
+  // desplegables (1 a 2 px) y `tarjeta` para las superficies (dos capas muy suaves).
+  it.each(TODOS_LOS_CSS)('%s solo usa box-shadow con los tokens de elevación', (ruta) => {
+    const sombras = [...leer(ruta).matchAll(/box-shadow:\s*([^;]+);/g)].map((m) => m[1].trim())
+    for (const sombra of sombras)
+      expect(['var(--elevacion-flotante)', 'var(--elevacion-tarjeta)']).toContain(sombra)
+  })
+
+  it('la elevación de tarjeta son dos capas suaves: de 12 px de desenfoque como máximo y opacidad de 10 % o menos', () => {
+    const capas = token('--elevacion-tarjeta').split(/,\s*(?=\d)/)
+    expect(capas).toHaveLength(2)
+    for (const capa of capas) {
+      const medidas = [...capa.matchAll(/(\d+)px/g)].map((m) => Number(m[1]))
+      for (const medida of medidas) expect(medida).toBeLessThanOrEqual(12)
+      expect(Number(capa.match(/\/ (\d+)%/)[1])).toBeLessThanOrEqual(10)
+    }
+  })
+
+  it('la elevación sutil no pasa de 2 px de desplazamiento ni de desenfoque', () => {
+    const medidas = [...token('--elevacion-flotante').matchAll(/(\d+)px/g)].map((m) => Number(m[1]))
+    expect(medidas.length).toBeGreaterThan(0)
+    for (const medida of medidas) expect(medida).toBeLessThanOrEqual(2)
+  })
+
+  it('el radio de tarjeta va de 10 a 14 px', () => {
+    expect(pixeles(token('--radio-tarjeta'))).toBeGreaterThanOrEqual(10)
+    expect(pixeles(token('--radio-tarjeta'))).toBeLessThanOrEqual(14)
+  })
+
+  it('los radios de control (botones, campos, insignias) van de 4 a 6 px', () => {
     for (const nombre of ['--radio', '--radio-pequeno']) {
       expect(token(nombre), `falta ${nombre}`).toBeDefined()
       expect(pixeles(token(nombre))).toBeGreaterThanOrEqual(4)
@@ -39,7 +67,8 @@ describe('formas sobrias: sin degradados ni sombras', () => {
 
   it.each(MODULOS)('%s solo usa radios de los tokens (o 0)', (ruta) => {
     const radios = [...leer(ruta).matchAll(/border-radius:\s*([^;]+);/g)].map((m) => m[1].trim())
-    for (const radio of radios) expect(radio).toMatch(/^(0|var\(--radio(-pequeno|-completo)?\))$/)
+    for (const radio of radios)
+      expect(radio).toMatch(/^(0|var\(--radio(-pequeno|-completo|-tarjeta)?\))$/)
   })
 
   it('el botón y las insignias usan el radio pequeño (esquinas de 4 px, no cápsulas)', () => {
@@ -75,7 +104,7 @@ describe('tablas: encabezado marino claro y filas con separadores finos', () => 
 })
 
 describe('acento dorado: solo detalle', () => {
-  it('el dorado se usa únicamente en bordes (franja del login y línea del menú), nunca como color de texto ni de fondo', () => {
+  it('el dorado se usa únicamente en bordes (franja del login, línea bajo el nombre en el menú de usuario, filete del resumen y marca del ítem activo del menú), nunca como color de texto ni de fondo', () => {
     const usos = TODOS_LOS_CSS.flatMap((ruta) =>
       [...leer(ruta).matchAll(/([\w-]+)\s*:\s*[^;]*var\(--color-dorado\)[^;]*;/g)].map((m) => [
         ruta,
@@ -86,6 +115,8 @@ describe('acento dorado: solo detalle', () => {
     for (const [ruta, propiedad] of usos) expect(propiedad, ruta).toMatch(/^border/)
     expect([...new Set(usos.map(([ruta]) => ruta))].sort()).toEqual([
       'components/Layout/Layout.module.css',
+      'components/Layout/MenuDeUsuario.module.css',
+      'components/ResumenDeSolicitud/ResumenDeSolicitud.module.css',
       'pages/LoginPage.module.css',
     ])
   })
@@ -134,18 +165,73 @@ describe('login: la foto es decorativa y solo se pide en pantallas anchas', () =
     expect(fuera).not.toMatch(/url\(/)
   })
 
-  it('la foto no se estira más de 1,5 veces (alto máximo de 768 px = 1,5 × 512) y se ancla abajo; la capa es plana', () => {
+  it('la foto no se estira más de 1,5 veces (alto máximo de 768 px = 1,5 × 512) y se ancla abajo; sus capas vienen de los tokens', () => {
     expect(pixeles(token('--alto-foto-maximo'))).toBeLessThanOrEqual(768)
     expect(login).toMatch(/height:\s*min\(100%,\s*var\(--alto-foto-maximo\)\)/)
     expect(login).toMatch(/background-size:\s*cover/)
-    expect(login).toMatch(/background:\s*var\(--capa-foto\)/)
+    expect(login).toMatch(
+      /background:\s*var\(--degradado-superior-foto\),\s*var\(--degradado-lateral-foto\)/,
+    )
     expect(antesDelMovil).toMatch(/background:\s*var\(--color-marino\)/)
   })
 
-  it('la capa sobre la foto es del marino con la opacidad del token (al menos 70 %)', () => {
-    const capa = token('--capa-foto')
-    expect(capa).toMatch(/^rgb\(31 54 92 \/ \d+%\)$/)
-    expect(Number.parseInt(capa.match(/(\d+)%/)[1], 10)).toBeGreaterThanOrEqual(70)
+  // El degradado lateral es del marino #1F365C y oscurece la zona del texto (primer 42 % del panel) con 72 % o más. Se comprueba el
+  // peor caso: la foto blanca pura bajo esa capa; el texto blanco debe seguir a 4,5:1 o más (WCAG 1.4.3).
+  const luminancia = (canales) => {
+    const [r, g, b] = canales.map((c) => {
+      const x = c / 255
+      return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4
+    })
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+  }
+
+  it('el degradado lateral deja el texto blanco a 4,5:1 o más sobre la foto más clara posible en la zona del texto', () => {
+    const lateral = token('--degradado-lateral-foto').replace(/\s+/g, ' ')
+    const paradas = [...lateral.matchAll(/rgb\(31 54 92 \/ (\d+)%\) (\d+)%/g)].map((m) => ({
+      opacidad: Number(m[1]) / 100,
+      posicion: Number(m[2]),
+    }))
+    expect(paradas.length).toBeGreaterThanOrEqual(3)
+    const zonaDelTexto = paradas.filter((parada) => parada.posicion <= 42)
+    expect(zonaDelTexto.length).toBeGreaterThanOrEqual(2)
+    for (const { opacidad } of zonaDelTexto) {
+      expect(opacidad).toBeGreaterThanOrEqual(0.72)
+      const mezcla = [31, 54, 92].map((c) => c * opacidad + 255 * (1 - opacidad))
+      const contraste = 1.05 / (luminancia(mezcla) + 0.05)
+      expect(contraste).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it('el degradado va de más oscuro a más claro hacia la derecha y la foto se ve al final', () => {
+    const lateral = token('--degradado-lateral-foto').replace(/\s+/g, ' ')
+    const opacidades = [...lateral.matchAll(/rgb\(31 54 92 \/ (\d+)%\)/g)].map((m) => Number(m[1]))
+    expect(opacidades).toEqual([...opacidades].sort((a, b) => b - a))
+    expect(opacidades.at(-1)).toBe(0)
+  })
+
+  it('solo los tokens declaran degradados (tres) y solo el login y la portada del Inicio los usan', () => {
+    expect(leer('styles/tokens.css').match(/linear-gradient\(/g)).toHaveLength(3)
+    const usan = TODOS_LOS_CSS.filter((ruta) => /var\(--degradado-/.test(leer(ruta)))
+    expect(usan).toEqual([
+      'components/InicioAdmin/Portada.module.css',
+      'pages/LoginPage.module.css',
+    ])
+  })
+
+  it('la portada del Inicio deja el texto blanco a 4,5:1 o más sobre cada color de su degradado', () => {
+    const colores = [...token('--degradado-portada').matchAll(/#([0-9a-f]{6})/gi)].map((m) => m[1])
+    expect(colores.length).toBeGreaterThanOrEqual(3)
+    for (const hex of colores) {
+      const canales = [0, 2, 4].map((i) => Number.parseInt(hex.slice(i, i + 2), 16))
+      expect(1.05 / (luminancia(canales) + 0.05), `#${hex}`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it('el formulario del login usa controles de 48 px y el fondo gris azulado de la tarjeta', () => {
+    expect(pixeles(token('--alto-control-login'))).toBe(48)
+    expect(token('--fondo-login').toLowerCase()).toBe('#f4f6fa')
+    expect(login).toMatch(/--alto-control:\s*var\(--alto-control-login\)/)
+    expect(login).toMatch(/background:\s*var\(--fondo-login\)/)
   })
 
   it('la franja dorada va entre el panel y el formulario', () => {
@@ -163,7 +249,7 @@ describe('logo: versiones optimizadas, nunca el original de 1724 x 2000', () => 
   })
 
   it('el menú y el login usan su propia versión y el recuadro blanco tiene esquinas pequeñas', () => {
-    expect(readFileSync(join(SRC, 'components/Layout/Layout.jsx'), 'utf8')).toMatch(
+    expect(readFileSync(join(SRC, 'components/Layout/MenuLateral.jsx'), 'utf8')).toMatch(
       /logo-upla-menu\.webp/,
     )
     expect(readFileSync(join(SRC, 'pages/LoginPage.jsx'), 'utf8')).toMatch(/logo-upla-login\.webp/)

@@ -1,4 +1,4 @@
-// Comprobación del Layout tras usar el componente Button: botón del menú en móvil (cerrado y abierto) y "Cerrar sesión".
+// Comprobación del Layout tras usar el componente Button: botón del menú en móvil (cerrado y abierto) y "Cerrar sesión" por el menú de usuario.
 import { BASE, abrirNavegador, capturar, carpeta, iniciarSesion, leerSesion, nuevaPagina, ok, paso } from './lib.mjs'
 
 const destino = carpeta('docs', 'evidencias', 'fase7')
@@ -11,25 +11,30 @@ try {
   await admin.goto(`${BASE}/ambientes`)
   const sesion = await leerSesion(admin)
 
-  paso('Escritorio: el botón del menú no se ve y "Cerrar sesión" sí')
-  if (await admin.getByRole('button', { name: 'Menú' }).isVisible()) throw new Error('el botón Menú se ve en escritorio')
+  paso('Escritorio: el botón del menú no se ve y "Cerrar sesión" está en el menú de usuario')
+  if (await admin.getByRole('button', { name: 'Menú', exact: true }).isVisible()) throw new Error('el botón Menú se ve en escritorio')
   ok('botón Menú oculto en 1280 px')
+  await admin.getByRole('button', { name: /, Administrador$/ }).click()
   await admin.getByRole('button', { name: 'Cerrar sesión' }).waitFor()
   await capturar(admin, destino, '10-layout', 'escritorio')
 
   paso('375 px: Menú abre y cierra el panel; Cerrar sesión funciona')
   const movil = await nuevaPagina(navegador, 'movil', sesion)
   await movil.goto(`${BASE}/ambientes`)
-  const menu = movil.getByRole('button', { name: 'Menú' })
+  const menu = movil.getByRole('button', { name: 'Menú', exact: true })
   await menu.waitFor()
   if ((await menu.getAttribute('aria-expanded')) !== 'false') throw new Error('aria-expanded debería ser false')
-  if (await movil.getByRole('button', { name: 'Cerrar sesión' }).isVisible()) throw new Error('el panel debería estar cerrado')
+  if (await movil.getByRole('button', { name: 'Cerrar menú' }).isVisible()) throw new Error('el panel debería estar cerrado')
   await capturar(movil, destino, '10-layout-menu-cerrado', 'movil')
   await menu.click()
   if ((await menu.getAttribute('aria-expanded')) !== 'true') throw new Error('aria-expanded debería ser true')
-  await movil.getByRole('button', { name: 'Cerrar sesión' }).waitFor({ state: 'visible' })
+  await movil.getByRole('button', { name: 'Cerrar menú' }).waitFor({ state: 'visible' })
   ok('el panel se abre con aria-expanded=true')
   await capturar(movil, destino, '11-layout-menu-abierto', 'movil')
+  await movil.keyboard.press('Escape')
+  if ((await menu.getAttribute('aria-expanded')) !== 'false') throw new Error('Escape debería cerrar el panel')
+  ok('Escape cierra el panel')
+  await movil.getByRole('button', { name: /, Administrador$/ }).click()
   await movil.getByRole('button', { name: 'Cerrar sesión' }).click()
   await movil.waitForURL('**/login')
   ok('Cerrar sesión lleva al login')

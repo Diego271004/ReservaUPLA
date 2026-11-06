@@ -8,6 +8,7 @@ import {
   capturar,
   capturasConDesbordamiento,
   carpeta,
+  cerrarSesionPorMenu,
   iniciarSesion,
   leerSesion,
   nuevaPagina,
@@ -61,10 +62,10 @@ try {
   const admin = await nuevaPagina(navegador, 'escritorio')
   await iniciarSesion(admin, 'carla.rojas@upla.edu.pe')
   await admin.waitForURL('**/dashboard')
-  await admin.getByRole('heading', { name: 'Dashboard' }).waitFor()
+  await admin.getByRole('heading', { name: 'Inicio' }).waitFor()
   await admin.getByRole('link', { name: 'Ambientes' }).click()
   await admin.waitForURL('**/ambientes')
-  await admin.getByRole('cell', { name: 'Laboratorio de Cómputo 2' }).waitFor()
+  await admin.getByRole('cell', { name: 'Laboratorio de Cómputo 2 Laboratorio' }).waitFor()
   sesionAdmin = await leerSesion(admin)
   ok(`aterrizó en ${new URL(admin.url()).pathname}; menú: ${(await menu(admin)).join(', ')}`)
   await capturar(admin, destino, '06-ambientes', 'escritorio')
@@ -84,7 +85,7 @@ try {
   await admin.getByLabel('Responsable').selectOption({ label: 'Mario Huamán' })
   await admin.getByRole('button', { name: 'Registrar ambiente' }).click()
   await admin.getByText('Ambiente registrado.').waitFor()
-  await admin.getByRole('cell', { name: 'Laboratorio de Física' }).waitFor()
+  await admin.getByRole('cell', { name: 'Laboratorio de Física Laboratorio' }).waitFor()
   ok('ambiente creado: "Ambiente registrado." y la fila aparece')
 
   await admin.getByRole('button', { name: 'Nuevo ambiente' }).click()
@@ -125,21 +126,23 @@ try {
   await admin.getByRole('button', { name: 'Registrar usuario' }).click()
   await admin.getByText('Ese correo ya está registrado.').waitFor()
   ok('correo repetido: "Ese correo ya está registrado."')
-  await admin.getByRole('button', { name: 'Cerrar sesión' }).click()
+  await cerrarSesionPorMenu(admin)
   await admin.waitForURL('**/login')
 
   paso('Escritorio · Ana Torres (Solicitante)')
   const ana = await nuevaPagina(navegador, 'escritorio')
   await iniciarSesion(ana, 'ana.torres@upla.edu.pe')
+  await ana.waitForURL('**/dashboard')
+  await ana.getByRole('link', { name: 'Nueva reserva' }).click()
   await ana.waitForURL('**/reservas/nueva')
   sesionAna = await leerSesion(ana)
   ok(`aterrizó en ${new URL(ana.url()).pathname}; menú: ${(await menu(ana)).join(', ')}`)
-  await ana.getByRole('option', { name: /Laboratorio de Física/ }).waitFor({ state: 'attached' })
+  await ana.getByRole('radio', { name: /Laboratorio de Física/ }).waitFor({ state: 'attached' })
   await capturar(ana, destino, '04-nueva-reserva', 'escritorio')
   await ana.getByRole('button', { name: 'Registrar solicitud' }).click()
   await ana.getByText('Ingresa el motivo de la reserva.').waitFor()
   await capturar(ana, destino, '05-nueva-reserva-errores', 'escritorio')
-  await ana.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Física' })
+  await ana.getByRole('radio', { name: /Laboratorio de Física/ }).click()
   await ana.getByLabel('Fecha').fill('')
   await ana.getByLabel('Fecha').pressSequentially(fechaRelativa(14).digitos)
   await ana.getByLabel('Hora de inicio').selectOption('14:00')
@@ -155,7 +158,7 @@ try {
   await ana.goto(`${BASE}/usuarios`)
   await ana.getByRole('heading', { name: 'Sin permiso' }).waitFor()
   ok('la Solicitante en /usuarios ve "Sin permiso"')
-  await ana.getByRole('button', { name: 'Cerrar sesión' }).click()
+  await cerrarSesionPorMenu(ana)
   await ana.waitForURL('**/login')
 
   // ============================ 375 px: las mismas pantallas ============================
@@ -165,9 +168,9 @@ try {
   paso('375 px · Administrador')
   const adminMovil = await nuevaPagina(navegador, 'movil', sesionAdmin)
   await adminMovil.goto(`${BASE}/ambientes`)
-  await adminMovil.getByRole('cell', { name: 'Laboratorio de Física' }).waitFor()
+  await adminMovil.getByRole('cell', { name: 'Laboratorio de Física Laboratorio' }).waitFor()
   await capturar(adminMovil, destino, '06-ambientes', 'movil')
-  await adminMovil.getByRole('button', { name: 'Menú' }).click()
+  await adminMovil.getByRole('button', { name: 'Menú', exact: true }).click()
   await capturar(adminMovil, destino, '06-ambientes-menu-abierto', 'movil')
   await adminMovil.getByRole('link', { name: 'Ambientes' }).click()
   await adminMovil.getByRole('button', { name: 'Nuevo ambiente' }).click()
@@ -189,13 +192,13 @@ try {
   paso('375 px · Solicitante')
   const anaMovil = await nuevaPagina(navegador, 'movil', sesionAna)
   await anaMovil.goto(`${BASE}/reservas/nueva`)
-  await anaMovil.getByRole('option', { name: /Laboratorio de Física/ }).waitFor({ state: 'attached' })
+  await anaMovil.getByRole('radio', { name: /Laboratorio de Física/ }).waitFor({ state: 'attached' })
   await capturar(anaMovil, destino, '04-nueva-reserva', 'movil')
   await separacionUniforme(anaMovil, ['ambienteId', 'fecha', 'horaInicio', 'horaFin'], 'nueva reserva (375 px)')
   await anaMovil.getByRole('button', { name: 'Registrar solicitud' }).click()
   await anaMovil.getByText('Ingresa el motivo de la reserva.').waitFor()
   await capturar(anaMovil, destino, '05-nueva-reserva-errores', 'movil')
-  await anaMovil.getByLabel('Ambiente').selectOption({ label: 'Laboratorio de Física' })
+  await anaMovil.getByRole('radio', { name: /Laboratorio de Física/ }).click()
   await anaMovil.getByLabel('Fecha').fill('')
   await anaMovil.getByLabel('Fecha').pressSequentially(fechaRelativa(16).digitos)
   await anaMovil.getByLabel('Hora de inicio').selectOption('08:00')
