@@ -1,11 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
 import { TEXTOS } from '../constants/messages.js'
 import { crearReserva, listarAmbientes } from '../services/recursosService.js'
-import { HORAS, fechaAIso, horasPosterioresA, hoy } from '../utils/fechas.js'
+import { HORAS, fechaAIso, horasPosterioresA, hoy, isoAFecha } from '../utils/fechas.js'
 import { validarReserva } from '../utils/validators.js'
 import { useCarga } from './useCarga.js'
 import { useDisponibilidad } from './useDisponibilidad.js'
 import { useFormulario } from './useFormulario.js'
+import { useSearchParams } from 'react-router-dom'
 
 const valoresIniciales = () => ({
   ambienteId: '',
@@ -33,9 +34,27 @@ export function detalleDeAmbiente(ambiente) {
 }
 
 export function useReservaForm() {
+  const [parametros] = useSearchParams()
   const ambientes = useCarga(listarAmbientes)
   const [reservaCreada, setReservaCreada] = useState(null)
-  const [valoresPorDefecto] = useState(valoresIniciales)
+  const [valoresPorDefecto] = useState(() => {
+    const ambienteId = parametros.get('ambienteId') ?? ''
+    const fechaIso = parametros.get('fecha') ?? ''
+    const horaInicio = parametros.get('horaInicio') ?? ''
+    const horaFinParam = parametros.get('horaFin') ?? ''
+    const horaFin = horaFinParam || (horaInicio ? (horasPosterioresA(horaInicio)[0] ?? '') : '')
+    return {
+      ...valoresIniciales(),
+      ambienteId,
+      fecha: fechaIso
+        ? fechaIso.includes('/')
+          ? fechaIso
+          : (isoAFecha(fechaIso) ?? valoresIniciales().fecha)
+        : valoresIniciales().fecha,
+      horaInicio,
+      horaFin,
+    }
+  })
 
   const opcionesAmbiente = useMemo(
     () =>
@@ -80,9 +99,26 @@ export function useReservaForm() {
     return elegido ? detalleDeAmbiente(elegido) : undefined
   }, [ambientes.datos, formulario.valores.ambienteId])
 
-  const disponibilidad = useDisponibilidad(formulario.valores, reservaCreada === null)
+  const ambienteElegido = useMemo(() => {
+    const elegido = ambientes.datos.find(
+      (ambiente) => String(ambiente.id) === formulario.valores.ambienteId,
+    )
+    return elegido ? { nombre: elegido.nombre, detalle: detalleDeAmbiente(elegido) } : null
+  }, [ambientes.datos, formulario.valores.ambienteId])
 
-  const { reiniciar } = formulario
+  const disponibilidad = useDisponibilidad(formulario.valores, reservaCreada === null)
+  const { setValores, reiniciar } = formulario
+  const seleccionarFranja = useCallback(
+    (horaInicio, horaFin) => {
+      setValores((actuales) => ({
+        ...actuales,
+        horaInicio,
+        horaFin,
+      }))
+    },
+    [setValores],
+  )
+
   const registrarOtra = useCallback(() => {
     setReservaCreada(null)
     reiniciar(valoresIniciales())
@@ -90,13 +126,16 @@ export function useReservaForm() {
 
   return {
     ...formulario,
+    ambientes: ambientes.datos,
     opcionesAmbiente,
     ayudaAmbiente,
+    ambienteElegido,
     cargandoAmbientes: ambientes.cargando,
     errorAmbientes: ambientes.error,
     horasInicio: HORAS,
     horasFin: horasPosterioresA(formulario.valores.horaInicio),
     disponibilidad,
+    seleccionarFranja,
     reservaCreada,
     registrarOtra,
     cancelar: () => formulario.reiniciar(valoresIniciales()),

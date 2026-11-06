@@ -14,7 +14,9 @@
   max-width: 760px;
   padding: var(--espacio-3);
   background: var(--color-superficie);
-  border-radius: var(--radio);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--elevacion-tarjeta);
 }
 
 .resumen {
@@ -46,9 +48,10 @@
 }
 
 @media (max-width: 767px) {
+  /* minmax(0, 1fr): con 1fr a secas las columnas no bajan de su contenido y la página se ensancha a 188 px (zoom del 200 %). */
   .horas,
   .resumen {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .acciones {

@@ -1,0 +1,64 @@
+.franja {
+  margin: 0 0 var(--espacio-3);
+  padding: var(--espacio-2);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--elevacion-tarjeta);
+  background: var(--color-superficie);
+}
+.franja h2 {
+  margin: 0 0 var(--espacio-1);
+  font-size: 1rem;
+}
+.franja p {
+  margin: 0 0 var(--espacio-1);
+  color: var(--color-texto-suave);
+  font-size: 0.875rem;
+}
+.tramos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-1);
+}
+.tramo {
+  min-height: var(--alto-control);
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+.libre {
+  color: var(--color-exito);
+  background: var(--fondo-exito);
+  border-color: var(--color-exito);
+}
+.aprobada {
+  color: var(--color-exito);
+  background: var(--fondo-exito);
+}
+.pendiente {
+  color: var(--color-aviso);
+  background: var(--fondo-aviso);
+}
+.mantenimiento {
+  color: var(--color-texto);
+  border: 2px dashed var(--color-borde-control);
+}
+.marcaChoque {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  color: var(--color-error);
+}
+@media (max-width: 767px) {
+  .tramos {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tramo {
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+    text-align: left;
+    white-space: normal; /* «Libre 13:00–22:00 Choque» puede partirse en dos líneas en lugar de salirse de la pantalla */
+  }
+}

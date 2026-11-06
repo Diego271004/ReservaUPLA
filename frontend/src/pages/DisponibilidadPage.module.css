@@ -1,0 +1,311 @@
+.pagina {
+  min-width: 0;
+}
+.cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-2);
+}
+.cabecera h1 {
+  margin: 0;
+}
+.cabecera p {
+  margin: var(--espacio-1) 0 0;
+  color: var(--color-texto-suave);
+}
+.fechas {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--espacio-1);
+}
+.botonNav {
+  min-width: 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.botonHoy {
+  height: 44px;
+  min-width: 54px;
+  padding: 0 var(--espacio-2);
+}
+.fechas label {
+  display: grid;
+  gap: 0.25rem;
+}
+.fechas input {
+  height: var(--alto-control);
+  width: 150px;
+  border: 1px solid var(--color-borde-control);
+  border-radius: var(--radio);
+}
+.leyenda {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-2);
+}
+.leyenda > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-1);
+  min-height: 44px;
+  font-size: var(--texto-sm);
+  white-space: nowrap;
+}
+.vista {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-superficie);
+  overflow: visible;
+}
+.desktop {
+  min-width: 0;
+  padding: var(--espacio-1);
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+}
+.nombreEje {
+  min-height: 44px;
+}
+.filaAmbiente {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  min-height: 64px;
+  border-top: 1px solid var(--color-borde);
+}
+.nombreAmbiente {
+  display: flex;
+  align-items: center;
+  padding: var(--espacio-1);
+  border-right: 1px solid var(--color-borde);
+  font-weight: 700;
+}
+.lineaTiempo {
+  position: relative;
+  min-width: 0;
+  height: 64px;
+  background: var(--color-fondo);
+}
+.bloque {
+  position: absolute;
+  top: 8px;
+  height: 48px;
+  min-width: 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radio-pequeno);
+  overflow: hidden;
+  justify-content: flex-start;
+  gap: 0.25rem;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+.bloque span {
+  overflow: visible;
+  text-overflow: clip;
+}
+.libreMuyCorto .textoLibre {
+  display: none;
+}
+.libreCorto .textoLibre {
+  white-space: nowrap;
+}
+.libreMedio .textoLibre {
+  white-space: nowrap;
+}
+.libre {
+  color: var(--color-exito);
+  border: 1px solid var(--color-borde-control);
+  background: var(--color-superficie);
+}
+.aprobada {
+  color: var(--color-exito);
+  border: 1px solid var(--color-exito);
+  background: var(--fondo-exito);
+}
+.pendiente {
+  color: var(--color-aviso);
+  border: 1px solid var(--color-aviso);
+  background: var(--fondo-aviso);
+}
+.mantenimiento {
+  color: var(--color-texto);
+  border: 2px dashed var(--color-borde-control);
+  background: var(--fondo-neutro);
+}
+.lineaAhora {
+  position: absolute;
+  z-index: 4;
+  top: -8px;
+  bottom: -8px;
+  width: 2px;
+  background: var(--color-marino);
+  pointer-events: none;
+}
+.esqueleto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-2);
+}
+.carrilEsqueleto {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  height: 64px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  overflow: hidden;
+}
+.esqueletoNombre {
+  background: var(--fondo-neutro);
+  border-right: 1px solid var(--color-borde);
+  animation: pulsoEsqueleto 1.5s ease-in-out infinite;
+}
+.esqueletoPista {
+  position: relative;
+  background: var(--color-fondo);
+  padding: 8px;
+  display: flex;
+  gap: var(--espacio-2);
+  align-items: center;
+}
+.esqueletoBloque1 {
+  width: 30%;
+  height: 48px;
+  border-radius: var(--radio-pequeno);
+  background: var(--fondo-neutro);
+  animation: pulsoEsqueleto 1.5s ease-in-out infinite;
+}
+.esqueletoBloque2 {
+  width: 45%;
+  height: 48px;
+  border-radius: var(--radio-pequeno);
+  background: var(--fondo-neutro);
+  animation: pulsoEsqueleto 1.5s ease-in-out infinite 0.2s;
+}
+@keyframes pulsoEsqueleto {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .esqueletoNombre,
+  .esqueletoBloque1,
+  .esqueletoBloque2 {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+.vacio {
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-superficie);
+}
+.vacio h2 {
+  margin-top: 0;
+}
+.mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .leyenda {
+    flex-wrap: wrap;
+    gap: var(--espacio-1) var(--espacio-2);
+  }
+  .cabecera {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .fechas {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px auto;
+    align-items: end;
+    gap: var(--espacio-1);
+  }
+  .fechas label {
+    min-width: 0;
+  }
+  .fechas input {
+    width: 100%;
+    min-width: 0;
+  }
+  .desktop {
+    display: none;
+  }
+  .mobile {
+    display: grid;
+    gap: var(--espacio-1);
+    padding: var(--espacio-1);
+  }
+  .vista {
+    border: 0;
+    background: transparent;
+  }
+  .tarjetaAmbiente {
+    padding: var(--espacio-1);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    background: var(--color-superficie);
+  }
+  .tarjetaAmbiente h2 {
+    margin: 0 0 var(--espacio-1);
+    font-size: 1rem;
+  }
+  .listaMovil {
+    display: grid;
+    gap: var(--espacio-1);
+  }
+  .itemMovil {
+    width: 100%;
+    min-height: var(--alto-control);
+    justify-content: flex-start;
+    font-size: 0.875rem;
+  }
+  .carrilEsqueleto {
+    grid-template-columns: 1fr;
+    height: auto;
+    padding: var(--espacio-2);
+    gap: var(--espacio-1);
+  }
+  .esqueletoNombre {
+    height: 24px;
+    width: 60%;
+    border-right: none;
+    border-radius: var(--radio-pequeno);
+  }
+  .esqueletoPista {
+    flex-direction: column;
+    padding: 0;
+    gap: var(--espacio-1);
+  }
+  .esqueletoBloque1,
+  .esqueletoBloque2 {
+    width: 100%;
+    height: 44px;
+  }
+}
+
+@media (max-width: 320px) {
+  .fechas {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+  }
+  .botonHoy {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}

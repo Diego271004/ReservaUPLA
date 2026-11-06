@@ -8,6 +8,7 @@ import {
   isoAFecha,
   minutosDeHora,
   parsearFecha,
+  tiempoRelativo,
 } from './fechas.js'
 
 describe('HORAS (lista cerrada, RN-04)', () => {
@@ -82,5 +83,16 @@ describe('fechas dd/mm/aaaa', () => {
     expect(aplicarMascaraFecha('0')).toBe('0')
     expect(aplicarMascaraFecha('05a/11-2026999')).toBe('05/11/2026')
     expect(aplicarMascaraFecha('')).toBe('')
+  })
+})
+
+describe('tiempoRelativo', () => {
+  const base = new Date('2026-11-05T15:00:00Z')
+
+  it('formatea fechas relativas correctamente', () => {
+    expect(tiempoRelativo('2026-11-05T14:59:30Z', base)).toBe('hace un momento')
+    expect(tiempoRelativo('2026-11-05T14:30:00Z', base)).toBe('hace 30 minutos')
+    expect(tiempoRelativo('2026-11-05T13:00:00Z', base)).toBe('hace 2 horas')
+    expect(tiempoRelativo('2026-11-02T15:00:00Z', base)).toBe('hace 3 días')
   })
 })

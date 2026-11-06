@@ -1,17 +1,25 @@
 import AlertMessage from '../components/ui/AlertMessage.jsx'
+import AtajosDeDuracion from '../components/AtajosDeDuracion/AtajosDeDuracion.jsx'
+import BarraResumenMovil from '../components/ResumenDeSolicitud/BarraResumenMovil.jsx'
+import ResumenDeSolicitud from '../components/ResumenDeSolicitud/ResumenDeSolicitud.jsx'
 import Button from '../components/ui/Button.jsx'
 import DateInput from '../components/ui/DateInput.jsx'
 import FormularioTarjeta from '../components/FormularioTarjeta/FormularioTarjeta.jsx'
+import FranjaNuevaReserva from '../components/Disponibilidad/FranjaNuevaReserva.jsx'
 import Insignia from '../components/ui/Insignia.jsx'
-import SelectInput from '../components/ui/SelectInput.jsx'
+import PageHeader from '../components/ui/PageHeader.jsx'
+import SelectorDeAmbientes from '../components/ui/SelectorDeAmbientes.jsx'
 import TextInput from '../components/ui/TextInput.jsx'
 import TimeInput from '../components/ui/TimeInput.jsx'
 import { MENSAJES, TEXTOS } from '../constants/messages.js'
 import { ESTADOS_DISPONIBILIDAD } from '../hooks/useDisponibilidad.js'
 import { useReservaForm } from '../hooks/useReservaForm.js'
 import { isoAFecha } from '../utils/fechas.js'
+import { LIMITES } from '../utils/validators.js'
 import { useNavigate } from 'react-router-dom'
 import estilos from './NuevaReservaPage.module.css'
+
+const LIMITE_MOTIVO = LIMITES.motivo
 
 // Aviso inmediato (pantallas 04 y 04e): verde si está libre, rojo con la hora ocupada si no.
 function AvisoDisponibilidad({ aviso }) {
@@ -32,7 +40,7 @@ export default function NuevaReservaPage() {
   if (reservaCreada) {
     return (
       <>
-        <h1>{TEXTOS.tituloNuevaReserva}</h1>
+        <PageHeader titulo={TEXTOS.tituloNuevaReserva} />
         <section className={estilos.cierre}>
           <AlertMessage tipo="exito">{MENSAJES.reservaRegistrada}</AlertMessage>
           <dl className={estilos.resumen}>
@@ -58,7 +66,12 @@ export default function NuevaReservaPage() {
             </div>
           </dl>
           <div className={estilos.acciones}>
-            <Button variante="secundario" onClick={() => navigate(`/reservas/${reservaCreada.id}`)}>
+            <Button
+              variante="secundario"
+              onClick={() =>
+                navigate(`/reservas/${reservaCreada.id}`, { state: { volverA: '/reservas' } })
+              }
+            >
               {TEXTOS.verDetalle}
             </Button>
             <Button onClick={form.registrarOtra}>{TEXTOS.registrarOtra}</Button>
@@ -77,18 +90,41 @@ export default function NuevaReservaPage() {
       alerta={form.alerta}
       onSubmit={form.handleSubmit}
       onCancelar={form.cancelar}
+      barraInferior={
+        <BarraResumenMovil
+          ambiente={form.ambienteElegido}
+          fecha={form.valores.fecha}
+          horaInicio={form.valores.horaInicio}
+          horaFin={form.valores.horaFin}
+        />
+      }
+      lateral={
+        <ResumenDeSolicitud
+          ambiente={form.ambienteElegido}
+          fecha={form.valores.fecha}
+          horaInicio={form.valores.horaInicio}
+          horaFin={form.valores.horaFin}
+          motivo={form.valores.motivo}
+        />
+      }
     >
       {form.errorAmbientes && <AlertMessage tipo="error">{form.errorAmbientes}</AlertMessage>}
-      <SelectInput
+      <SelectorDeAmbientes
         {...form.campoDeLista('ambienteId')}
         etiqueta={TEXTOS.etiquetaAmbiente}
-        opciones={form.opcionesAmbiente}
-        ayuda={form.ayudaAmbiente}
+        ambientes={form.ambientes}
       />
       <DateInput
         {...form.campoDeTexto('fecha')}
         etiqueta={TEXTOS.etiquetaFecha}
         ayuda={TEXTOS.ayudaFecha}
+      />
+      <FranjaNuevaReserva
+        ambienteId={form.valores.ambienteId}
+        fecha={form.valores.fecha}
+        horaInicio={form.valores.horaInicio}
+        horaFin={form.valores.horaFin}
+        seleccionar={form.seleccionarFranja}
       />
       <div className={estilos.horas}>
         <TimeInput
@@ -103,8 +139,18 @@ export default function NuevaReservaPage() {
         />
       </div>
       <p className={estilos.ayudaHorario}>{TEXTOS.ayudaHorario}</p>
+      <AtajosDeDuracion
+        horaInicio={form.valores.horaInicio}
+        horaFin={form.valores.horaFin}
+        alElegir={form.seleccionarFranja}
+      />
       <AvisoDisponibilidad aviso={form.disponibilidad} />
-      <TextInput {...form.campoDeTexto('motivo')} etiqueta={TEXTOS.etiquetaMotivo} multilinea />
+      <TextInput
+        {...form.campoDeTexto('motivo')}
+        etiqueta={TEXTOS.etiquetaMotivo}
+        ayuda={`${form.valores.motivo.length} de ${LIMITE_MOTIVO} caracteres`}
+        multilinea
+      />
     </FormularioTarjeta>
   )
 }

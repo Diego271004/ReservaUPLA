@@ -1,0 +1,42 @@
+.contenedor {
+  display: grid;
+  gap: var(--espacio-1);
+  min-width: 0;
+}
+
+.eje {
+  position: relative;
+  height: 20px;
+  margin-right: 2px;
+}
+
+.eje span {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: var(--color-texto-suave);
+}
+
+.eje .etiquetaOculta {
+  visibility: hidden;
+}
+
+.carrilAhora {
+  position: relative;
+  height: 22px;
+  border-top: 1px dashed var(--color-borde-control);
+}
+
+.carrilAhora span {
+  position: absolute;
+  top: -11px;
+  transform: translateX(-50%);
+  padding: 0 var(--espacio-1);
+  min-height: 20px;
+  border-radius: var(--radio-pequeno);
+  background: var(--color-marino);
+  color: var(--color-sobre-oscuro);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}

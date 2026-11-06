@@ -1,0 +1,32 @@
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  margin-bottom: var(--espacio-3);
+}
+
+.titulo {
+  font-weight: 600;
+  color: var(--color-marino);
+  font-size: 0.875rem;
+}
+
+.cuadricula {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espacio-1);
+}
+
+.boton {
+  min-height: var(--control-alto-minimo, 44px);
+  height: 44px;
+  width: 100%;
+  padding: 0 var(--espacio-1);
+  justify-content: center;
+}
+
+.boton.elegida {
+  color: var(--color-sobre-oscuro);
+  background: var(--color-primario);
+  border-color: transparent; /* el relleno azul ya es el límite del control (6:1 sobre la tarjeta) */
+}

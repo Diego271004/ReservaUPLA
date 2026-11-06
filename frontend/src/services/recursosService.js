@@ -1,5 +1,5 @@
 import { consultaDeFiltros } from '../utils/filtrosDeReservas.js'
-import { llamarApi } from './llamarApi.js'
+import { llamarApi, RESULTADO } from './llamarApi.js'
 
 // Usuarios (solo Administrador)
 export const listarUsuarios = (rol) =>
@@ -23,6 +23,29 @@ export const listarReservas = (filtros = {}) => {
   const consulta = consultaDeFiltros(filtros).toString()
   return llamarApi(consulta ? `/reservas?${consulta}` : '/reservas')
 }
+
+const ESTADOS_DE_RESERVA = ['Pendiente', 'Aprobada', 'Rechazada', 'Cancelada']
+
+/**
+ * Cuántas reservas hay en cada estado con los demás filtros aplicados (para el número de cada pestaña). Una consulta por estado;
+ * si alguna falla se devuelve ese fallo, igual que cualquier otra llamada.
+ */
+export const contarReservasPorEstado = async (filtros = {}) => {
+  const resultados = await Promise.all(
+    ESTADOS_DE_RESERVA.map((estado) => listarReservas({ ...filtros, estado, pagina: 1 })),
+  )
+  const fallido = resultados.find((resultado) => !resultado || resultado.tipo !== RESULTADO.exito)
+  if (fallido !== undefined) return fallido
+  return {
+    tipo: RESULTADO.exito,
+    data: Object.fromEntries(
+      ESTADOS_DE_RESERVA.map((estado, i) => [estado, resultados[i].data.total]),
+    ),
+  }
+}
+
+export const obtenerDisponibilidadDia = (fecha) =>
+  llamarApi(`/reservas/disponibilidad-dia?${new URLSearchParams({ fecha }).toString()}`)
 
 // Dashboard (solo Administrador) y Mi ambiente (solo Responsable)
 export const obtenerDashboard = () => llamarApi('/dashboard')

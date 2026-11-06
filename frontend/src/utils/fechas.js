@@ -81,3 +81,44 @@ export function aplicarMascaraFecha(entrada) {
   if (digitos.length <= 4) return `${digitos.slice(0, 2)}/${digitos.slice(2)}`
   return `${digitos.slice(0, 2)}/${digitos.slice(2, 4)}/${digitos.slice(4)}`
 }
+
+// La universidad está en Lima (UTC-5, sin horario de verano): «hoy» y el saludo no dependen de la zona del equipo.
+const partesEnLima = (ahora) =>
+  Object.fromEntries(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'America/Lima',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      hourCycle: 'h23',
+    })
+      .formatToParts(ahora)
+      .map(({ type, value }) => [type, value]),
+  )
+
+/** La fecha de hoy en Lima como dd/mm/aaaa. */
+export function hoyEnLima(ahora = new Date()) {
+  const { day, month, year } = partesEnLima(ahora)
+  return `${day}/${month}/${year}`
+}
+
+/** La hora actual en Lima (0 a 23). */
+export const horaEnLima = (ahora = new Date()) => Number(partesEnLima(ahora).hour)
+
+/** Formato de tiempo relativo en español: «hace un momento», «hace 2 horas», «hace 3 días». */
+export function tiempoRelativo(iso, ahora = new Date()) {
+  if (!iso) return ''
+  const fecha = new Date(iso)
+  const diffSegundos = Math.floor((ahora.getTime() - fecha.getTime()) / 1000)
+  if (isNaN(diffSegundos) || diffSegundos < 0) return 'hace un momento'
+  if (diffSegundos < 60) return 'hace un momento'
+  const diffMinutos = Math.floor(diffSegundos / 60)
+  if (diffMinutos < 60) return `hace ${diffMinutos} ${diffMinutos === 1 ? 'minuto' : 'minutos'}`
+  const diffHoras = Math.floor(diffMinutos / 60)
+  if (diffHoras < 24) return `hace ${diffHoras} ${diffHoras === 1 ? 'hora' : 'horas'}`
+  const diffDias = Math.floor(diffHoras / 24)
+  if (diffDias < 30) return `hace ${diffDias} ${diffDias === 1 ? 'día' : 'días'}`
+  const diffMeses = Math.floor(diffDias / 30)
+  return `hace ${diffMeses} ${diffMeses === 1 ? 'mes' : 'meses'}`
+}
