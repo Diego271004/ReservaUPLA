@@ -131,10 +131,20 @@ La regla se verificó con `etiquetasDeAcciones.test.jsx` (cada lista abre su for
 
 | Tipo | Elementos | Dónde está | Qué hace |
 |---|---|---|---|
-| **Global** | Menú lateral (`nav` «Principal») con 1 a 5 opciones según el rol; marca de la opción activa | Columna izquierda en escritorio; panel plegable con el botón **Menú** en móvil | Lleva a cada pantalla principal; la opción activa se marca (las de `exacta: false` también en sus subpantallas); **en el detalle de una reserva marca la sección de origen** (Reservas por defecto, Dashboard o Mi ambiente, con `aria-current="true"`); no hay migas de pan |
+| **Global** | Menú lateral (`nav` «Principal») con 1 a 5 opciones según el rol, cada una con **icono y texto**; marca de la opción activa; contador de pendientes junto a «Reservas» (Administrador) | Columna izquierda en escritorio, **contraíble a solo iconos** (la preferencia se guarda en `localStorage`); **panel deslizante** en móvil que abre la hamburguesa de la barra superior | Lleva a cada pantalla principal; la opción activa se marca (las de `exacta: false` también en sus subpantallas); **en el detalle de una reserva marca la sección de origen** (Reservas por defecto, Dashboard o Mi ambiente, con `aria-current="true"`) |
+| **Global (barra superior)** | Migas de pan (`nav` «Migas de pan»), fecha de hoy en Lima (dd/mm/aaaa) y menú de usuario | Franja superior fija sobre el contenido, en todas las pantallas autenticadas | Dice **dónde está** la persona (una miga en las secciones del menú; «Sección › Detalle de la reserva» o «Ambientes › Registrar ambiente» en las subpantallas, con el origen como enlace) y quién tiene la sesión |
 | **Local** | Filtros de Reservas (Estado, Ambiente, Fecha desde, Fecha hasta), «Aplicar filtros», «Limpiar»; paginación «Anterior/Siguiente»; selector de ambiente de `Mi ambiente` | Encima y debajo de la tabla de la pantalla | Cambia lo que muestra la **misma** pantalla; el estado va en la dirección (`?estado=Pendiente&pagina=2`) |
 | **Contextual** | «Ver detalle» (filas de Reservas, Dashboard y Mi ambiente; cierre de Nueva reserva); «Ver todas las pendientes»; «Volver a Reservas» / «Volver al Dashboard» / «Volver a Mi ambiente»; «Nuevo ambiente», «Nuevo usuario»; «Volver» de los formularios de Ambientes y Usuarios | Dentro de la pantalla, junto al contenido al que se refiere | Va a una pantalla **relacionada** que no está en el menú, o regresa |
-| **De utilidad** | «Cerrar sesión»; nombre y rol de quien tiene la sesión; «¿Olvidaste tu contraseña?» (login) | Pie y cabecera del menú | Sesión y ayuda, fuera del flujo de tareas |
+| **De utilidad** | Menú de usuario (avatar con iniciales, nombre y rol) con «Cerrar sesión»; «¿Olvidaste tu contraseña?» (login) | Extremo derecho de la barra superior | Sesión y ayuda, fuera del flujo de tareas |
+
+**Barra superior, menú contraíble y contador (rediseño de experiencia, sub-fase A).**
+- *Migas de pan:* `utils/migas.js` las calcula con la tabla `RUTAS`: una sección del menú es una sola miga (sin enlace, `aria-current="page"`); el detalle cuelga de su origen (la misma regla de `rutaDeRegreso`, con filtros y página) y los formularios de registro, de su listado. Los enlaces miden 44 px de alto. El menú lateral sigue marcando la sección de origen.
+- *Menú contraíble:* en escritorio «Contraer menú» deja solo los iconos (80 px); cada opción conserva su nombre accesible (el texto queda fuera de la vista pero en el árbol) y su `title`. `useMenuColapsado` guarda la preferencia (`reservaupla.menu-colapsado`); si `localStorage` está bloqueado, funciona sin recordar.
+- *Menú de usuario:* botón con nombre accesible «Carla Rojas, Administrador» que despliega nombre, rol (con la línea dorada fina) y «Cerrar sesión». Se abre con Enter y Espacio; Escape lo cierra y devuelve el foco al botón; **Tab fuera del panel lo cierra** (decisión: no atrapa el foco, porque no es un modal); un clic fuera también lo cierra. En móvil muestra solo el avatar y el panel se ancla a los dos lados de la barra (cabe a 188 px).
+- *Panel móvil:* la hamburguesa (aria-expanded, aria-controls) abre el panel; el foco entra, Tab y Mayús+Tab dan la vuelta, Escape, «Cerrar menú» o un clic en el fondo lo cierran y el foco vuelve a la hamburguesa.
+- *Contador de pendientes:* solo para el Administrador, con el endpoint del Dashboard; el enlace pasa a llamarse «Reservas 6 pendientes» (singular «1 pendiente»). Se actualiza tras aprobar, rechazar o cancelar desde el Dashboard o el detalle (`PendientesContext`).
+- *Avisos:* el éxito de una acción (aprobada, rechazada, cancelada, registrado) sale como aviso no bloqueante en la esquina; los errores siguen en el lugar donde ocurren.
+Pruebas: `Layout.test.jsx`, `Avisos.test.jsx`, `PendientesContext.test.jsx`, `pendientesTrasDecidir.test.jsx`, `migas.test.js`, `useMenuColapsado.test.jsx`, `e2e experiencia-a` y la sección H de `docs/evidencias/experiencia-accesibilidad.txt`.
 
 **Regreso con filtro y página conservados.** Reservas pasa su dirección completa en el estado del router (`state.volverA = /reservas?estado=Pendiente&pagina=2`) al abrir un detalle, y el enlace «Volver a Reservas» regresa **exactamente** a esa lista; desde el Dashboard el estado es `/dashboard` y el enlace se llama «Volver al Dashboard». Mi ambiente hace lo mismo con su dirección (`/mi-ambiente?ambienteId=1&pagina=2`) y el enlace dice «Volver a Mi ambiente». Un origen que no está en el menú del rol se ignora; si se abre el detalle escribiendo la dirección, el regreso es la primera pantalla de origen de su menú (Reservas, o Mi ambiente para la Responsable). Como el filtro está en la URL, «atrás» del navegador y compartir el enlace también funcionan. Pruebas: `ReservasPage.test.jsx`, `DashboardPage.test.jsx`, `MiAmbientePage.test.jsx`, `LayoutYDetalle.test.jsx`, `utils/rutaDeRegreso.test.js`, `e2e fase9` y `e2e fase-ai`.
 
@@ -273,6 +283,8 @@ El vocabulario conecta dos palabras: **solicitud** es una reserva que todavía n
 
 ## 7. Mapa del sitio
 
+**Decisión de `/mi-ambiente`:** se conserva como pantalla de detalle operativo del Responsable. El inicio comparte únicamente agenda de hoy, próximas reservas y acceso a esa pantalla; `/mi-ambiente` conserva la vista detallada, por lo que no reemplaza ni duplica el Dashboard del Responsable.
+
 Generado por `node tools/usabilidad/mapa-del-sitio.mjs --escribir` desde `constants/rutas.js` y `navegacion.js`; **no se edita a mano**. `--verificar` falla si no coincide con el código.
 
 <!-- MAPA:inicio -->
@@ -281,7 +293,8 @@ Generado por `node tools/usabilidad/mapa-del-sitio.mjs --escribir` desde `consta
 |---|---|---|---|---|
 | `/login` | Iniciar sesión | Sin sesión (pública) | — | Dirección o cierre de sesión |
 | `/` | Redirige a la pantalla inicial del rol (o a `/login`) | Cualquiera | — | Dirección |
-| `/dashboard` | Dashboard | Administrador | Administrador | Menú lateral |
+| `/dashboard` | Inicio | Administrador, Solicitante, Responsable de ambiente | Administrador, Solicitante, Responsable de ambiente | Menú lateral |
+| `/disponibilidad` | Disponibilidad | Administrador, Solicitante, Responsable de ambiente | Administrador, Solicitante, Responsable de ambiente | Menú lateral |
 | `/ambientes` | Ambientes | Administrador | Administrador | Menú lateral |
 | `/ambientes/nuevo` | Registrar ambiente | Administrador | — | Botón dentro de la pantalla del menú |
 | `/usuarios` | Usuarios | Administrador | Administrador | Menú lateral |
@@ -297,7 +310,8 @@ flowchart LR
   LOGIN[Iniciar sesión]
   subgraph Administrador["Administrador"]
     direction TB
-    A_dashboard["Dashboard"]
+    A_dashboard["Inicio"]
+    A_disponibilidad["Disponibilidad"]
     A_ambientes["Ambientes"]
     A_ambientes_nuevo["Registrar ambiente (botón)"]
     A_usuarios["Usuarios"]
@@ -314,20 +328,26 @@ flowchart LR
   LOGIN --> A_dashboard
   subgraph Solicitante["Solicitante"]
     direction TB
+    S_dashboard["Inicio"]
+    S_disponibilidad["Disponibilidad"]
     S_reservas_nueva["Nueva reserva"]
     S_reservas["Reservas"]
     S_reservas__id["Detalle de la reserva (enlace)"]
     S_reservas -->|Ver detalle| S_reservas__id
+    S_dashboard -->|Ver detalle| S_reservas__id
     S_reservas_nueva -->|Ver detalle| S_reservas__id
   end
-  LOGIN --> S_reservas_nueva
+  LOGIN --> S_dashboard
   subgraph Responsable["Responsable de ambiente"]
     direction TB
+    R_dashboard["Inicio"]
+    R_disponibilidad["Disponibilidad"]
     R_reservas__id["Detalle de la reserva (enlace)"]
     R_mi_ambiente["Mi ambiente"]
+    R_dashboard -->|Ver detalle| R_reservas__id
     R_mi_ambiente -->|Ver detalle| R_reservas__id
   end
-  LOGIN --> R_mi_ambiente
+  LOGIN --> R_dashboard
 ```
 
 <!-- MAPA:fin -->
@@ -350,3 +370,7 @@ flowchart LR
 ## 9. Principios
 
 Las filas de Nielsen N2, N4 y N6 y de Shneiderman S1 y S8 que citan estas etiquetas, la navegación y la jerarquía están en `matriz-principios-final.md` («Arquitectura de información»).
+
+## 10. Disponibilidad (Sub-fase C)
+
+`Disponibilidad` es una entrada de primer nivel para los tres roles. El Administrador y el Solicitante ven todos los ambientes; el Responsable solo los ambientes asignados. La decisión protege la privacidad: el backend del Solicitante incluye nombre y motivo solo en sus propias reservas; las reservas ajenas muestran estado y horario sin nombre ni motivo. Los días pasados son de solo lectura.

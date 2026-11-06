@@ -27,6 +27,9 @@ El caso habla de "ambiente asignado", pero el modelo mínimo no dice a quién es
 
 **No incluye (queda fuera por no ser parte del reto):** notificaciones por correo, reservas recurrentes, calendario visual, exportación a PDF o Excel, recuperación de contraseña y varias sedes.
 
+### Decisión de la vista de disponibilidad (Sub-fase C)
+La vista diaria de disponibilidad apoya RF-04 (validar disponibilidad antes de registrar) y RF-08 (información de uso y ocupación), pero **no** es el calendario visual excluido del alcance original. Es una cuadrícula diaria y una agenda móvil, acotada al día elegido; el Calendario visual excluido quedó fuera.
+
 ## 4. Requerimientos funcionales
 
 | Código | Requerimiento | Pantalla o módulo | Actor |

@@ -1,57 +1,42 @@
 # ReservaUPLA — Sistema de diseño
 
-Sistema web de reservas de ambientes universitarios (laboratorios, auditorios y salas) de la Universidad Peruana Los Andes. Todo el texto de la interfaz va en español. Solo se usa el texto "ReservaUPLA": sin logo oficial y sin fotos de personas.
+Sistema web de reservas de ambientes universitarios (laboratorios, auditorios y salas) de la Universidad Peruana Los Andes. Todo el texto de la interfaz va en español con voz activa en segunda persona.
 
 ## Estilo
-Institucional y limpio, azul y blanco, minimalista, coherente con la web de la UPLA. Una sola tarea principal por pantalla.
+Institucional y limpio, azul marino y blanco, minimalista, coherente con la web e intranet de la UPLA. Una sola tarea principal por pantalla.
 
 ## Paleta
-| Uso | Color |
-|---|---|
-| Primario (botón primario y enlaces) | `#0063A8` |
-| Azul marino (menú lateral, títulos, panel del login) | `#1F365C` |
-| Azul de títulos | `#1E73BE` |
-| Celeste (solo decoración; nunca texto ni foco) | `#3696EA` |
-| Anillo de foco | `#1E73BE` (blanco `#FFFFFF` sobre el menú marino) |
-| Texto | `#1F365C` y `#4F4F4F` |
-| Fondo de página | `#F3F4F6` |
-| Superficies | `#FFFFFF` |
-| Dorado (solo acento, con texto marino encima; nunca texto sobre blanco) | `#EAA658` |
+| Uso | Color | Token |
+|---|---|---|
+| Primario (botón primario y enlaces) | `#0063A8` | `--color-primario` |
+| Azul marino (menú lateral, títulos, cabecera de login) | `#1F365C` | `--color-marino` |
+| Azul de títulos | `#1E73BE` | `--color-titulo` |
+| Celeste (solo decoración; nunca texto ni foco) | `#3696EA` | `--color-celeste` |
+| Anillo de foco | `#1E73BE` (blanco `#FFFFFF` sobre fondo marino) | `--color-foco`, `--color-foco-sobre-oscuro` |
+| Texto principal | `#1F365C` y `#4F4F4F` | `--color-texto`, `--color-texto-suave` |
+| Fondo de página | `#F4F6FA` | `--color-fondo` |
+| Superficies y tarjetas | `#FFFFFF` | `--color-superficie` |
+| Dorado (solo acento institucional; nunca texto) | `#EAA658` | `--color-dorado` |
 
 ### Colores de estado (independientes de la marca)
-| Estado | Color |
-|---|---|
-| Error | `#B91C1C` |
-| Éxito | `#166534` |
-| Aviso | `#92400E` |
-| Información | `#1E3A8A` |
+| Estado | Color de texto | Fondo de estado | Tokens |
+|---|---|---|---|
+| Error | `#B91C1C` | `#FDF2F2` | `--color-error`, `--fondo-error` |
+| Éxito | `#166534` | `#EFFAF3` | `--color-exito`, `--fondo-exito` |
+| Aviso | `#92400E` | `#FEF8E7` | `--color-aviso`, `--fondo-aviso` |
+| Información | `#1E3A8A` | `#EEF4FD` | `--color-info`, `--fondo-info` |
 
 Insignias de la reserva, siempre con icono y texto: Pendiente (ámbar), Aprobada (verde), Rechazada (rojo), Cancelada (gris).
 
 ## Tipografía
-Títulos en **Poppins SemiBold** y texto en **Montserrat**, como la web de la UPLA. Poppins ya se usa: Stitch no la ofrecía, pero ahora se aloja localmente con `@fontsource` (también Montserrat, sin CDN). Texto de campos de 16 px. Controles de al menos 44 px de alto. Foco visible con contorno `#1E73BE` de 3 px (`#FFFFFF` sobre el menú marino). Contraste AA.
+Títulos en **Poppins SemiBold** y texto en **Montserrat**, como la web institucional de la UPLA. Ambas autoalojadas localmente con `@fontsource` en subset `latin` exclusivamente para los pesos usados (sin CDNs externas). Texto de campos de 16 px para evitar zoom indeseado en dispositivos iOS. Controles de al menos 44 px de alto (48 px en el Login). Foco visible con contorno `#1E73BE` de 3 px (`#FFFFFF` sobre el menú marino). Contraste AA verificado en el 100% de combinaciones.
 
-## Navegación
-- Escritorio: menú lateral con Dashboard, Reservas, Nueva reserva, Ambientes y Usuarios (página actual resaltada), nombre y rol de la persona arriba y "Cerrar sesión" abajo.
-- Móvil: menú desplegable, una sola columna, tablas convertidas en tarjetas apiladas, sin desplazamiento horizontal.
-
-## Componentes reutilizables (idénticos en todas las pantallas)
-TextInput, SelectInput, DateInput, TimeInput, Button, AlertMessage, ModalConfirmacion, TableList, CardIndicador.
-
-## Reglas para todas las pantallas
-- Cada campo con etiqueta siempre visible y ayuda con ejemplo si hace falta.
-- Errores debajo del campo con icono, texto y borde, diciendo qué corregir.
-- Toda acción irreversible (aprobar, rechazar, cancelar) pide confirmación en un modal con un resumen.
-- Siempre hay forma de volver o cancelar.
-- Los botones con acciones largas muestran carga.
-- Cada acción termina con un mensaje claro de éxito o error.
-- Un solo estilo de botón primario, de error, de tarjeta y de tabla; el botón primario siempre en el mismo lugar.
-
-## Datos de ejemplo
-Ambientes: "Laboratorio de Cómputo 2", "Auditorio Principal", "Sala de Reuniones A". Personas: "Ana Torres", "Luis Quispe". Fechas de noviembre de 2026. Horarios como "10:00 – 12:00". Nada de lorem ipsum.
-
-## Decisión de la Fase 8: la accesibilidad prevalece sobre el celeste del foco
-El diseño de Stitch (v1 y v2) pintaba el anillo de foco en `#3696EA`. Medido con `tools/usabilidad/contraste.mjs`, ese celeste da **2,84:1 sobre el fondo gris `#F3F4F6`** (WCAG 1.4.11 pide 3:1); sobre blanco da 3,13:1. Por decisión del planificador el anillo pasa a `#1E73BE` (**4,94:1 sobre blanco y 4,49:1 sobre gris**) y el celeste `#3696EA` queda solo como color decorativo (`--color-celeste`). Sobre el menú lateral marino, `#1E73BE` solo da 2,44:1, así que ahí el anillo es blanco (12,07:1; `--color-foco-sobre-oscuro`). Es la única diferencia deliberada entre el diseño y lo construido en el foco; resultado guardado en `docs/evidencias/fase8-contraste-foco.txt`.
-
-## Identidad visual (pase posterior a la Fase 9)
-Menú lateral y panel del login en azul marino `#1F365C` plano, sin degradados. El dorado `#EAA658` es solo un detalle sin texto: la franja entre el panel y el formulario del login y la línea bajo el nombre de la persona en el menú; nunca se usa como color de texto (2,1:1 sobre blanco). Radios de 4 a 6 px, sin sombras, bordes de 1 px. Logo de la UPLA dentro de un recuadro blanco (es azul y no se vería sobre el marino) y foto del campus solo en el panel del login en pantallas anchas. Detalle, mediciones y justificación: `docs/diseno/identidad-visual.md`.
+## Decisiones de diseño frente al Stitch de referencia
+Stitch sirvió como borrador visual de exploración, pero se aplicaron decisiones de ingeniería y accesibilidad superiores cuando Stitch chocaba con el contrato del proyecto:
+1. **Tipografía institucional**: Stitch sugería tipografías genéricas de CDN (Inter/Roboto). Se reemplazaron por Poppins SemiBold y Montserrat locales con cero peticiones a servidores de terceros.
+2. **Anillo de foco de alto contraste**: Stitch sugería `#3696EA` (contraste insuficiente de 2.84:1 sobre fondos grises). Se adoptó `#1E73BE` de 3 px con contraste de 4.94:1 sobre blanco y 4.57:1 sobre fondo de página, y blanco `#FFFFFF` (12.07:1) sobre el menú marino.
+3. **Selección de ambiente táctil y accesible**: Stitch empleaba un `<select>` tradicional de difícil exploración. Se diseñó un grupo de tarjetas seleccionables (`role="radiogroup"`) navegable con flechas y tecla Espacio, mostrando capacidad, ubicación, avatar del responsable y estado de mantenimiento bloqueado.
+4. **Línea de tiempo diaria sin componentes desmesurados**: Frente a la propuesta de Stitch de calendarios mensuales sobrecargados fuera del MVP, se construyó una línea de tiempo diaria con carriles de solapamiento legibles, leyenda compacta y modal accesible.
+5. **Contadores de caracteres y validación reactiva**: Formularios con contadores `X de Y caracteres` conectados en vivo vía `aria-describedby` y requisitos de contraseña visibles de inmediato.
+6. **Barra de resumen adherida en móvil**: Para el flujo de reserva en dispositivos móviles, se implementó una barra adherida sobre el botón de envío que resume ambiente, fecha y horas sin tapar controles ni requerir desplazamientos continuos.
+7. **Microcopy exacto y estandarizado**: Se erradicaron verbos ambiguos («Guardar», «Aceptar», «Cancelar» para salir). Cada acción emplea su verbo unívoco: «Registrar X», «Nuevo X», «Volver», «Limpiar formulario» y «Cancelar reserva».
