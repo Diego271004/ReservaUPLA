@@ -1,0 +1,14 @@
+.celda {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.principal {
+  font-weight: 600;
+  color: var(--color-marino);
+}
+
+.detalle {
+  font-size: 0.875rem;
+  color: var(--color-texto-suave);
+}

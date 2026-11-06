@@ -1,17 +1,19 @@
+/* Login a pantalla partida (referencia: la intranet de la UPLA): la foto del campus con un degradado lateral oscuro a la
+   izquierda y, a la derecha, una tarjeta blanca con el logo y el formulario sobre un fondo gris azulado. */
 .pagina {
   display: grid;
-  grid-template-columns: minmax(280px, 45%) 1fr;
+  grid-template-columns: minmax(0, 64fr) minmax(380px, 36fr);
   min-height: 100vh;
-  background: var(--color-superficie);
+  background: var(--fondo-login);
 }
 
-/* Panel marino plano. La franja dorada (detalle, sin texto) lo separa del formulario. La foto va solo en pantallas anchas. */
+/* Panel marino con la foto de fondo. La franja dorada (detalle, sin texto) lo separa del formulario. */
 .panel {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: var(--espacio-4);
+  justify-content: center;
+  padding: var(--espacio-4) 5vw;
   overflow: hidden;
   color: var(--color-sobre-oscuro);
   background: var(--color-marino);
@@ -23,10 +25,64 @@
   z-index: 1;
 }
 
-/* Logo azul sobre un recuadro blanco de esquinas pequeñas: sobre el marino no se vería. */
+.universidad {
+  margin: 0 0 var(--espacio-2);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.marca {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.lema {
+  max-width: 24ch;
+  margin: var(--espacio-2) 0 0;
+  font-size: 1.25rem;
+}
+
+.contenido {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--espacio-4);
+}
+
+.tarjeta {
+  width: 100%;
+  max-width: 440px;
+  padding: var(--espacio-4);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--elevacion-tarjeta);
+  animation: entrada var(--duracion-transicion) ease-out;
+}
+
+@keyframes entrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Logo en la cabecera de la tarjeta (sobre blanco). */
 .logo {
-  display: inline-flex;
+  display: flex;
+  justify-content: center;
   padding: var(--relleno-logo);
+  margin-bottom: var(--espacio-2);
   background: var(--color-superficie);
   border-radius: var(--radio-pequeno);
 }
@@ -37,38 +93,22 @@
   height: var(--alto-logo-login);
 }
 
-.marca {
-  margin: var(--espacio-2) 0 0;
-  font-family: var(--fuente-titulo);
-  font-size: 2.25rem;
-  font-weight: 600;
-}
-
-.lema {
-  max-width: 24ch;
-  margin: var(--espacio-1) 0 0;
-  font-size: 1.25rem;
-}
-
-.universidad {
-  margin: 0;
-}
-
-.contenido {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--espacio-4);
-}
-
+/* Campos y botón de 48 px en el login: más cómodos para tocar y para escribir. */
 .formulario {
+  --alto-control: var(--alto-control-login);
+
   width: 100%;
-  max-width: 420px;
+}
+
+.formulario h1 {
+  margin: 0 0 var(--espacio-1);
+  text-align: center;
 }
 
 .subtitulo {
   margin: 0 0 var(--espacio-3);
   color: var(--color-texto-suave);
+  text-align: center;
 }
 
 .boton > button {
@@ -81,8 +121,10 @@
   margin-top: var(--espacio-1);
 }
 
-/* Foto del campus (decorativa) anclada abajo, sin estirarla más de 1,5 veces (--alto-foto-maximo); lo que sobra arriba queda marino.
-   La capa plana del marino la deja en segundo plano y garantiza el contraste del texto blanco. Móvil no la descarga. */
+/* Foto del campus (decorativa) anclada abajo, sin estirarla más de 1,5 veces (--alto-foto-maximo); lo que sobra arriba queda marino
+   y el difuminado superior lo funde con la foto (sin escalón). Los degradados viven en los tokens: oscurecen la parte del texto
+   (marino a 72 % o más, que da 4,5:1 o más al texto blanco sobre lo más claro de la foto) y dejan ver la foto hacia la derecha.
+   Móvil no la descarga. */
 @media (min-width: 768px) {
   .panel::before,
   .panel::after {
@@ -102,11 +144,11 @@
   }
 
   .panel::after {
-    background: var(--capa-foto);
+    background: var(--degradado-superior-foto), var(--degradado-lateral-foto);
   }
 }
 
-/* Móvil: una sola columna, una franja superior con el logo y el nombre (sin foto). */
+/* Móvil: una sola columna, una franja superior con el nombre (sin foto); el logo queda en la tarjeta. */
 @media (max-width: 767px) {
   .pagina {
     grid-template-columns: minmax(0, 1fr);
@@ -119,28 +161,37 @@
     border-bottom: var(--ancho-franja-dorada) solid var(--color-dorado);
   }
 
-  .panel > div {
-    display: flex;
-    gap: var(--espacio-2);
-    align-items: center;
-  }
-
-  .logo img {
-    height: var(--alto-logo-login-movil);
+  .universidad,
+  .lema {
+    display: none;
   }
 
   .marca {
-    margin: 0;
     font-size: 1.25rem;
-  }
-
-  .lema,
-  .universidad {
-    display: none;
   }
 
   .contenido {
     align-items: flex-start;
     padding: var(--espacio-3) var(--espacio-2);
+  }
+
+  .tarjeta {
+    padding: var(--espacio-3) var(--espacio-2);
+  }
+
+  .logo img {
+    height: var(--alto-logo-login-movil);
+  }
+}
+
+/* Zoom del 200 % en un teléfono (188 px): menos relleno alrededor y dentro de la tarjeta para que el campo de la contraseña y su
+   botón «Mostrar» quepan sin scroll horizontal (WCAG 1.4.10). */
+@media (max-width: 480px) {
+  .contenido {
+    padding: var(--espacio-2) var(--espacio-1);
+  }
+
+  .tarjeta {
+    padding: var(--espacio-2) var(--espacio-1);
   }
 }

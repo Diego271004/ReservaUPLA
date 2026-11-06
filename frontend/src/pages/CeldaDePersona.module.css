@@ -1,0 +1,5 @@
+.persona {
+  display: inline-flex;
+  gap: var(--espacio-1);
+  align-items: center;
+}

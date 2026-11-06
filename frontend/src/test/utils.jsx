@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthProvider } from '../context/AuthContext.jsx'
+import { AvisosProvider } from '../context/AvisosContext.jsx'
 import { SESION_STORAGE_KEY } from '../services/sesionStorage.js'
 
 export const SESIONES = {
@@ -29,6 +30,7 @@ export function UbicacionActual() {
   return (
     <div data-testid="ubicacion" data-state={JSON.stringify(ubicacion.state)}>
       {ubicacion.pathname}
+      {ubicacion.search}
     </div>
   )
 }
@@ -40,10 +42,12 @@ export function renderEnRuta(ui, { ruta = '/', sesionInicial, rutaDelElemento = 
   return render(
     <MemoryRouter initialEntries={[ruta]}>
       <AuthProvider>
-        <Routes>
-          <Route path={rutaDelElemento} element={ui} />
-        </Routes>
-        <UbicacionActual />
+        <AvisosProvider>
+          <Routes>
+            <Route path={rutaDelElemento} element={ui} />
+          </Routes>
+          <UbicacionActual />
+        </AvisosProvider>
       </AuthProvider>
     </MemoryRouter>,
   )
@@ -57,8 +61,10 @@ export async function renderApp(ruta, sesionInicial) {
   return render(
     <MemoryRouter initialEntries={[ruta]}>
       <AuthProvider>
-        <App />
-        <UbicacionActual />
+        <AvisosProvider>
+          <App />
+          <UbicacionActual />
+        </AvisosProvider>
       </AuthProvider>
     </MemoryRouter>,
   )

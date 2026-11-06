@@ -3,22 +3,32 @@
   min-height: 100vh;
 }
 
+.columna {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Menú marino plano. En escritorio queda fijo a la altura de la ventana; en móvil es un panel (más abajo). */
 .menu {
-  width: var(--ancho-menu);
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 var(--ancho-menu);
   flex-shrink: 0;
-  padding: var(--espacio-3) var(--espacio-2);
+  width: var(--ancho-menu);
+  height: 100vh;
+  padding: var(--espacio-2);
+  overflow-y: auto;
   color: var(--color-sobre-oscuro);
   background: var(--color-marino);
+  transition: width var(--duracion-transicion) ease-out;
 }
 
 .menu :focus-visible {
   outline-color: var(--color-foco-sobre-oscuro);
-}
-
-.panel {
-  display: flex;
-  flex-direction: column;
-  min-height: calc(100vh - 2 * var(--espacio-3) - var(--alto-logo-menu) - 2 * var(--relleno-logo));
 }
 
 .cabecera {
@@ -28,6 +38,8 @@
   align-items: center;
   justify-content: space-between;
   min-height: calc(var(--alto-logo-menu) + 2 * var(--relleno-logo));
+  padding-bottom: var(--espacio-2);
+  border-bottom: 1px solid var(--separador-sobre-oscuro);
 }
 
 .identidad {
@@ -58,25 +70,9 @@
   font-weight: 600;
 }
 
-/* Contenedor del botón del menú: solo se muestra en móvil. */
-.botonMenu {
+/* El botón de cerrar el panel solo existe en móvil. */
+.cerrarPanel {
   display: none;
-}
-
-.persona {
-  padding: var(--espacio-2) 0;
-  border-bottom: var(--grosor-linea-dorada) solid var(--color-dorado);
-}
-
-.nombre {
-  margin: 0;
-  font-weight: 600;
-}
-
-.rol {
-  margin: 2px 0 0;
-  font-size: 0.875rem;
-  opacity: 0.85;
 }
 
 .navegacion {
@@ -89,19 +85,59 @@
 
 .opcion {
   display: flex;
+  gap: var(--espacio-1);
   align-items: center;
   min-height: var(--alto-control);
   padding: 0 var(--espacio-2);
   font-weight: 500;
   color: var(--color-sobre-oscuro);
   text-decoration: none;
+  border-left: 3px solid transparent;
   border-radius: var(--radio);
+  transition: background-color var(--duracion-transicion);
+}
+
+.opcion:hover {
+  background: var(--separador-sobre-oscuro);
 }
 
 /* Ítem activo: fondo azul sólido y texto blanco, sin franjas ni transparencias. */
-.activa {
+.activa,
+.activa:hover {
   font-weight: 700;
   background: var(--color-primario);
+  border-left-color: var(--color-dorado);
+}
+
+.iconoOpcion {
+  flex-shrink: 0;
+}
+
+.textoOpcion {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Cantidad de solicitudes pendientes: número blanco sobre marino, con el texto «6 pendientes» para el lector de pantalla. */
+.contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-marino);
+  background: var(--color-superficie);
+  border-radius: var(--radio-completo);
+}
+
+.pieMenu {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--espacio-1);
+  border-top: 1px solid var(--separador-sobre-oscuro);
 }
 
 .contenido {
@@ -110,27 +146,93 @@
   padding: var(--espacio-4);
 }
 
+/* Menú contraído (solo escritorio): iconos con el texto oculto a la vista pero disponible para el lector de pantalla. */
+@media (min-width: 768px) {
+  .menu[data-colapsado='true'] {
+    width: var(--ancho-menu-colapsado);
+    flex-basis: var(--ancho-menu-colapsado);
+  }
+
+  .menu[data-colapsado='true'] .marca,
+  .menu[data-colapsado='true'] .textoOpcion {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .menu[data-colapsado='true'] .cabecera {
+    justify-content: center;
+  }
+
+  .menu[data-colapsado='true'] .opcion {
+    position: relative;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .menu[data-colapsado='true'] .contador {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    font-size: 0.6875rem;
+  }
+
+  .menu[data-colapsado='true'] .pieMenu {
+    justify-content: center;
+  }
+}
+
+/* Móvil: el menú es un panel que se desliza desde la izquierda sobre un fondo que lo cierra al tocarlo. */
 @media (max-width: 767px) {
   .contenedor {
     flex-direction: column;
   }
 
+  .fondo {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: var(--capa-modal);
+  }
+
   .menu {
-    width: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 31;
+    width: min(20rem, 85vw);
+    flex-basis: auto;
+    height: auto;
+    visibility: hidden;
+    transform: translateX(-100%);
+    /* Al cerrar, se oculta cuando termina de deslizarse. */
+    transition:
+      transform var(--duracion-transicion) ease-out,
+      visibility 0s linear var(--duracion-transicion);
   }
 
-  .botonMenu {
+  /* Al abrir, es visible desde el primer instante: si no, el foco no puede entrar al panel. */
+  .menu[data-abierto='true'] {
+    visibility: visible;
+    transform: none;
+    transition:
+      transform var(--duracion-transicion) ease-out,
+      visibility 0s;
+  }
+
+  .cerrarPanel {
     display: inline-flex;
-    align-items: center;
   }
 
-  .panel {
+  .pieMenu {
     display: none;
-    min-height: 0;
-  }
-
-  .panel.abierto {
-    display: flex;
   }
 
   .contenido {

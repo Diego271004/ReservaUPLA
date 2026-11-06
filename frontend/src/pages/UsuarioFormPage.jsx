@@ -7,6 +7,7 @@ import TextInput from '../components/ui/TextInput.jsx'
 import { TEXTOS } from '../constants/messages.js'
 import { OPCIONES_ROL } from '../constants/navegacion.js'
 import { useUsuarioForm } from '../hooks/useUsuarioForm.js'
+import { LIMITES } from '../utils/validators.js'
 
 export default function UsuarioFormPage() {
   const form = useUsuarioForm()
@@ -25,6 +26,7 @@ export default function UsuarioFormPage() {
       <TextInput
         {...form.campoDeTexto('nombreCompleto')}
         etiqueta={TEXTOS.etiquetaNombreCompleto}
+        ayuda={`${form.valores.nombreCompleto.length} de ${LIMITES.nombreCompleto} caracteres`}
         autoComplete="off"
       />
       <TextInput

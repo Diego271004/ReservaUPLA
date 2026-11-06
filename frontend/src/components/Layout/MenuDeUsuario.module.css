@@ -1,0 +1,93 @@
+.contenedor {
+  position: relative;
+}
+
+.avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-sobre-oscuro);
+  background: var(--color-marino);
+  border-radius: var(--radio-completo);
+}
+
+.datos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.nombre {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.rol {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-texto-suave);
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  min-width: 15rem;
+  padding: var(--espacio-1);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--elevacion-flotante);
+  animation: abrir var(--duracion-transicion) ease-out;
+}
+
+/* Nombre y rol de quien tiene la sesión, con el acento dorado como línea fina debajo del nombre. */
+.persona {
+  padding: var(--espacio-1);
+  margin-bottom: var(--espacio-1);
+  border-bottom: var(--grosor-linea-dorada) solid var(--color-dorado);
+}
+
+.nombrePanel {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.rolPanel {
+  margin: 2px 0 0;
+  font-size: 0.875rem;
+  color: var(--color-texto-suave);
+}
+
+@keyframes abrir {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 767px) {
+  .datos {
+    display: none;
+  }
+
+  /* El panel se ancla a la barra superior (que es sticky): ocupa su ancho y nunca se sale de la pantalla, ni con zoom del 200 %. */
+  .contenedor {
+    position: static;
+  }
+
+  .panel {
+    right: var(--espacio-1);
+    left: var(--espacio-1);
+    min-width: 0;
+  }
+}

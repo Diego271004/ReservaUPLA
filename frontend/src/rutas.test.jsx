@@ -21,7 +21,20 @@ function seLlegaSinEscribirLaDireccion(rol, pantalla) {
 }
 
 describe('estructura de la información: menú y rutas', () => {
-  it('toda ruta protegida declara los roles que pueden entrar (una lista no vacía de roles válidos)', () => {
+  it.each(ROLES_VALIDOS)('%s puede entrar al inicio /dashboard', (rol) => {
+    expect(ruta('/dashboard').roles).toContain(rol)
+  })
+
+  it.each(ROLES_VALIDOS)('%s tiene «Inicio» con el icono de dashboard en su menú', (rol) => {
+    expect(MENU_POR_ROL[rol][0]).toMatchObject({
+      ruta: '/dashboard',
+      texto: 'Inicio',
+      icono: 'dashboard',
+      exacta: true,
+    })
+  })
+
+  it('toda ruta protegida declara los roles que puede entrar (una lista no vacía de roles válidos)', () => {
     for (const pantalla of RUTAS) {
       expect(Array.isArray(pantalla.roles), `${pantalla.ruta} sin lista de roles`).toBe(true)
       expect(pantalla.roles.length, `${pantalla.ruta} sin roles`).toBeGreaterThan(0)
@@ -93,7 +106,7 @@ describe('estructura de la información: menú y rutas', () => {
   )
   it.each(denegadas)('%s en %s ve «Sin permiso»', async (rol, camino) => {
     await renderApp(abrible(camino), SESIONES[rol.toLowerCase()])
-    expect(screen.getByRole('heading', { name: 'Sin permiso' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Sin permiso' })).toBeInTheDocument()
     expect(screen.getByText(MENSAJES.sinPermiso)).toBeInTheDocument()
   })
 })

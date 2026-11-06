@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, screen, waitFor } from '@testing-library/react'
+import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MENSAJES } from './constants/messages.js'
 import { RESULTADO } from './services/llamarApi.js'
@@ -7,6 +7,7 @@ import {
   listarAmbientes,
   listarUsuarios,
   obtenerDashboard,
+  obtenerDisponibilidadDia,
   obtenerMiAmbiente,
   obtenerReserva,
 } from './services/recursosService.js'
@@ -23,6 +24,7 @@ vi.mock('./services/recursosService.js', () => ({
   listarReservas: vi.fn(),
   listarUsuarios: vi.fn(),
   obtenerDashboard: vi.fn(),
+  obtenerDisponibilidadDia: vi.fn(),
   obtenerMiAmbiente: vi.fn(),
   obtenerReserva: vi.fn(),
   rechazarReserva: vi.fn(),
@@ -76,6 +78,23 @@ beforeEach(() => {
   vi.resetAllMocks()
   listarUsuarios.mockResolvedValue({ tipo: RESULTADO.exito, data: usuarios })
   listarAmbientes.mockResolvedValue({ tipo: RESULTADO.exito, data: ambientes })
+  obtenerDashboard.mockResolvedValue({
+    tipo: RESULTADO.exito,
+    data: {
+      indicadores: { total: 0, pendientes: 0, aprobadas: 0, rechazadas: 0 },
+      ambientesMasUtilizados: [],
+      pendientesMasAntiguas: { elementos: [], total: 0, pagina: 1, tamano: 5 },
+      solicitudesRequierenDecision: [],
+      hoyEnLosAmbientes: [],
+      usoPorAmbiente: [],
+      inicioSolicitante: { proximaReserva: null, resumenPorEstado: [] },
+      inicioResponsable: { hoy: [], proximas: [] },
+    },
+  })
+  obtenerDisponibilidadDia.mockResolvedValue({
+    tipo: RESULTADO.exito,
+    data: { fecha: '2026-11-05', soloLectura: false, ambientes: [] },
+  })
 })
 afterEach(() => vi.unstubAllGlobals())
 
@@ -91,8 +110,8 @@ describe('rutas protegidas por sesión', () => {
     '/dashboard',
   ])('sin sesión, %s lleva al login', async (ruta) => {
     await renderApp(ruta)
+    expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument()
     expect(ubicacion()).toHaveTextContent('/login')
-    expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument()
   })
 
   it('la raíz lleva al login sin sesión y a la pantalla inicial del rol con sesión', async () => {
@@ -100,7 +119,7 @@ describe('rutas protegidas por sesión', () => {
     expect(ubicacion()).toHaveTextContent('/login')
     cleanup()
     await renderApp('/', SESIONES.solicitante)
-    await waitFor(() => expect(ubicacion()).toHaveTextContent('/reservas/nueva'))
+    await waitFor(() => expect(ubicacion()).toHaveTextContent('/dashboard'))
   })
 
   it('una sesión vencida cuenta como sin sesión', async () => {
@@ -113,6 +132,62 @@ describe('rutas protegidas por sesión', () => {
 })
 
 describe('rutas protegidas por rol', () => {
+  it.each(['administrador', 'solicitante', 'responsable'])(
+    '%s puede montar Disponibilidad por la ruta real',
+    async (rol) => {
+      await renderApp('/disponibilidad', SESIONES[rol])
+      expect(await screen.findByRole('heading', { name: 'Disponibilidad' })).toBeInTheDocument()
+      cleanup()
+    },
+  )
+  it('todos los roles aterrizan en /dashboard desde la raíz', async () => {
+    for (const rol of ['administrador', 'solicitante', 'responsable']) {
+      await renderApp('/', SESIONES[rol])
+      expect(ubicacion()).toHaveTextContent('/dashboard')
+      cleanup()
+    }
+  })
+
+  it.each(['administrador', 'solicitante', 'responsable'])(
+    '%s puede montar el Dashboard completo por la ruta real',
+    async (rol) => {
+      obtenerDashboard.mockReturnValue(new Promise(() => {}))
+      await renderApp('/dashboard', SESIONES[rol])
+      expect(await screen.findByRole('heading', { name: 'Inicio' })).toBeInTheDocument()
+      cleanup()
+    },
+  )
+
+  it('un Solicitante ve «Tu próxima reserva» al montar /dashboard por el router real', async () => {
+    obtenerDashboard.mockResolvedValue({
+      tipo: RESULTADO.exito,
+      data: {
+        inicioSolicitante: {
+          proximaReserva: {
+            id: 21,
+            ambienteNombre: 'Auditorio Principal',
+            fecha: '2026-11-06',
+            horaInicio: '09:00',
+            horaFin: '11:00',
+            estado: 'Aprobada',
+          },
+          resumenPorEstado: [],
+        },
+      },
+    })
+    await renderApp('/dashboard', SESIONES.solicitante)
+    expect(await screen.findByRole('heading', { name: 'Tu próxima reserva' })).toBeInTheDocument()
+  })
+
+  it('un Responsable ve «Hoy en tu ambiente» al montar /dashboard por el router real', async () => {
+    obtenerDashboard.mockResolvedValue({
+      tipo: RESULTADO.exito,
+      data: { inicioResponsable: { hoy: [], proximas: [] } },
+    })
+    await renderApp('/dashboard', SESIONES.responsable)
+    expect(await screen.findByRole('heading', { name: 'Hoy en tu ambiente' })).toBeInTheDocument()
+  })
+
   it('el Administrador entra a Ambientes y Usuarios', async () => {
     await renderApp('/ambientes', SESIONES.administrador)
     expect(await screen.findByRole('heading', { name: 'Ambientes' })).toBeInTheDocument()
@@ -138,7 +213,7 @@ describe('rutas protegidas por rol', () => {
     expect(listarAmbientes).not.toHaveBeenCalled()
   })
 
-  it('cada rol entra a su pantalla: la Solicitante a Nueva reserva, la Responsable a Mi ambiente y el Administrador al Dashboard', async () => {
+  it('cada rol entra a su pantalla inicial: los tres roles muestran Inicio; el Administrador puede abrir la raíz', async () => {
     obtenerMiAmbiente.mockReturnValue(new Promise(() => {}))
     obtenerDashboard.mockReturnValue(new Promise(() => {}))
     await renderApp('/reservas/nueva', SESIONES.solicitante)
@@ -148,7 +223,7 @@ describe('rutas protegidas por rol', () => {
     expect(screen.getByRole('heading', { name: 'Mi ambiente' })).toBeInTheDocument()
     cleanup()
     await renderApp('/', SESIONES.administrador)
-    expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Inicio' })).toBeInTheDocument()
     expect(screen.getByTestId('ubicacion')).toHaveTextContent('/dashboard')
   })
 
@@ -190,10 +265,10 @@ describe('rutas protegidas por rol', () => {
   it('el título de la pestaña cambia con la pantalla y con el estado «Sin permiso»', async () => {
     obtenerDashboard.mockReturnValue(new Promise(() => {}))
     await renderApp('/dashboard', SESIONES.administrador)
-    await waitFor(() => expect(document.title).toBe('Dashboard · ReservaUPLA'))
+    await waitFor(() => expect(document.title).toBe('Inicio · ReservaUPLA'))
     cleanup()
     await renderApp('/dashboard', SESIONES.solicitante)
-    await waitFor(() => expect(document.title).toBe('Sin permiso · ReservaUPLA'))
+    await waitFor(() => expect(document.title).toBe('Inicio · ReservaUPLA'))
     cleanup()
     await renderApp('/login')
     await waitFor(() => expect(document.title).toBe('Iniciar sesión · ReservaUPLA'))
@@ -258,16 +333,18 @@ describe('listado de Ambientes', () => {
     expect(await screen.findByText('Laboratorio de Cómputo 2')).toBeInTheDocument()
     expect(screen.getAllByRole('columnheader').map((c) => c.textContent)).toEqual([
       'Nombre',
-      'Tipo',
       'Capacidad',
       'Ubicación',
       'Estado',
+      'Ocupación de hoy',
       'Responsable',
     ])
     expect(screen.getByText('Disponible')).toBeInTheDocument()
     expect(screen.getByText('En mantenimiento')).toBeInTheDocument()
     expect(screen.getByText('Mario Huamán')).toBeInTheDocument()
-    expect(screen.getByText('—')).toBeInTheDocument()
+    // La sala en mantenimiento no tiene ocupación ni responsable: dos «—» en su fila.
+    const fila = screen.getByText('Sala de Reuniones A').closest('tr')
+    expect(within(fila).getAllByText('—')).toHaveLength(2)
   })
 
   it('"Nuevo ambiente" lleva al formulario', async () => {
@@ -280,6 +357,7 @@ describe('listado de Ambientes', () => {
 describe('cierre de sesión y sesión vencida', () => {
   it('Cerrar sesión lleva al login y borra la sesión', async () => {
     await renderApp('/ambientes', SESIONES.administrador)
+    await userEvent.click(await screen.findByRole('button', { name: /Carla Rojas/ }))
     await userEvent.click(await screen.findByRole('button', { name: 'Cerrar sesión' }))
     expect(ubicacion()).toHaveTextContent('/login')
     expect(sessionStorage.length).toBe(0)

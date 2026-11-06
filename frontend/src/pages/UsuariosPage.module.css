@@ -1,0 +1,25 @@
+.barraSuperior {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--espacio-2);
+}
+
+.barraBusqueda {
+  width: 100%;
+  max-width: 440px;
+}
+
+.sinResultados {
+  padding: var(--espacio-4);
+  font-size: 0.9375rem;
+  font-style: italic;
+  color: var(--color-texto-suave);
+  text-align: center;
+  background: var(--color-superficie);
+  border: 1px dashed var(--color-borde-control);
+  border-radius: var(--radio-tarjeta);
+}
+

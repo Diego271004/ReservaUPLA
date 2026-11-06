@@ -1,27 +1,52 @@
-import { useState } from 'react'
-import { Link, matchPath, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { NOMBRE_DE_ROL, MENU_POR_ROL } from '../../constants/navegacion.js'
-import { TEXTOS } from '../../constants/messages.js'
-import Button from '../ui/Button.jsx'
-import { rutaDeRegreso } from '../../utils/rutaDeRegreso.js'
-import logo from '../../assets/logo-upla-menu.webp'
+import { useCallback, useEffect, useState } from 'react'
+import { matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { MENU_POR_ROL, ROLES } from '../../constants/navegacion.js'
 import { useAuth } from '../../context/AuthContext.jsx'
+import { PendientesProvider, usePendientes } from '../../context/PendientesContext.jsx'
+import { useMenuColapsado } from '../../hooks/useMenuColapsado.js'
+import { migasDe } from '../../utils/migas.js'
+import { rutaDeRegreso } from '../../utils/rutaDeRegreso.js'
+import MenuLateral from './MenuLateral.jsx'
+import Topbar from './Topbar.jsx'
 import estilos from './Layout.module.css'
 
+const ANCHO_MOVIL = '(max-width: 767px)'
+
 /**
- * Único Layout con menú lateral (hallazgo G1): ancho, relleno e ítem activo se definen solo aquí.
- * El menú depende del rol: cada persona ve solo lo que puede usar.
+ * Único Layout (hallazgo G1): menú lateral + barra superior + contenido. El menú depende del rol y se contrae en
+ * escritorio (se recuerda); en móvil es un panel deslizante que abre la hamburguesa de la barra superior.
  */
 export default function Layout() {
-  const { sesion, cerrarSesion } = useAuth()
-  const navigate = useNavigate()
-  const { pathname, state } = useLocation()
-  const [menuAbierto, setMenuAbierto] = useState(false)
-
+  const { sesion } = useAuth()
   // Al cerrar la sesión (o si vence) el layout se vuelve a pintar un instante sin sesión antes de que el router redirija.
   if (!sesion) return null
-  const opciones = MENU_POR_ROL[sesion.rol] ?? []
-  // En el detalle de una reserva el menú marca la sección de origen (sin migas de pan).
+  return (
+    <PendientesProvider activo={sesion.rol === ROLES.administrador}>
+      <Estructura sesion={sesion} />
+    </PendientesProvider>
+  )
+}
+
+function Estructura({ sesion }) {
+  const { cerrarSesion } = useAuth()
+  const navigate = useNavigate()
+  const { pathname, state } = useLocation()
+  const { pendientes } = usePendientes()
+  const [colapsado, alternarColapso] = useMenuColapsado()
+  const [panelAbierto, setPanelAbierto] = useState(false)
+
+  const cerrarPanel = useCallback(() => setPanelAbierto(false), [])
+
+  // Si se agranda la ventana con el panel abierto, deja de ser un panel: se cierra.
+  useEffect(() => {
+    const consulta = window.matchMedia?.(ANCHO_MOVIL)
+    if (!consulta) return undefined
+    const alCambiar = (evento) => evento.matches || setPanelAbierto(false)
+    consulta.addEventListener('change', alCambiar)
+    return () => consulta.removeEventListener('change', alCambiar)
+  }, [])
+
+  // En el detalle de una reserva el menú marca la sección de origen.
   const esDetalle = matchPath('/reservas/:id', pathname) && pathname !== '/reservas/nueva'
   const origen = esDetalle ? rutaDeRegreso(sesion.rol, state?.volverA).split('?')[0] : null
 
@@ -32,65 +57,30 @@ export default function Layout() {
 
   return (
     <div className={estilos.contenedor}>
-      <aside className={estilos.menu}>
-        <div className={estilos.cabecera}>
-          <div className={estilos.identidad}>
-            <span className={estilos.logo}>
-              <img src={logo} width="69" height="80" alt={TEXTOS.universidad} />
-            </span>
-            <span className={estilos.marca}>{TEXTOS.nombreProducto}</span>
-          </div>
-          <div className={estilos.botonMenu}>
-            <Button
-              variante="sobreOscuro"
-              aria-expanded={menuAbierto}
-              aria-controls="menu-principal"
-              onClick={() => setMenuAbierto((abierto) => !abierto)}
-            >
-              {TEXTOS.menuAbrir}
-            </Button>
-          </div>
-        </div>
-        <div className={`${estilos.panel} ${menuAbierto ? estilos.abierto : ''}`}>
-          <div className={estilos.persona}>
-            <p className={estilos.nombre}>{sesion.nombreCompleto}</p>
-            <p className={estilos.rol}>{NOMBRE_DE_ROL[sesion.rol] ?? sesion.rol}</p>
-          </div>
-          <nav id="menu-principal" aria-label="Principal" className={estilos.navegacion}>
-            {opciones.map((opcion) =>
-              opcion.ruta === origen ? (
-                <Link
-                  key={opcion.ruta}
-                  to={opcion.ruta}
-                  aria-current="true"
-                  className={`${estilos.opcion} ${estilos.activa}`}
-                  onClick={() => setMenuAbierto(false)}
-                >
-                  {opcion.texto}
-                </Link>
-              ) : (
-                <NavLink
-                  key={opcion.ruta}
-                  to={opcion.ruta}
-                  end={opcion.exacta}
-                  className={({ isActive }) =>
-                    `${estilos.opcion} ${isActive ? estilos.activa : ''}`
-                  }
-                  onClick={() => setMenuAbierto(false)}
-                >
-                  {opcion.texto}
-                </NavLink>
-              ),
-            )}
-          </nav>
-          <Button variante="sobreOscuroLista" onClick={alCerrarSesion}>
-            {TEXTOS.cerrarSesion}
-          </Button>
-        </div>
-      </aside>
-      <main className={estilos.contenido}>
-        <Outlet />
-      </main>
+      {panelAbierto && (
+        <div className={estilos.fondo} data-testid="fondo-del-menu" onClick={cerrarPanel} />
+      )}
+      <MenuLateral
+        opciones={MENU_POR_ROL[sesion.rol] ?? []}
+        origen={origen}
+        pendientes={pendientes}
+        colapsado={colapsado}
+        alternarColapso={alternarColapso}
+        abierto={panelAbierto}
+        alCerrar={cerrarPanel}
+      />
+      <div className={estilos.columna}>
+        <Topbar
+          sesion={sesion}
+          migas={migasDe(pathname, sesion.rol, state?.volverA)}
+          panelAbierto={panelAbierto}
+          alAbrirPanel={() => setPanelAbierto(true)}
+          alCerrarSesion={alCerrarSesion}
+        />
+        <main className={estilos.contenido}>
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }

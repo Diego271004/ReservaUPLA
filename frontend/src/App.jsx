@@ -8,6 +8,7 @@ import AmbienteFormPage from './pages/AmbienteFormPage.jsx'
 import AmbientesPage from './pages/AmbientesPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import DetalleReservaPage from './pages/DetalleReservaPage.jsx'
+import DisponibilidadPage from './pages/DisponibilidadPage.jsx'
 import { NoEncontradaPage } from './pages/ErrorRutaPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import MiAmbientePage from './pages/MiAmbientePage.jsx'
@@ -26,6 +27,7 @@ function Inicio() {
 
 const PANTALLAS = {
   '/dashboard': DashboardPage,
+  '/disponibilidad': DisponibilidadPage,
   '/ambientes': AmbientesPage,
   '/ambientes/nuevo': AmbienteFormPage,
   '/usuarios': UsuariosPage,

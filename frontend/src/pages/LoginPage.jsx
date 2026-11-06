@@ -22,75 +22,77 @@ export default function LoginPage() {
   return (
     <div className={estilos.pagina}>
       <aside className={estilos.panel}>
+        <p className={estilos.universidad}>{TEXTOS.universidad}</p>
         <div data-testid="encabezado-panel">
-          <span className={estilos.logo}>
-            <img src={logo} width="138" height="160" alt={TEXTOS.universidad} />
-          </span>
           <p className={estilos.marca}>{TEXTOS.nombreProducto}</p>
           <p className={estilos.lema}>{TEXTOS.lemaLogin}</p>
         </div>
-        <p className={estilos.universidad}>{TEXTOS.universidad}</p>
       </aside>
       <main className={estilos.contenido}>
-        <form className={estilos.formulario} onSubmit={form.handleSubmit} noValidate>
-          <h1>{TEXTOS.tituloLogin}</h1>
-          <p className={estilos.subtitulo}>{TEXTOS.subtituloLogin}</p>
+        <div className={estilos.tarjeta}>
+          <span className={estilos.logo}>
+            <img src={logo} width="138" height="160" alt={TEXTOS.universidad} />
+          </span>
+          <form className={estilos.formulario} onSubmit={form.handleSubmit} noValidate>
+            <h1>{TEXTOS.tituloLogin}</h1>
+            <p className={estilos.subtitulo}>{TEXTOS.subtituloLogin}</p>
 
-          {sesionTerminada && !form.alerta && (
-            <AlertMessage tipo="info">{MENSAJES.sesionTerminada}</AlertMessage>
-          )}
-          {form.alerta && (
-            <AlertMessage tipo={form.alerta.tipo}>{form.alerta.mensaje}</AlertMessage>
-          )}
+            {sesionTerminada && !form.alerta && (
+              <AlertMessage tipo="info">{MENSAJES.sesionTerminada}</AlertMessage>
+            )}
+            {form.alerta && (
+              <AlertMessage tipo={form.alerta.tipo}>{form.alerta.mensaje}</AlertMessage>
+            )}
 
-          <TextInput
-            {...form.campoDeTexto('correo')}
-            etiqueta={TEXTOS.etiquetaCorreo}
-            ayuda={TEXTOS.ayudaCorreo}
-            tipo="email"
-            autoComplete="username"
-          />
-          <PasswordInput
-            {...form.campoDeTexto('contrasena')}
-            etiqueta={TEXTOS.etiquetaContrasena}
-            aviso={form.bloqMayusActivo ? TEXTOS.avisoBloqMayus : undefined}
-            onKeyDown={form.handleBloqMayus}
-            onKeyUp={form.handleBloqMayus}
-            onMouseDown={form.handleBloqMayus}
-            mostrando={form.mostrarContrasena}
-            onAlternar={form.alternarMostrarContrasena}
-            autoComplete="current-password"
-          />
+            <TextInput
+              {...form.campoDeTexto('correo')}
+              etiqueta={TEXTOS.etiquetaCorreo}
+              ayuda={TEXTOS.ayudaCorreo}
+              tipo="email"
+              autoComplete="username"
+            />
+            <PasswordInput
+              {...form.campoDeTexto('contrasena')}
+              etiqueta={TEXTOS.etiquetaContrasena}
+              aviso={form.bloqMayusActivo ? TEXTOS.avisoBloqMayus : undefined}
+              onKeyDown={form.handleBloqMayus}
+              onKeyUp={form.handleBloqMayus}
+              onMouseDown={form.handleBloqMayus}
+              mostrando={form.mostrarContrasena}
+              onAlternar={form.alternarMostrarContrasena}
+              autoComplete="current-password"
+            />
 
-          <div className={estilos.boton}>
-            <Button tipo="submit" cargando={enviando} textoCarga={TEXTOS.verificandoCredenciales}>
-              {TEXTOS.botonIngresar}
-            </Button>
-          </div>
-          {enviando && (
-            <div className={estilos.centrado}>
-              <Button variante="enlace" onClick={form.cancelarEnvio}>
-                {TEXTOS.cancelar}
+            <div className={estilos.boton}>
+              <Button tipo="submit" cargando={enviando} textoCarga={TEXTOS.verificandoCredenciales}>
+                {TEXTOS.botonIngresar}
               </Button>
             </div>
-          )}
+            {enviando && (
+              <div className={estilos.centrado}>
+                <Button variante="enlace" onClick={form.cancelarEnvio}>
+                  {TEXTOS.cancelar}
+                </Button>
+              </div>
+            )}
 
-          <div className={estilos.centrado}>
-            <Button
-              variante="enlace"
-              onClick={form.alternarAyudaSoporte}
-              aria-expanded={form.ayudaSoporteVisible}
-              aria-controls="ayuda-soporte"
-            >
-              {TEXTOS.olvidasteContrasena}
-            </Button>
-          </div>
-          {form.ayudaSoporteVisible && (
-            <div id="ayuda-soporte">
-              <AlertMessage tipo="info">{TEXTOS.ayudaSoporte}</AlertMessage>
+            <div className={estilos.centrado}>
+              <Button
+                variante="enlace"
+                onClick={form.alternarAyudaSoporte}
+                aria-expanded={form.ayudaSoporteVisible}
+                aria-controls="ayuda-soporte"
+              >
+                {TEXTOS.olvidasteContrasena}
+              </Button>
             </div>
-          )}
-        </form>
+            {form.ayudaSoporteVisible && (
+              <div id="ayuda-soporte">
+                <AlertMessage tipo="info">{TEXTOS.ayudaSoporte}</AlertMessage>
+              </div>
+            )}
+          </form>
+        </div>
       </main>
     </div>
   )

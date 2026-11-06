@@ -50,7 +50,7 @@ describe('Login: contenido', () => {
     expect(screen.getByRole('button', { name: '¿Olvidaste tu contraseña?' })).toBeInTheDocument()
   })
 
-  it('el panel agrupa la marca y el lema arriba, como en el diseño; la universidad va aparte, abajo', () => {
+  it('el panel agrupa la marca y el lema; el nombre de la universidad va aparte, encima, como sobretítulo', () => {
     mostrar()
     const encabezado = screen.getByTestId('encabezado-panel')
     expect(encabezado).toContainElement(screen.getByText('ReservaUPLA'))
@@ -58,11 +58,16 @@ describe('Login: contenido', () => {
     expect(encabezado).not.toContainElement(screen.getByText('Universidad Peruana Los Andes'))
   })
 
-  it('el panel lleva el logo de la universidad (único logo, con su texto alternativo) junto al nombre', () => {
+  it('la tarjeta del formulario lleva el logo de la universidad (único logo, con su texto alternativo) sobre el título', () => {
     mostrar()
     const logo = screen.getByRole('img', { name: 'Universidad Peruana Los Andes' })
     expect(screen.getAllByRole('img')).toHaveLength(1)
-    expect(screen.getByTestId('encabezado-panel')).toContainElement(logo)
+    expect(screen.getByTestId('encabezado-panel')).not.toContainElement(logo)
+    expect(screen.getByRole('main')).toContainElement(logo)
+    expect(
+      logo.compareDocumentPosition(screen.getByRole('heading', { name: 'Iniciar sesión' })) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
     expect(logo).toHaveAttribute('src', expect.stringContaining('logo-upla-login'))
   })
 
@@ -274,9 +279,7 @@ describe('Login: mensajes de éxito y de error', () => {
     mostrar()
     await llenar()
     await userEvent.click(botonIngresar())
-    await waitFor(() =>
-      expect(screen.getByTestId('ubicacion')).toHaveTextContent('/reservas/nueva'),
-    )
+    await waitFor(() => expect(screen.getByTestId('ubicacion')).toHaveTextContent('/dashboard'))
     expect(JSON.parse(sessionStorage.getItem('reservaupla.sesion')).token).toBe(
       SESIONES.solicitante.token,
     )
@@ -285,7 +288,7 @@ describe('Login: mensajes de éxito y de error', () => {
 
   it.each([
     ['Administrador', '/dashboard'],
-    ['Responsable', '/mi-ambiente'],
+    ['Responsable', '/dashboard'],
   ])('el rol %s va a %s', async (rol, ruta) => {
     login.mockResolvedValue({ tipo: RESULTADO.exito, data: { ...SESIONES.administrador, rol } })
     mostrar()

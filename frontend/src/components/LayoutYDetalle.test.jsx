@@ -1,15 +1,23 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from '../context/AuthContext.jsx'
+import { RESULTADO } from '../services/llamarApi.js'
+import { obtenerDashboard } from '../services/recursosService.js'
 import { SESIONES, UbicacionActual, iniciarSesionEnPrueba } from '../test/utils.jsx'
 import AlertMessage from './ui/AlertMessage.jsx'
 import Button from './ui/Button.jsx'
 import DetalleReserva from './DetalleReserva/DetalleReserva.jsx'
 import Layout from './Layout/Layout.jsx'
 
+vi.mock('../services/recursosService.js', () => ({ obtenerDashboard: vi.fn() }))
+
 function mostrarLayout(sesion, ruta = '/reservas') {
+  obtenerDashboard.mockResolvedValue({
+    tipo: RESULTADO.exito,
+    data: { indicadores: { pendientes: 0 } },
+  })
   sessionStorage.clear()
   iniciarSesionEnPrueba(sesion)
   return render(
@@ -41,14 +49,14 @@ const marcadas = () =>
 describe('Layout: en el detalle de una reserva el menú marca la sección de origen', () => {
   const detalle = (volverA) => ({ pathname: '/reservas/7', state: volverA ? { volverA } : null })
 
-  it('por defecto marca Reservas', () => {
+  it('por defecto en el detalle marca Inicio', () => {
     mostrarLayout(SESIONES.administrador, detalle())
-    expect(marcadas()).toEqual(['Reservas'])
+    expect(marcadas()).toEqual(['Inicio'])
   })
 
-  it('si se vino del Dashboard marca Dashboard', () => {
+  it('si se vino de Inicio marca Inicio', () => {
     mostrarLayout(SESIONES.administrador, detalle('/dashboard'))
-    expect(marcadas()).toEqual(['Dashboard'])
+    expect(marcadas()).toEqual(['Inicio'])
   })
 
   it('si se vino de una lista filtrada marca Reservas', () => {
@@ -56,9 +64,9 @@ describe('Layout: en el detalle de una reserva el menú marca la sección de ori
     expect(marcadas()).toEqual(['Reservas'])
   })
 
-  it('la Responsable ve marcada Mi ambiente, con o sin origen', () => {
+  it('la Responsable vuelve a Inicio sin origen y conserva Mi ambiente si es el origen válido', () => {
     mostrarLayout(SESIONES.responsable, detalle())
-    expect(marcadas()).toEqual(['Mi ambiente'])
+    expect(marcadas()).toEqual(['Inicio'])
     cleanup()
     mostrarLayout(SESIONES.responsable, detalle('/mi-ambiente?ambienteId=3'))
     expect(marcadas()).toEqual(['Mi ambiente'])
@@ -74,7 +82,8 @@ describe('Layout: menú por rol (hallazgo G1: un solo layout)', () => {
   it('el Administrador ve las cinco opciones', () => {
     mostrarLayout(SESIONES.administrador)
     expect(opcionesDelMenu()).toEqual([
-      'Dashboard',
+      'Inicio',
+      'Disponibilidad',
       'Reservas',
       'Nueva reserva',
       'Ambientes',
@@ -84,12 +93,12 @@ describe('Layout: menú por rol (hallazgo G1: un solo layout)', () => {
 
   it('la Solicitante ve solo Reservas y Nueva reserva', () => {
     mostrarLayout(SESIONES.solicitante)
-    expect(opcionesDelMenu()).toEqual(['Reservas', 'Nueva reserva'])
+    expect(opcionesDelMenu()).toEqual(['Inicio', 'Disponibilidad', 'Reservas', 'Nueva reserva'])
   })
 
   it('la Responsable ve solo Mi ambiente', () => {
     mostrarLayout(SESIONES.responsable, '/mi-ambiente')
-    expect(opcionesDelMenu()).toEqual(['Mi ambiente'])
+    expect(opcionesDelMenu()).toEqual(['Inicio', 'Disponibilidad', 'Mi ambiente'])
   })
 
   it('el menú lleva el logo de la universidad con su texto alternativo, junto al nombre del producto', () => {
@@ -117,29 +126,36 @@ describe('Layout: menú por rol (hallazgo G1: un solo layout)', () => {
 
   it('Ambientes sigue activo en una subpágina (/ambientes/nuevo)', () => {
     mostrarLayout(SESIONES.administrador, '/ambientes/nuevo')
-    expect(screen.getByRole('link', { name: 'Ambientes' })).toHaveAttribute('aria-current', 'page')
+    const enElMenu = within(screen.getByRole('navigation', { name: 'Principal' }))
+    expect(enElMenu.getByRole('link', { name: 'Ambientes' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
   })
 
   it('Cerrar sesión borra la sesión y lleva al login', async () => {
     mostrarLayout(SESIONES.administrador)
+    await userEvent.click(screen.getByRole('button', { name: /Carla Rojas/ })) // el menú de usuario de la barra superior
     await userEvent.click(screen.getByRole('button', { name: 'Cerrar sesión' }))
     expect(sessionStorage.length).toBe(0)
     expect(screen.getByText('pantalla de login')).toBeInTheDocument()
   })
 
-  it('el botón Menú abre y cierra el menú en móvil (aria-expanded)', async () => {
+  it('el botón Menú abre el panel en móvil y «Cerrar menú» lo cierra (aria-expanded)', async () => {
     mostrarLayout(SESIONES.solicitante)
     const boton = screen.getByRole('button', { name: 'Menú' })
     expect(boton).toHaveAttribute('aria-expanded', 'false')
     await userEvent.click(boton)
     expect(boton).toHaveAttribute('aria-expanded', 'true')
-    await userEvent.click(boton)
+    await userEvent.click(screen.getByRole('button', { name: 'Cerrar menú' }))
     expect(boton).toHaveAttribute('aria-expanded', 'false')
   })
 
   it('se navega solo con el teclado: Tab hasta una opción y Enter', async () => {
     mostrarLayout(SESIONES.solicitante, '/reservas')
     await userEvent.tab() // botón Menú
+    await userEvent.tab() // Inicio
+    await userEvent.tab() // Disponibilidad
     await userEvent.tab() // Reservas
     await userEvent.tab() // Nueva reserva
     expect(screen.getByRole('link', { name: 'Nueva reserva' })).toHaveFocus()
@@ -165,9 +181,9 @@ describe('DetalleReserva (hallazgo E4: un único componente)', () => {
       </MemoryRouter>,
     )
 
-  it('el enlace de regreso se llama como su destino: «Volver al Dashboard» si se vino del Dashboard', () => {
+  it('el enlace de regreso se llama como su destino: «Volver a Inicio» si se vino de Inicio', () => {
     mostrar({ volverA: '/dashboard' })
-    expect(screen.getByRole('link', { name: 'Volver al Dashboard' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Volver a Inicio' })).toHaveAttribute(
       'href',
       '/dashboard',
     )

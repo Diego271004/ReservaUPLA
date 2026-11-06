@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MENSAJES, TEXTOS } from '../constants/messages.js'
 import { RESULTADO } from '../services/llamarApi.js'
@@ -10,6 +10,7 @@ import {
   crearUsuario,
   listarAmbientes,
   listarUsuarios,
+  obtenerDisponibilidadDia,
 } from '../services/recursosService.js'
 import { SESIONES, renderEnRuta } from '../test/utils.jsx'
 import AmbienteFormPage from './AmbienteFormPage.jsx'
@@ -25,6 +26,7 @@ vi.mock('../services/recursosService.js', () => ({
   crearUsuario: vi.fn(),
   listarAmbientes: vi.fn(),
   listarUsuarios: vi.fn(),
+  obtenerDisponibilidadDia: vi.fn(),
   obtenerReserva: vi.fn(),
   rechazarReserva: vi.fn(),
 }))
@@ -34,6 +36,9 @@ const pendiente = () => new Promise(() => {})
 
 beforeEach(() => {
   vi.resetAllMocks()
+  obtenerDisponibilidadDia.mockResolvedValue(
+    exito({ fecha: '2026-11-05', soloLectura: false, ambientes: [] }),
+  )
   consultarDisponibilidad.mockResolvedValue(
     exito({ disponible: true, mensaje: MENSAJES.disponible }),
   )
@@ -112,6 +117,21 @@ describe('Registrar usuario', () => {
     expect(ingresar('Nombre completo')).toHaveFocus()
   })
 
+  it('al enviar vacío, foco al primer error', async () => {
+    mostrar()
+    await userEvent.click(boton('Registrar usuario'))
+    expect(crearUsuario).not.toHaveBeenCalled()
+    expect(ingresar('Nombre completo')).toHaveFocus()
+  })
+
+  it('error al salir del campo (blur), antes de enviar', async () => {
+    mostrar()
+    await userEvent.type(ingresar('Correo institucional'), 'invalido')
+    await userEvent.tab()
+    expect(screen.getByText(MENSAJES.correoFormatoInvalido)).toBeInTheDocument()
+    expect(crearUsuario).not.toHaveBeenCalled()
+  })
+
   it('campos inválidos: correo con formato y dominio incorrectos', async () => {
     mostrar()
     await userEvent.type(ingresar('Correo institucional'), 'rosa')
@@ -158,26 +178,31 @@ describe('Registrar usuario', () => {
   )
 
   it('U2: una contraseña inicial que cumple no muestra error y se envía', async () => {
+    const usuario = userEvent.setup()
     crearUsuario.mockResolvedValue(exito({ id: 9 }))
     mostrar()
-    await userEvent.type(ingresar('Nombre completo'), 'Rosa Chávez')
-    await userEvent.type(ingresar('Correo institucional'), 'rosa.chavez@upla.edu.pe')
-    await userEvent.selectOptions(ingresar('Rol'), 'Responsable')
-    await userEvent.type(ingresar('Contraseña inicial'), 'Abcdefg1')
-    await userEvent.tab()
+    await usuario.type(ingresar('Nombre completo'), 'Rosa Chávez')
+    await usuario.type(ingresar('Correo institucional'), 'rosa.chavez@upla.edu.pe')
+    await usuario.selectOptions(ingresar('Rol'), 'Responsable')
+    await usuario.type(ingresar('Contraseña inicial'), 'Abcdefg1')
+    await usuario.tab()
     expect(screen.queryByText(MENSAJES.contrasenaInicialRequisitos)).not.toBeInTheDocument()
-    await userEvent.click(boton('Registrar usuario'))
-    expect(crearUsuario).toHaveBeenCalledTimes(1)
+    await usuario.click(boton('Registrar usuario'))
+    await waitFor(() => expect(crearUsuario).toHaveBeenCalledTimes(1))
   })
 
   it('U2: si el backend rechaza la contraseña, su mensaje aparece bajo el campo', async () => {
+    const usuario = userEvent.setup()
     crearUsuario.mockResolvedValue({
       tipo: RESULTADO.datosInvalidos,
       errores: { contrasena: MENSAJES.contrasenaInicialRequisitos },
     })
     mostrar()
-    await llenarValido()
-    await userEvent.click(boton('Registrar usuario'))
+    await usuario.type(ingresar('Nombre completo'), 'Rosa Chávez')
+    await usuario.type(ingresar('Correo institucional'), 'rosa.chavez@upla.edu.pe')
+    await usuario.selectOptions(ingresar('Rol'), 'Responsable')
+    await usuario.type(ingresar('Contraseña inicial'), 'Clave#123')
+    await usuario.click(boton('Registrar usuario'))
     expect(await screen.findByText(MENSAJES.contrasenaInicialRequisitos)).toBeInTheDocument()
     expect(ingresar('Contraseña inicial')).toHaveFocus()
   })
@@ -241,9 +266,11 @@ describe('Registrar usuario', () => {
     mostrar()
     await llenarValido()
     await userEvent.click(boton('Registrar usuario'))
-    await waitFor(() => expect(screen.getByTestId('ubicacion')).toHaveTextContent('/usuarios'))
-    expect(JSON.parse(screen.getByTestId('ubicacion').dataset.state)).toEqual({
-      exito: MENSAJES.usuarioRegistrado,
+    await waitFor(() => {
+      expect(screen.getByTestId('ubicacion')).toHaveTextContent('/usuarios')
+      expect(JSON.parse(screen.getByTestId('ubicacion').dataset.state)).toEqual({
+        exito: MENSAJES.usuarioRegistrado,
+      })
     })
   })
 
@@ -389,11 +416,16 @@ describe('Registrar ambiente', () => {
   })
 
   it('guardando: "Guardando…", campos bloqueados y sin doble envío', async () => {
+    const usuario = userEvent.setup()
     crearAmbiente.mockReturnValue(pendiente())
     mostrar()
-    await llenarValido()
-    await userEvent.click(boton('Registrar ambiente'))
-    expect(boton('Guardando…')).toBeInTheDocument()
+    await usuario.type(ingresar('Nombre'), 'Auditorio Principal')
+    await usuario.selectOptions(ingresar('Tipo'), 'Auditorio')
+    await usuario.type(ingresar('Capacidad'), '200')
+    await usuario.type(ingresar('Ubicación'), 'Pabellón B, piso 1')
+    await usuario.selectOptions(ingresar('Estado'), 'Disponible')
+    await usuario.click(boton('Registrar ambiente'))
+    await waitFor(() => expect(boton('Guardando…')).toBeInTheDocument())
     expect(ingresar('Tipo')).toBeDisabled()
     await userEvent.click(boton('Guardando…'))
     expect(crearAmbiente).toHaveBeenCalledTimes(1)
@@ -404,9 +436,11 @@ describe('Registrar ambiente', () => {
     mostrar()
     await llenarValido()
     await userEvent.click(boton('Registrar ambiente'))
-    await waitFor(() => expect(screen.getByTestId('ubicacion')).toHaveTextContent('/ambientes'))
-    expect(JSON.parse(screen.getByTestId('ubicacion').dataset.state)).toEqual({
-      exito: MENSAJES.ambienteRegistrado,
+    await waitFor(() => {
+      expect(screen.getByTestId('ubicacion')).toHaveTextContent('/ambientes')
+      expect(JSON.parse(screen.getByTestId('ubicacion').dataset.state)).toEqual({
+        exito: MENSAJES.ambienteRegistrado,
+      })
     })
   })
 
@@ -487,23 +521,20 @@ describe('Nueva reserva', () => {
     estado: 'Pendiente',
   }
 
-  async function llenarValido() {
-    await userEvent.selectOptions(
-      ingresar('Ambiente'),
-      await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ }),
-    )
-    await userEvent.clear(ingresar('Fecha'))
-    await userEvent.type(ingresar('Fecha'), '05112030')
-    await userEvent.selectOptions(ingresar('Hora de inicio'), '10:00')
-    await userEvent.selectOptions(ingresar('Hora de fin'), '12:00')
-    await userEvent.type(ingresar('Motivo'), 'Práctica de programación')
+  async function llenarValido(usuario = userEvent) {
+    await usuario.click(await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ }))
+    await usuario.clear(ingresar('Fecha'))
+    await usuario.type(ingresar('Fecha'), '05112030')
+    await usuario.selectOptions(ingresar('Hora de inicio'), '10:00')
+    await usuario.selectOptions(ingresar('Hora de fin'), '12:00')
+    await usuario.type(ingresar('Motivo'), 'Práctica de programación')
   }
 
   it('la fecha dice en qué formato se escribe (el icono de calendario no abre ningún selector)', async () => {
     mostrar()
     expect(ingresar('Fecha')).toHaveAccessibleDescription(TEXTOS.ayudaFecha)
     expect(TEXTOS.ayudaFecha).toMatch(/dd\/mm\/aaaa/)
-    await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ })
+    await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
   })
 
   it('muestra los campos del diseño, la fecha de hoy ya escrita y la ayuda del horario', async () => {
@@ -513,29 +544,28 @@ describe('Nueva reserva', () => {
       new Date().toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
     )
     expect(screen.getByText('Horario permitido: 07:00 a 22:00')).toBeInTheDocument()
-    await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ })
+    await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
   })
 
   it('las opciones del ambiente muestran solo el nombre; el que está en mantenimiento no se puede elegir', async () => {
     mostrar()
-    expect(await screen.findByRole('option', { name: 'Laboratorio de Cómputo 2' })).toBeEnabled()
-    expect(
-      screen.getByRole('option', {
-        name: 'Sala de Reuniones A · En mantenimiento (no disponible)',
-      }),
-    ).toBeDisabled()
-    expect(screen.queryByText(/30 personas/)).not.toBeInTheDocument()
+    const lab = await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
+    expect(lab).not.toHaveAttribute('aria-disabled')
+    expect(within(lab).getByText('Laboratorio de Cómputo 2')).toBeInTheDocument()
+    expect(within(lab).getByText('30 personas · Pabellón A, piso 2')).toBeInTheDocument()
+    expect(within(lab).getByText('Disponible')).toBeInTheDocument()
+
+    const mantenimiento = screen.getByRole('radio', { name: /Sala de Reuniones A/ })
+    expect(mantenimiento).toHaveAttribute('aria-disabled', 'true')
+    expect(within(mantenimiento).getByText('En mantenimiento (no disponible)')).toBeInTheDocument()
   })
 
-  it('al elegir un ambiente, su capacidad y ubicación aparecen como ayuda bajo el campo', async () => {
+  it('al elegir un ambiente con clic queda marcado con aria-checked="true"', async () => {
     mostrar()
-    await userEvent.selectOptions(
-      ingresar('Ambiente'),
-      await screen.findByRole('option', { name: 'Laboratorio de Cómputo 2' }),
-    )
-    expect(screen.getByText('30 personas · Pabellón A, piso 2')).toBeInTheDocument()
-    await userEvent.selectOptions(ingresar('Ambiente'), '')
-    expect(screen.queryByText(/30 personas/)).not.toBeInTheDocument()
+    const lab = await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
+    expect(lab).toHaveAttribute('aria-checked', 'false')
+    await userEvent.click(lab)
+    expect(lab).toHaveAttribute('aria-checked', 'true')
   })
 
   it('campos vacíos: no envía y marca ambiente, horas y motivo; la fecha ya tiene valor', async () => {
@@ -547,7 +577,7 @@ describe('Nueva reserva', () => {
     expect(screen.getByText(MENSAJES.horaFinVacia)).toBeInTheDocument()
     expect(screen.getByText(MENSAJES.motivoVacio)).toBeInTheDocument()
     expect(screen.queryByText(MENSAJES.fechaVacia)).not.toBeInTheDocument()
-    expect(ingresar('Ambiente')).toHaveFocus()
+    expect(screen.getByRole('radio', { name: /Laboratorio de Cómputo 2/ })).toHaveFocus()
   })
 
   it('fecha vacía o inexistente muestra su mensaje', async () => {
@@ -635,22 +665,26 @@ describe('Nueva reserva', () => {
   })
 
   it('RN-07: una fecha anterior a hoy se avisa junto al campo y no se envía', async () => {
+    const usuario = userEvent.setup()
     mostrar()
-    await llenarValido()
-    await userEvent.clear(ingresar('Fecha'))
-    await userEvent.type(ingresar('Fecha'), '01012020')
-    await userEvent.click(boton('Registrar solicitud'))
+    await llenarValido(usuario)
+    await usuario.clear(ingresar('Fecha'))
+    await usuario.type(ingresar('Fecha'), '01012020')
+    await usuario.click(boton('Registrar solicitud'))
     expect(await screen.findByText(MENSAJES.fechaPasada)).toBeInTheDocument()
     expect(ingresar('Fecha')).toHaveAttribute('aria-invalid', 'true')
     expect(crearReserva).not.toHaveBeenCalled()
   })
 
   it('éxito (cierre): mensaje, resumen con ambiente, fecha, horario e insignia Pendiente', async () => {
+    const usuario = userEvent.setup()
     crearReserva.mockResolvedValue(exito(reservaCreada))
     mostrar()
-    await llenarValido()
-    await userEvent.click(boton('Registrar solicitud'))
-    expect(await screen.findByText(MENSAJES.reservaRegistrada)).toBeInTheDocument()
+    await llenarValido(usuario)
+    await usuario.click(boton('Registrar solicitud'))
+    await waitFor(() => {
+      expect(screen.getByText(MENSAJES.reservaRegistrada)).toBeInTheDocument()
+    })
     expect(screen.getByText('Laboratorio de Cómputo 2')).toBeInTheDocument()
     expect(screen.getByText('05/11/2026')).toBeInTheDocument()
     expect(screen.getByText('10:00 – 12:00')).toBeInTheDocument()
@@ -709,10 +743,10 @@ describe('Nueva reserva', () => {
   it('solo con teclado: Tab recorre los campos en orden y Enter envía', async () => {
     crearReserva.mockResolvedValue(exito(reservaCreada))
     mostrar()
-    await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ })
+    const lab = await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
     await userEvent.tab()
-    expect(ingresar('Ambiente')).toHaveFocus()
-    await userEvent.selectOptions(ingresar('Ambiente'), '1')
+    expect(lab).toHaveFocus()
+    await userEvent.keyboard('{Space}')
     await userEvent.tab()
     expect(ingresar('Fecha')).toHaveFocus()
     await userEvent.tab()
@@ -721,6 +755,10 @@ describe('Nueva reserva', () => {
     await userEvent.tab()
     expect(ingresar('Hora de fin')).toHaveFocus()
     await userEvent.selectOptions(ingresar('Hora de fin'), '12:00')
+    for (const duracion of ['1 h', '2 h', '3 h']) {
+      await userEvent.tab()
+      expect(boton(duracion)).toHaveFocus()
+    }
     await userEvent.tab()
     expect(ingresar('Motivo')).toHaveFocus()
     await userEvent.keyboard('Práctica')
@@ -738,11 +776,10 @@ describe('Nueva reserva', () => {
     'Ese ambiente ya tiene una reserva aprobada de 10:00 a 12:00. Elige otro horario u otro ambiente.'
 
   async function elegirHorario(ambiente = '1', inicio = '10:00', fin = '12:00') {
-    await userEvent.selectOptions(
-      ingresar('Ambiente'),
-      await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ }),
-    )
-    if (ambiente !== '1') await userEvent.selectOptions(ingresar('Ambiente'), ambiente)
+    const radio = await screen.findByRole('radio', {
+      name: ambiente === '1' ? /Laboratorio de Cómputo 2/ : /Sala de Reuniones A/,
+    })
+    await userEvent.click(radio)
     await userEvent.clear(ingresar('Fecha'))
     await userEvent.type(ingresar('Fecha'), '05112030')
     await userEvent.selectOptions(ingresar('Hora de inicio'), inicio)
@@ -783,20 +820,14 @@ describe('Nueva reserva', () => {
 
   it('no consulta mientras falten datos (solo con el ambiente elegido)', async () => {
     mostrar()
-    await userEvent.selectOptions(
-      ingresar('Ambiente'),
-      await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ }),
-    )
+    await userEvent.click(await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ }))
     await new Promise((resolver) => setTimeout(resolver, 450))
     expect(consultarDisponibilidad).not.toHaveBeenCalled()
   })
 
   it('no consulta si la hora de fin no es posterior (el error ya se ve en el formulario)', async () => {
     mostrar()
-    await userEvent.selectOptions(
-      ingresar('Ambiente'),
-      await screen.findByRole('option', { name: /Laboratorio de Cómputo 2/ }),
-    )
+    await userEvent.click(await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ }))
     await userEvent.selectOptions(ingresar('Hora de inicio'), '10:00')
     await userEvent.selectOptions(ingresar('Hora de fin'), '10:30')
     await userEvent.selectOptions(ingresar('Hora de inicio'), '10:30') // el fin deja de ser válido y se vacía
@@ -857,7 +888,100 @@ describe('Nueva reserva', () => {
     await llenarValido()
     await userEvent.click(boton('Registrar solicitud'))
     expect(await screen.findByText(MENSAJES.ambienteEnMantenimiento)).toBeInTheDocument()
-    expect(ingresar('Ambiente')).toHaveFocus()
+    expect(screen.getByRole('radio', { name: /Laboratorio de Cómputo 2/ })).toHaveFocus()
+  })
+
+  describe('resumen vivo, atajos de duración y contador', () => {
+    const resumen = () => screen.getByRole('complementary', { name: 'Resumen de tu solicitud' })
+
+    it('el resumen empieza con «Sin elegir» y con la fecha de hoy en letras', async () => {
+      mostrar()
+      await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
+      expect(within(resumen()).getAllByText('Sin elegir')).toHaveLength(3)
+      expect(within(resumen()).getByText(/^\w+, \d{1,2} de \w+ de \d{4}$/)).toBeInTheDocument()
+      expect(within(resumen()).getByText(/Pendiente/)).toBeInTheDocument()
+    })
+
+    it('lo que se elige aparece en el resumen al instante, con la duración', async () => {
+      mostrar()
+      await userEvent.click(await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ }))
+      await userEvent.selectOptions(ingresar('Hora de inicio'), '10:00')
+      await userEvent.selectOptions(ingresar('Hora de fin'), '12:30')
+      await userEvent.type(ingresar('Motivo'), 'Práctica de programación')
+      const panel = within(resumen())
+      expect(panel.getByText('Laboratorio de Cómputo 2')).toBeInTheDocument()
+      expect(panel.getByText('30 personas · Pabellón A, piso 2')).toBeInTheDocument()
+      expect(panel.getByText('10:00 – 12:30')).toBeInTheDocument()
+      expect(panel.getByText('2 h 30 min')).toBeInTheDocument()
+      expect(panel.getByText('Práctica de programación')).toBeInTheDocument()
+      expect(panel.queryByText('Sin elegir')).not.toBeInTheDocument()
+    })
+
+    it('el resumen cambia al cambiar ambiente/fecha/horario', async () => {
+      mostrar()
+      const radio = await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
+      await userEvent.click(radio)
+      const inputFecha = ingresar('Fecha')
+      await userEvent.clear(inputFecha)
+      await userEvent.type(inputFecha, '20112026')
+      await userEvent.selectOptions(ingresar('Hora de inicio'), '10:00')
+      await userEvent.selectOptions(ingresar('Hora de fin'), '12:00')
+      const panel = within(resumen())
+      expect(panel.getByText('Laboratorio de Cómputo 2')).toBeInTheDocument()
+      expect(panel.getByText(/20 de noviembre de 2026/i)).toBeInTheDocument()
+      expect(panel.getByText('10:00 – 12:00')).toBeInTheDocument()
+      expect(panel.getByText('2 h')).toBeInTheDocument()
+    })
+
+    it('el resumen se anuncia con aria-live="polite" y es solo lectura', async () => {
+      mostrar()
+      await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
+      expect(resumen().querySelector('dl')).toHaveAttribute('aria-live', 'polite')
+      expect(within(resumen()).queryByRole('button')).not.toBeInTheDocument()
+    })
+
+    it('sin hora de inicio los atajos están desactivados y dicen por qué', async () => {
+      mostrar()
+      await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
+      for (const duracion of ['1 h', '2 h', '3 h']) {
+        expect(boton(duracion)).toBeDisabled()
+        expect(boton(duracion)).toHaveAttribute('title', 'Elige primero la hora de inicio')
+      }
+    })
+
+    it('un atajo completa la hora de fin, queda presionado y el resumen lo refleja', async () => {
+      mostrar()
+      await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
+      await userEvent.selectOptions(ingresar('Hora de inicio'), '10:00')
+      expect(boton('2 h')).toHaveAttribute('aria-pressed', 'false')
+      await userEvent.click(boton('2 h'))
+      expect(ingresar('Hora de fin')).toHaveValue('12:00')
+      expect(boton('2 h')).toHaveAttribute('aria-pressed', 'true')
+      expect(within(resumen()).getByText('2 h')).toBeInTheDocument()
+      await userEvent.click(boton('3 h'))
+      expect(ingresar('Hora de fin')).toHaveValue('13:00')
+      expect(boton('3 h')).toHaveAttribute('aria-pressed', 'true')
+      expect(boton('2 h')).toHaveAttribute('aria-pressed', 'false')
+    })
+
+    it('un atajo que pasaría de las 22:00 se desactiva y dice por qué; el de 1 h sí sirve', async () => {
+      mostrar()
+      await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
+      await userEvent.selectOptions(ingresar('Hora de inicio'), '21:00')
+      expect(boton('2 h')).toBeDisabled()
+      expect(boton('2 h')).toHaveAttribute('title', 'Pasaría de las 22:00')
+      expect(boton('3 h')).toBeDisabled()
+      await userEvent.click(boton('1 h'))
+      expect(ingresar('Hora de fin')).toHaveValue('22:00')
+    })
+
+    it('el motivo cuenta los caracteres (de 300) y el contador forma parte de su descripción', async () => {
+      mostrar()
+      await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
+      expect(ingresar('Motivo')).toHaveAccessibleDescription('0 de 300 caracteres')
+      await userEvent.type(ingresar('Motivo'), 'Clase')
+      expect(ingresar('Motivo')).toHaveAccessibleDescription('5 de 300 caracteres')
+    })
   })
 
   it('04c: el cierre ofrece "Ver detalle", que lleva a la reserva recién creada', async () => {
@@ -867,5 +991,9 @@ describe('Nueva reserva', () => {
     await userEvent.click(boton('Registrar solicitud'))
     await userEvent.click(await screen.findByRole('button', { name: 'Ver detalle' }))
     expect(screen.getByTestId('ubicacion')).toHaveTextContent('/reservas/7')
+    // Quien acaba de registrar su solicitud vuelve a su lista de Reservas, no a Inicio.
+    expect(JSON.parse(screen.getByTestId('ubicacion').dataset.state)).toEqual({
+      volverA: '/reservas',
+    })
   })
 })

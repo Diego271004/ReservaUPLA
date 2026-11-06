@@ -1,0 +1,105 @@
+import { useRef } from 'react'
+import { Link, NavLink } from 'react-router-dom'
+import { TEXTOS, textoPendientes } from '../../constants/messages.js'
+import { useTrampaDeFoco } from '../../hooks/useTrampaDeFoco.js'
+import logo from '../../assets/logo-upla-menu.webp'
+import Button from '../ui/Button.jsx'
+import { Icono } from '../ui/Icono.jsx'
+import estilos from './Layout.module.css'
+
+/** Lo que lleva cada opción: icono, texto y, junto a «Reservas», el contador de pendientes del Administrador. */
+function Contenido({ opcion, pendientes }) {
+  const contador = opcion.ruta === '/reservas' ? pendientes : 0
+  return (
+    <>
+      <Icono nombre={opcion.icono} tamano={20} className={estilos.iconoOpcion} />
+      <span className={estilos.textoOpcion}>{opcion.texto}</span>
+      {contador > 0 && (
+        <span className={estilos.contador}>
+          <span aria-hidden="true">{contador}</span>
+          <span className="solo-lector">{textoPendientes(contador)}</span>
+        </span>
+      )}
+    </>
+  )
+}
+
+/**
+ * El menú lateral marino. En escritorio puede contraerse a solo iconos; en móvil es un panel que se desliza desde la
+ * izquierda con el foco atrapado (Esc o «Cerrar menú» lo cierran y el foco vuelve a la hamburguesa).
+ */
+export default function MenuLateral({
+  opciones,
+  origen,
+  pendientes,
+  colapsado,
+  alternarColapso,
+  abierto,
+  alCerrar,
+}) {
+  const panelRef = useRef(null)
+  const alPulsarTecla = useTrampaDeFoco(abierto, panelRef, { alEscape: alCerrar })
+
+  return (
+    <aside
+      id="panel-menu"
+      ref={panelRef}
+      className={estilos.menu}
+      data-colapsado={colapsado}
+      data-abierto={abierto}
+      onKeyDown={abierto ? alPulsarTecla : undefined}
+    >
+      <div className={estilos.cabecera}>
+        <div className={estilos.identidad}>
+          <span className={estilos.logo}>
+            <img src={logo} width="69" height="80" alt={TEXTOS.universidad} />
+          </span>
+          <span className={estilos.marca}>{TEXTOS.nombreProducto}</span>
+        </div>
+        <div className={estilos.cerrarPanel}>
+          <Button variante="sobreOscuroIcono" aria-label={TEXTOS.menuCerrar} onClick={alCerrar}>
+            <Icono nombre="equis" tamano={20} />
+          </Button>
+        </div>
+      </div>
+      <nav id="menu-principal" aria-label="Principal" className={estilos.navegacion}>
+        {opciones.map((opcion) =>
+          opcion.ruta === origen ? (
+            <Link
+              key={opcion.ruta}
+              to={opcion.ruta}
+              aria-current="true"
+              title={colapsado ? opcion.texto : undefined}
+              className={`${estilos.opcion} ${estilos.activa}`}
+              onClick={alCerrar}
+            >
+              <Contenido opcion={opcion} pendientes={pendientes} />
+            </Link>
+          ) : (
+            <NavLink
+              key={opcion.ruta}
+              to={opcion.ruta}
+              end={opcion.exacta}
+              title={colapsado ? opcion.texto : undefined}
+              className={({ isActive }) => `${estilos.opcion} ${isActive ? estilos.activa : ''}`}
+              onClick={alCerrar}
+            >
+              <Contenido opcion={opcion} pendientes={pendientes} />
+            </NavLink>
+          ),
+        )}
+      </nav>
+      <div className={estilos.pieMenu}>
+        <Button
+          variante="sobreOscuroIcono"
+          aria-label={colapsado ? TEXTOS.menuExpandir : TEXTOS.menuContraer}
+          aria-expanded={!colapsado}
+          aria-controls="menu-principal"
+          onClick={alternarColapso}
+        >
+          <Icono nombre={colapsado ? 'expandir' : 'contraer'} tamano={20} />
+        </Button>
+      </div>
+    </aside>
+  )
+}

@@ -14,6 +14,7 @@ vi.mock('./services/recursosService.js', () => ({
   crearReserva: vi.fn(),
   crearUsuario: vi.fn(),
   listarAmbientes: vi.fn(),
+  obtenerDisponibilidadDia: vi.fn(),
   listarReservas: vi.fn(),
   listarUsuarios: vi.fn(),
   obtenerDashboard: vi.fn(),

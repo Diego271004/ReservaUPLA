@@ -5,6 +5,7 @@ import TextInput from '../components/ui/TextInput.jsx'
 import { TEXTOS } from '../constants/messages.js'
 import { OPCIONES_ESTADO_AMBIENTE, OPCIONES_TIPO } from '../constants/navegacion.js'
 import { useAmbienteForm } from '../hooks/useAmbienteForm.js'
+import { LIMITES } from '../utils/validators.js'
 
 export default function AmbienteFormPage() {
   const form = useAmbienteForm()
@@ -23,6 +24,7 @@ export default function AmbienteFormPage() {
       <TextInput
         {...form.campoDeTexto('nombre')}
         etiqueta={TEXTOS.etiquetaNombre}
+        ayuda={`${form.valores.nombre.length} de ${LIMITES.nombreAmbiente} caracteres`}
         autoComplete="off"
       />
       <SelectInput
@@ -39,6 +41,7 @@ export default function AmbienteFormPage() {
       <TextInput
         {...form.campoDeTexto('ubicacion')}
         etiqueta={TEXTOS.etiquetaUbicacion}
+        ayuda={`${form.valores.ubicacion.length} de ${LIMITES.ubicacion} caracteres`}
         autoComplete="off"
       />
       <SelectInput
