@@ -13,6 +13,8 @@ export default function Button({
   textoCarga,
   deshabilitado = false,
   onClick,
+  className = '',
+  inputRef,
   children,
   ...resto
 }) {
@@ -27,8 +29,9 @@ export default function Button({
   return (
     <button
       {...resto}
+      ref={inputRef}
       type={tipo}
-      className={`${estilos.boton} ${estilos[variante]}`}
+      className={`${estilos.boton} ${estilos[variante]} ${className}`}
       disabled={deshabilitado}
       aria-busy={cargando || undefined}
       aria-disabled={cargando || undefined}

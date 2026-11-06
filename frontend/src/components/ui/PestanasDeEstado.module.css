@@ -1,0 +1,49 @@
+.pestanas {
+  display: flex;
+  gap: var(--espacio-1);
+  padding-bottom: 0;
+  margin-bottom: var(--espacio-2);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.pestana {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: var(--espacio-1);
+  align-items: center;
+  min-height: var(--alto-control);
+  padding: 0 var(--espacio-2);
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-texto-suave);
+  cursor: pointer;
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  transition:
+    color var(--duracion-transicion) ease-out,
+    border-color var(--duracion-transicion) ease-out;
+}
+
+.pestana:hover {
+  color: var(--color-marino);
+  border-bottom-color: var(--color-borde-control);
+}
+
+.activa,
+.activa:hover {
+  color: var(--color-marino);
+  border-bottom-color: var(--color-primario);
+}
+
+.conteo {
+  min-width: 1.75rem;
+  padding: 0 var(--espacio-1);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-marino);
+  text-align: center;
+  background: var(--fondo-encabezado-tabla);
+  border-radius: var(--radio-completo);
+}

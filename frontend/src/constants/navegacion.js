@@ -27,22 +27,38 @@ export const OPCIONES_ESTADO_AMBIENTE = ['Disponible', 'En mantenimiento'].map((
 }))
 
 // Menú lateral por rol (docs/diseno/DESIGN.md). "exacta" evita que /reservas quede activa en /reservas/nueva.
-const DASHBOARD = { ruta: '/dashboard', texto: 'Dashboard', exacta: true }
-const RESERVAS = { ruta: '/reservas', texto: 'Reservas', exacta: true }
-const NUEVA_RESERVA = { ruta: '/reservas/nueva', texto: 'Nueva reserva', exacta: true }
-const AMBIENTES = { ruta: '/ambientes', texto: 'Ambientes', exacta: false }
-const USUARIOS = { ruta: '/usuarios', texto: 'Usuarios', exacta: false }
-const MI_AMBIENTE = { ruta: '/mi-ambiente', texto: 'Mi ambiente', exacta: true }
+const INICIO = { ruta: '/dashboard', texto: 'Inicio', icono: 'dashboard', exacta: true }
+const RESERVAS = { ruta: '/reservas', texto: 'Reservas', icono: 'reservas', exacta: true }
+const NUEVA_RESERVA = {
+  ruta: '/reservas/nueva',
+  texto: 'Nueva reserva',
+  icono: 'nuevaReserva',
+  exacta: true,
+}
+const AMBIENTES = { ruta: '/ambientes', texto: 'Ambientes', icono: 'ambientes', exacta: false }
+const USUARIOS = { ruta: '/usuarios', texto: 'Usuarios', icono: 'usuarios', exacta: false }
+const MI_AMBIENTE = {
+  ruta: '/mi-ambiente',
+  texto: 'Mi ambiente',
+  icono: 'miAmbiente',
+  exacta: true,
+}
+const DISPONIBILIDAD = {
+  ruta: '/disponibilidad',
+  texto: 'Disponibilidad',
+  icono: 'calendario',
+  exacta: true,
+}
 
 export const MENU_POR_ROL = Object.freeze({
-  [ROLES.administrador]: [DASHBOARD, RESERVAS, NUEVA_RESERVA, AMBIENTES, USUARIOS],
-  [ROLES.solicitante]: [RESERVAS, NUEVA_RESERVA],
-  [ROLES.responsable]: [MI_AMBIENTE],
+  [ROLES.administrador]: [INICIO, DISPONIBILIDAD, RESERVAS, NUEVA_RESERVA, AMBIENTES, USUARIOS],
+  [ROLES.solicitante]: [INICIO, DISPONIBILIDAD, RESERVAS, NUEVA_RESERVA],
+  [ROLES.responsable]: [INICIO, DISPONIBILIDAD, MI_AMBIENTE],
 })
 
 // Primera pantalla de cada rol.
 export const RUTA_INICIAL_POR_ROL = Object.freeze({
   [ROLES.administrador]: '/dashboard',
-  [ROLES.solicitante]: '/reservas/nueva',
-  [ROLES.responsable]: '/mi-ambiente',
+  [ROLES.solicitante]: '/dashboard',
+  [ROLES.responsable]: '/dashboard',
 })

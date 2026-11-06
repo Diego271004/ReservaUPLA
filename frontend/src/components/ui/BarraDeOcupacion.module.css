@@ -1,0 +1,29 @@
+.contenedor {
+  display: inline-flex;
+  gap: var(--espacio-1);
+  align-items: center;
+  min-width: 6rem;
+}
+
+.pista {
+  flex: 1;
+  height: 0.5rem;
+  min-width: 3rem;
+  overflow: hidden;
+  background: var(--fondo-encabezado-tabla);
+  border-radius: var(--radio-completo);
+}
+
+.relleno {
+  display: block;
+  height: 100%;
+  background: var(--color-primario);
+  border-radius: var(--radio-completo);
+}
+
+.numero {
+  min-width: 3rem;
+  font-weight: 600;
+  color: var(--color-marino);
+  text-align: right;
+}

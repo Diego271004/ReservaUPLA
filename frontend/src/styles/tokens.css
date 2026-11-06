@@ -12,7 +12,7 @@
 
   --color-texto: #1f365c;
   --color-texto-suave: #4f4f4f;
-  --color-fondo: #f3f4f6;
+  --color-fondo: #f4f6fa;
   --color-superficie: #ffffff;
   --color-borde: #d1d5db;
   /* Límite de un campo o control: 3:1 sobre blanco y sobre el fondo de la página (WCAG 1.4.11). --color-borde queda para divisores. */
@@ -36,6 +36,9 @@
   --radio-completo: 999px;
   --grosor-foco: 3px;
   --ancho-menu: 260px;
+  --ancho-menu-colapsado: 80px;
+  --alto-barra-superior: 64px;
+  --duracion-transicion: 180ms; /* hover, foco, paneles, modales y avisos: 150 a 200 ms, sin movimiento con prefers-reduced-motion */
   --alto-logo-menu: 40px;
   --alto-logo-login: 80px;
   --alto-logo-login-movil: 40px;
@@ -60,8 +63,31 @@
   --fondo-neutro: #eceef1;
   --fondo-encabezado-tabla: #e6ecf5;
   /* Capas planas (sin degradado): la del login deja el texto blanco a 4,5:1 o más sobre la parte más clara de la foto. */
-  --capa-foto: rgb(31 54 92 / 78%);
+  --fondo-login: #f4f6fa;
+  /* Sistema de tarjetas: radio de 12 px y una elevación de dos capas muy suaves (1 px de contorno y 4 px de aire). */
+  --radio-tarjeta: 12px;
+  --elevacion-tarjeta: 0 1px 2px rgb(31 54 92 / 10%), 0 4px 12px rgb(31 54 92 / 6%);
+  /* Portada del Inicio: del marino al azul institucional; el texto blanco va a 6,3:1 o más sobre toda la franja. */
+  --degradado-portada: linear-gradient(120deg, #1f365c 0%, #164a7e 55%, #0063a8 100%);
+  --trazo-marca: rgb(255 255 255 / 22%);
+  --alto-control-login: 48px;
+  /* Foto del login: el marino cubre la zona del texto con 72 % o más (texto blanco a 4,5:1 o más sobre lo más claro de la foto) y se
+     aclara hacia la derecha para que la foto se vea. El difuminado superior funde el marino plano con la foto (sin escalón). */
+  --degradado-lateral-foto: linear-gradient(
+    100deg,
+    rgb(31 54 92 / 88%) 0%,
+    rgb(31 54 92 / 72%) 42%,
+    rgb(31 54 92 / 25%) 72%,
+    rgb(31 54 92 / 0%) 100%
+  );
+  --degradado-superior-foto: linear-gradient(
+    to bottom,
+    var(--color-marino) 0%,
+    rgb(31 54 92 / 0%) 28%
+  );
   --capa-modal: rgb(31 54 92 / 55%);
+  /* Elevación sutil, solo en elementos flotantes (avisos, menús desplegables) y en hover: de 1 a 2 px. */
+  --elevacion-flotante: 0 1px 2px rgb(31 54 92 / 24%);
   --separador-sobre-oscuro: rgb(255 255 255 / 20%);
   --color-neutro: #4f4f4f;
   --color-deshabilitado: #6b7280;

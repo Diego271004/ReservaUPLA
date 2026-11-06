@@ -4,12 +4,36 @@
   justify-content: center;
   gap: var(--espacio-1);
   min-height: var(--alto-control);
+  min-width: var(--alto-control);
   padding: 0 var(--espacio-3);
   font: inherit;
   font-weight: 600;
   border: 1px solid transparent;
   border-radius: var(--radio-pequeno);
   cursor: pointer;
+  max-width: 100%;
+  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+  transition:
+    background-color var(--duracion-transicion),
+    border-color var(--duracion-transicion);
+}
+
+@media (max-width: 767px) {
+  .boton {
+    padding: 0 var(--espacio-2);
+  }
+}
+
+.primario:hover:not(:disabled) {
+  background: var(--color-marino);
+}
+
+.secundario:hover:not(:disabled),
+.rechazar:hover:not(:disabled) {
+  background: var(--fondo-neutro);
 }
 
 .primario {
@@ -27,6 +51,16 @@
   color: var(--color-error);
   background: var(--color-superficie);
   border-color: var(--color-error);
+}
+
+.destructivo {
+  color: var(--color-error);
+  background: var(--color-superficie);
+  border-color: var(--color-error);
+}
+
+.destructivo:hover:not(:disabled) {
+  background: var(--fondo-error);
 }
 
 .confirmarRechazo {
@@ -56,6 +90,55 @@
   background: transparent;
   border-top: 1px solid var(--separador-sobre-oscuro);
   border-radius: 0;
+}
+
+/* Solo icono (cerrar un aviso, abrir el menú): cuadrado de 44 px. */
+.icono {
+  min-width: var(--alto-control);
+  padding: 0;
+  color: var(--color-marino);
+  background: transparent;
+}
+
+.icono:hover:not(:disabled) {
+  background: var(--fondo-neutro);
+}
+
+/* Disparador del menú de usuario y filas del menú desplegable (barra superior). */
+.usuario {
+  gap: var(--espacio-1);
+  padding: 0 var(--espacio-1);
+  color: var(--color-marino);
+  background: transparent;
+  border-color: transparent;
+}
+
+.usuario:hover:not(:disabled),
+.usuario[aria-expanded='true'] {
+  background: var(--fondo-neutro);
+}
+
+.filaDeMenu {
+  justify-content: flex-start;
+  width: 100%;
+  color: var(--color-marino);
+  background: transparent;
+}
+
+.filaDeMenu:hover:not(:disabled) {
+  background: var(--fondo-neutro);
+}
+
+/* Iconos sobre el menú marino: el contraer/expandir y el botón de la hamburguesa del panel. */
+.sobreOscuroIcono {
+  min-width: var(--alto-control);
+  padding: 0;
+  color: var(--color-sobre-oscuro);
+  background: transparent;
+}
+
+.sobreOscuroIcono:hover:not(:disabled) {
+  background: var(--separador-sobre-oscuro);
 }
 
 .boton:disabled {

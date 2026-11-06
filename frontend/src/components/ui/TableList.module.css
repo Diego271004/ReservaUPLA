@@ -2,7 +2,8 @@
   overflow-x: auto; /* red de seguridad: un dato excepcionalmente largo desplaza la tabla, no la página */
   background: var(--color-superficie);
   border: 1px solid var(--color-borde);
-  border-radius: var(--radio);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--elevacion-tarjeta);
 }
 
 .tabla {
@@ -21,7 +22,10 @@
 
 .tabla th {
   padding: var(--espacio-2);
+  font-size: 0.8125rem;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--color-marino);
   text-align: left;
   background: var(--fondo-encabezado-tabla);
@@ -33,6 +37,17 @@
   color: var(--color-texto-suave);
   overflow-wrap: break-word; /* una palabra no se parte a mitad salvo que no quepa en la tarjeta */
   border-bottom: 1px solid var(--color-borde);
+}
+
+/* Una fecha o un horario («08:00 – 10:00») no se parten en dos líneas: son datos cortos que se leen de un vistazo. */
+.tabla td[data-etiqueta='Fecha'],
+.tabla td[data-etiqueta='Horario'] {
+  white-space: nowrap;
+}
+
+/* El texto de un botón de la fila («Ver detalle») no se parte en dos líneas. */
+.tabla td button {
+  white-space: nowrap;
 }
 
 .tabla tbody tr:last-child td {
@@ -81,4 +96,13 @@
     font-weight: 700;
     color: var(--color-marino);
   }
+}
+
+.activable {
+  cursor: pointer;
+  transition: background-color var(--duracion-transicion) ease-out;
+}
+
+.activable:hover {
+  background: var(--fondo-info);
 }

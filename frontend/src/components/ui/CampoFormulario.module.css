@@ -72,10 +72,12 @@ select.control {
   cursor: pointer;
 }
 
+/* Un ejemplo largo sin espacios («nombre.apellido@upla.edu.pe») se parte en vez de empujar la página fuera de la pantalla (reflujo, WCAG 1.4.10). */
 .ayuda {
   margin: 0;
   font-size: 0.8125rem;
   color: var(--color-texto-suave);
+  overflow-wrap: anywhere;
 }
 
 .error,
@@ -86,6 +88,7 @@ select.control {
   margin: 0;
   font-size: 0.875rem;
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
 .error {

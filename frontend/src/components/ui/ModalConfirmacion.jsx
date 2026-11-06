@@ -1,10 +1,8 @@
-import { useEffect, useId, useRef } from 'react'
+import { useId, useRef } from 'react'
 import { TEXTOS } from '../../constants/messages.js'
+import { useTrampaDeFoco } from '../../hooks/useTrampaDeFoco.js'
 import Button from './Button.jsx'
 import estilos from './ModalConfirmacion.module.css'
-
-const FOCALIZABLES =
-  'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 /**
  * Confirmación antes de una acción irreversible: título, resumen, "Volver" y el botón de confirmar
@@ -30,33 +28,12 @@ export default function ModalConfirmacion({
   const cuadroRef = useRef(null)
   const botonVolverRef = useRef(null)
 
-  useEffect(() => {
-    if (!abierto) return undefined
-    const elementoPrevio = document.activeElement
-    botonVolverRef.current?.focus()
-    return () => elementoPrevio?.focus?.()
-  }, [abierto])
+  const alPulsarTecla = useTrampaDeFoco(abierto, cuadroRef, {
+    alEscape: onVolver,
+    inicialRef: botonVolverRef,
+  })
 
   if (!abierto) return null
-
-  const alPulsarTecla = (evento) => {
-    if (evento.key === 'Escape') {
-      evento.stopPropagation()
-      onVolver()
-      return
-    }
-    if (evento.key !== 'Tab') return
-    const elementos = [...cuadroRef.current.querySelectorAll(FOCALIZABLES)]
-    const primero = elementos[0]
-    const ultimo = elementos[elementos.length - 1]
-    if (evento.shiftKey && document.activeElement === primero) {
-      evento.preventDefault()
-      ultimo.focus()
-    } else if (!evento.shiftKey && document.activeElement === ultimo) {
-      evento.preventDefault()
-      primero.focus()
-    }
-  }
 
   return (
     <div className={estilos.fondo}>

@@ -9,7 +9,16 @@ const { administrador, solicitante, responsable } = ROLES
  * menú y tools/usabilidad/mapa-del-sitio.mjs la convierte en el mapa del sitio.
  */
 export const RUTAS = Object.freeze([
-  { ruta: '/dashboard', titulo: TEXTOS.tituloDashboard, roles: [administrador] },
+  {
+    ruta: '/dashboard',
+    titulo: TEXTOS.tituloDashboard,
+    roles: [administrador, solicitante, responsable],
+  },
+  {
+    ruta: '/disponibilidad',
+    titulo: TEXTOS.tituloDisponibilidad,
+    roles: [administrador, solicitante, responsable],
+  },
   { ruta: '/ambientes', titulo: TEXTOS.tituloAmbientes, roles: [administrador] },
   { ruta: '/ambientes/nuevo', titulo: TEXTOS.tituloRegistrarAmbiente, roles: [administrador] },
   { ruta: '/usuarios', titulo: TEXTOS.tituloUsuarios, roles: [administrador] },

@@ -13,7 +13,6 @@ export default function PasswordInput({ mostrando, onAlternar, ...resto }) {
           type="button"
           className={estilos.alternar}
           onClick={onAlternar}
-          aria-pressed={mostrando}
           aria-label={`${mostrando ? TEXTOS.ocultar : TEXTOS.mostrar} ${resto.etiqueta.toLowerCase()}`}
           disabled={resto.deshabilitado || resto.soloLectura}
         >

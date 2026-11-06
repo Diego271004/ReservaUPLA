@@ -1,0 +1,58 @@
+/* Esquina inferior derecha en escritorio; en móvil ocupa el ancho (sin scroll horizontal a 320 px). */
+.zona {
+  position: fixed;
+  right: var(--espacio-2);
+  bottom: var(--espacio-2);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  width: min(26rem, calc(100vw - 2 * var(--espacio-2)));
+  pointer-events: none;
+}
+
+.tarjeta {
+  display: flex;
+  gap: var(--espacio-1);
+  align-items: center;
+  padding: var(--espacio-1) var(--espacio-1) var(--espacio-1) var(--espacio-2);
+  pointer-events: auto;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-left-width: 4px;
+  border-radius: var(--radio);
+  box-shadow: var(--elevacion-flotante);
+  animation: entrar var(--duracion-transicion) ease-out;
+}
+
+.exito {
+  color: var(--color-exito);
+  border-left-color: var(--color-exito);
+}
+
+.info {
+  color: var(--color-info);
+  border-left-color: var(--color-info);
+}
+
+.aviso {
+  color: var(--color-aviso);
+}
+
+.icono {
+  flex-shrink: 0;
+}
+
+.mensaje {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-texto);
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

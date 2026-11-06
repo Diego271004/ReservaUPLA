@@ -1,0 +1,43 @@
+.vacio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  align-items: center;
+  padding: var(--espacio-4) var(--espacio-2);
+  text-align: center;
+}
+
+.mensaje {
+  margin: 0;
+  color: var(--color-texto-suave);
+}
+
+.ilustracion {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hoja {
+  fill: var(--color-superficie);
+  stroke: var(--color-borde-control);
+  stroke-width: 2;
+}
+
+.cabecera {
+  fill: var(--fondo-encabezado-tabla);
+  stroke: var(--color-borde-control);
+  stroke-width: 2;
+}
+
+.anillas,
+.lineas {
+  fill: none;
+  stroke: var(--color-borde-control);
+  stroke-width: 3;
+}
+
+.lupa {
+  fill: var(--fondo-info);
+  stroke: var(--color-primario);
+  stroke-width: 3;
+}

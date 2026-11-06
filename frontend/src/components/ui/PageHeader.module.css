@@ -1,0 +1,28 @@
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: var(--espacio-3);
+}
+
+.texto {
+  min-width: 0;
+}
+
+.texto h1 {
+  margin: 0;
+}
+
+.subtitulo {
+  margin: var(--espacio-1) 0 0;
+  color: var(--color-texto-suave);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-1);
+  align-items: center;
+}

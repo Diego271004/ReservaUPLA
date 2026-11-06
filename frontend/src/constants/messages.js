@@ -92,6 +92,13 @@ export const textoPagina = (numero) => `Página ${numero}`
 export const mensajeDominioNoInstitucional = (dominio) =>
   `Usa tu correo institucional (termina en @${dominio}).`
 
+/** El contador junto a «Reservas» en el menú del Administrador: «1 pendiente», «6 pendientes». */
+export const textoPendientes = (cantidad) =>
+  cantidad === 1 ? '1 pendiente' : `${cantidad} pendientes`
+
+export const textoSinUsuariosCoincidentes = (termino) =>
+  `No se encontraron usuarios que coincidan con «${termino}».`
+
 /** Textos propios de la interfaz. */
 export const TEXTOS = Object.freeze({
   nombreProducto: 'ReservaUPLA',
@@ -117,12 +124,20 @@ export const TEXTOS = Object.freeze({
   volver: 'Volver',
   noHayDatos: 'Todavía no hay registros.',
   menuAbrir: 'Menú',
+  menuCerrar: 'Cerrar menú',
+  menuContraer: 'Contraer menú',
+  menuExpandir: 'Expandir menú',
+  migasDePan: 'Migas de pan',
+  cerrarAviso: 'Cerrar aviso',
+  hoyEs: 'Hoy',
 
   // Usuarios
   tituloUsuarios: 'Usuarios',
   nuevoUsuario: 'Nuevo usuario',
   tituloRegistrarUsuario: 'Registrar usuario',
   registrarUsuario: 'Registrar usuario',
+  buscarUsuarios: 'Buscar usuarios',
+  ayudaBuscarUsuarios: 'Filtra por nombre, correo institucional o rol',
   etiquetaNombreCompleto: 'Nombre completo',
   etiquetaRol: 'Rol',
   etiquetaActivo: 'Activo',
@@ -178,12 +193,19 @@ export const TEXTOS = Object.freeze({
 
   // Salida de datos: Reservas, Dashboard y Mi ambiente
   tituloReservas: 'Reservas',
+  reservarUnAmbiente: 'Reservar un ambiente',
+  pestanaTodas: 'Todas',
+  pestanaPendientes: 'Pendientes',
+  pestanaAprobadas: 'Aprobadas',
+  pestanaRechazadas: 'Rechazadas',
+  pestanaCanceladas: 'Canceladas',
   tituloDetalleReserva: 'Detalle de la reserva',
   volverAReservas: 'Volver a Reservas',
-  volverAlDashboard: 'Volver al Dashboard',
+  volverAlDashboard: 'Volver a Inicio',
   volverAMiAmbiente: 'Volver a Mi ambiente',
-  tituloDashboard: 'Dashboard',
+  tituloDashboard: 'Inicio',
   tituloMiAmbiente: 'Mi ambiente',
+  tituloDisponibilidad: 'Disponibilidad',
   etiquetaFiltroEstado: 'Estado',
   etiquetaFiltroAmbiente: 'Ambiente',
   etiquetaFechaDesde: 'Fecha desde',
@@ -209,6 +231,14 @@ export const TEXTOS = Object.freeze({
   indicadorAprobadas: 'Reservas aprobadas',
   indicadorRechazadas: 'Reservas rechazadas',
   indicadorMasUtilizado: 'Ambiente más utilizado',
+  requierenDecision: 'Requieren tu decisión',
+  hoyEnAmbientes: 'Hoy en los ambientes',
+  usoPorAmbiente: 'Uso por ambiente',
+  distribucionEstados: 'Reservas por estado',
+  conflictoAprobada: 'Choca con una reserva ya aprobada.',
+  ambienteEnMantenimientoAviso: 'El ambiente está en mantenimiento.',
+  usoSinDatos: 'Todavía no hay reservas aprobadas.',
+  usoTablaAlternativa: 'Tabla alternativa de uso por ambiente',
   usoDelAmbiente: 'Uso del ambiente',
   sinAmbienteAsignado:
     'Todavía no tienes un ambiente a cargo. Cuando se te asigne uno, aparecerá aquí.',
@@ -222,5 +252,6 @@ export const TEXTOS = Object.freeze({
   // Pantallas y errores de ruta
   sinPermisoTitulo: 'Sin permiso',
   paginaNoEncontrada: 'No encontramos esa página.',
+  paginaNoEncontradaDetalle: 'Esta página no existe o cambió de dirección.',
   volverAlInicio: 'Volver al inicio',
 })
