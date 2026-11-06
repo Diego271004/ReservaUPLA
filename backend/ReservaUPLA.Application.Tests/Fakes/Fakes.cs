@@ -105,6 +105,7 @@ public sealed class FakeReservaRepository : IReservaRepository
     public IndicadoresDto IndicadoresARetornar { get; set; } = new(0, 0, 0, 0);
     public List<int?> AmbientesContados { get; } = new();
     public List<AmbienteUsoDto> MasUtilizadosARetornar { get; } = new();
+    public List<AmbienteUsoDto> UsoPorAmbienteARetornar { get; } = new();
     public int Guardados { get; private set; }
 
     /// <summary>Se ejecuta justo antes de guardar: permite simular que otra aprobación se coló entre la comprobación y el guardado.</summary>
@@ -156,6 +157,9 @@ public sealed class FakeReservaRepository : IReservaRepository
 
     public Task<IReadOnlyList<AmbienteUsoDto>> AmbientesMasUtilizadosAsync(CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyList<AmbienteUsoDto>>(MasUtilizadosARetornar.ToList());
+
+    public Task<IReadOnlyList<AmbienteUsoDto>> UsoPorAmbienteAsync(CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<AmbienteUsoDto>>(UsoPorAmbienteARetornar.ToList());
 
     public Task<Reserva?> BuscarAprobadaQueSeCruzaAsync(
         int ambienteId, DateOnly fecha, TimeOnly horaInicio, TimeOnly horaFin, int? excluirReservaId, CancellationToken cancellationToken) =>

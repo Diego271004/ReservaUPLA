@@ -50,15 +50,79 @@ public sealed class ConsultaService : IConsultaService
         return ResultadoOperacion<PaginaDeReservasDto>.Exitoso(await _reservas.ListarAsync(filtro, cancellationToken));
     }
 
-    public async Task<DashboardDto> ObtenerDashboardAsync(CancellationToken cancellationToken)
+    public async Task<DashboardDto> ObtenerDashboardAsync(ActorDto actor, CancellationToken cancellationToken)
     {
+        var hoy = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(-5));
+
+        if (actor.Rol == RolUsuario.Solicitante)
+        {
+            var solicitudes = await _reservas.ListarAsync(
+                new FiltroReservas(UsuarioId: actor.UsuarioId, Desde: hoy, Pagina: 1, Tamano: 1000, Orden: OrdenReservas.PorFecha),
+                cancellationToken);
+            var resumen = new List<IndicadorEstadoDto>();
+            foreach (var estado in new[] { EstadoReserva.Pendiente, EstadoReserva.Aprobada, EstadoReserva.Rechazada, EstadoReserva.Cancelada })
+            {
+                var pagina = await _reservas.ListarAsync(
+                    new FiltroReservas(UsuarioId: actor.UsuarioId, Estado: estado, Pagina: 1, Tamano: 1),
+                    cancellationToken);
+                resumen.Add(new IndicadorEstadoDto(estado.ToString(), pagina.Total));
+            }
+            var proxima = solicitudes.Elementos.FirstOrDefault();
+            var inicioSolicitante = new InicioSolicitanteDto(proxima, solicitudes.Elementos.ToList(), resumen);
+            return new DashboardDto(
+                new IndicadoresDto(solicitudes.Total, resumen.FirstOrDefault(x => x.Estado == "Pendiente")?.Total ?? 0,
+                    resumen.FirstOrDefault(x => x.Estado == "Aprobada")?.Total ?? 0,
+                    resumen.FirstOrDefault(x => x.Estado == "Rechazada")?.Total ?? 0),
+                [], new PaginaDeReservasDto([], 0, 1, 5), [], [], [], inicioSolicitante, null);
+        }
+
+        if (actor.Rol == RolUsuario.Responsable)
+        {
+            var propios = await _ambientes.ListarPorResponsableAsync(actor.UsuarioId, cancellationToken);
+            var hoyReservas = await _reservas.ListarAsync(
+                new FiltroReservas(ResponsableId: actor.UsuarioId, Desde: hoy, Hasta: hoy, Pagina: 1, Tamano: 1000),
+                cancellationToken);
+            var proximas = await _reservas.ListarAsync(
+                new FiltroReservas(ResponsableId: actor.UsuarioId, Desde: hoy.AddDays(1), Pagina: 1, Tamano: 1000),
+                cancellationToken);
+            var resumenes = propios.Select(ADto).ToList();
+            var inicioResponsable = new InicioResponsableDto(resumenes, hoyReservas.Elementos.ToList(), proximas.Elementos.ToList());
+            return new DashboardDto(new IndicadoresDto(hoyReservas.Total + proximas.Total, hoyReservas.Elementos.Count(r => r.Estado == "Pendiente"), hoyReservas.Elementos.Count(r => r.Estado == "Aprobada") + proximas.Elementos.Count(r => r.Estado == "Aprobada"), hoyReservas.Elementos.Count(r => r.Estado == "Rechazada") + proximas.Elementos.Count(r => r.Estado == "Rechazada")), [], new PaginaDeReservasDto([], 0, 1, 5), [], [], [], null, inicioResponsable);
+        }
+
         var indicadores = await _reservas.ContarAsync(null, cancellationToken);
         var masUtilizados = await _reservas.AmbientesMasUtilizadosAsync(cancellationToken);
+        var usoPorAmbiente = await _reservas.UsoPorAmbienteAsync(cancellationToken);
         var pendientes = await _reservas.ListarAsync(
             new FiltroReservas(Estado: EstadoReserva.Pendiente, Pagina: 1, Tamano: PendientesDelDashboard, Orden: OrdenReservas.PorAntiguedad),
             cancellationToken);
 
-        return new DashboardDto(indicadores, masUtilizados, pendientes);
+        var ambientes = await _ambientes.ListarAsync(cancellationToken);
+        var estadosPorAmbiente = ambientes.ToDictionary(ambiente => ambiente.Id, ambiente => ambiente);
+        var decisiones = new List<SolicitudDecisionDto>();
+        foreach (var reserva in pendientes.Elementos)
+        {
+            var ambiente = estadosPorAmbiente.GetValueOrDefault(reserva.AmbienteId);
+            Reserva? choque = null;
+            if (DateOnly.TryParse(reserva.Fecha, out var fecha)
+                && TimeOnly.TryParse(reserva.HoraInicio, out var inicio)
+                && TimeOnly.TryParse(reserva.HoraFin, out var fin))
+            {
+                choque = await _reservas.BuscarAprobadaQueSeCruzaAsync(
+                    reserva.AmbienteId, fecha, inicio, fin, reserva.Id, cancellationToken);
+            }
+            decisiones.Add(new SolicitudDecisionDto(reserva, choque is not null, ambiente?.Estado == EstadoAmbiente.EnMantenimiento));
+        }
+
+        var aprobadasHoy = await _reservas.ListarAsync(
+            new FiltroReservas(Estado: EstadoReserva.Aprobada, Desde: hoy, Hasta: hoy, Pagina: 1, Tamano: 1000),
+            cancellationToken);
+        var agenda = ambientes
+            .OrderBy(ambiente => ambiente.Nombre)
+            .Select(ambiente => new AgendaAmbienteDto(ambiente.Id, ambiente.Nombre, TextosDominio.ATexto(ambiente.Estado), aprobadasHoy.Elementos.Where(reserva => reserva.AmbienteId == ambiente.Id).ToList()))
+            .ToList();
+
+        return new DashboardDto(indicadores, masUtilizados, pendientes, decisiones, agenda, usoPorAmbiente, null, null);
     }
 
     public async Task<ResultadoOperacion<MiAmbienteDto>> ObtenerMiAmbienteAsync(
@@ -92,6 +156,71 @@ public sealed class ConsultaService : IConsultaService
             new FiltroReservas(AmbienteId: elegido.Id, Pagina: pagina ?? 1, Tamano: TamanoDePagina), cancellationToken);
 
         return ResultadoOperacion<MiAmbienteDto>.Exitoso(new MiAmbienteDto(ADto(elegido), resumenes, indicadores, reservas));
+    }
+
+    public async Task<ResultadoOperacion<DisponibilidadDiaDto>> ObtenerDisponibilidadDiaAsync(
+        ActorDto actor, string fecha, CancellationToken cancellationToken)
+    {
+        if (!DateOnly.TryParseExact(fecha, "yyyy-MM-dd", out var dia))
+        {
+            return ResultadoOperacion<DisponibilidadDiaDto>.DatosInvalidos("fecha", "Ingresa una fecha válida.");
+        }
+
+        var hoy = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(-5));
+        IReadOnlyList<Ambiente> ambientes;
+        if (actor.Rol == RolUsuario.Responsable)
+        {
+            ambientes = await _ambientes.ListarPorResponsableAsync(actor.UsuarioId, cancellationToken);
+        }
+        else
+        {
+            ambientes = await _ambientes.ListarAsync(cancellationToken);
+        }
+
+        var reservas = await _reservas.ListarAsync(
+            new FiltroReservas(
+                UsuarioId: actor.Rol == RolUsuario.Solicitante ? null : null,
+                ResponsableId: actor.Rol == RolUsuario.Responsable ? actor.UsuarioId : null,
+                Desde: dia,
+                Hasta: dia,
+                Pagina: 1,
+                Tamano: 1000,
+                Orden: OrdenReservas.PorFecha),
+            cancellationToken);
+
+        var porAmbiente = reservas.Elementos
+            .Where(reserva => reserva.Estado == "Pendiente" || reserva.Estado == "Aprobada")
+            .GroupBy(reserva => reserva.AmbienteId)
+            .ToDictionary(grupo => grupo.Key, grupo => grupo.ToList());
+
+        var salida = ambientes
+            .OrderBy(ambiente => ambiente.Nombre)
+            .Select(ambiente =>
+            {
+                var bloques = porAmbiente.TryGetValue(ambiente.Id, out var propias)
+                    ? propias.Select(reserva =>
+                    {
+                        var propia = actor.Rol != RolUsuario.Solicitante || reserva.UsuarioId == actor.UsuarioId;
+                        var esResponsable = actor.Rol == RolUsuario.Responsable;
+                        return new BloqueDisponibilidadDto(
+                            reserva.Id,
+                            reserva.HoraInicio,
+                            reserva.HoraFin,
+                            reserva.Estado,
+                            propia || esResponsable || actor.Rol == RolUsuario.Administrador ? reserva.SolicitanteNombre : null,
+                            propia || actor.Rol == RolUsuario.Administrador ? reserva.Motivo : null,
+                            propia);
+                    }).ToList()
+                    : new List<BloqueDisponibilidadDto>();
+                return new DisponibilidadDiaAmbienteDto(
+                    ambiente.Id,
+                    ambiente.Nombre,
+                    TextosDominio.ATexto(ambiente.Estado),
+                    bloques);
+            }).ToList();
+
+        return ResultadoOperacion<DisponibilidadDiaDto>.Exitoso(
+            new DisponibilidadDiaDto(fecha, dia < hoy, salida));
     }
 
     private static DateOnly? Fecha(string? texto) => HorarioReserva.TryFecha(texto, out var fecha) ? fecha : null;

@@ -296,8 +296,10 @@ public class ListadoYPanelesConBaseRealTests
         using var admin = api.ClienteDe(e.AdministradorId, RolUsuario.Administrador);
         using var anonimo = api.CreateClient();
 
-        Assert.Equal(HttpStatusCode.Forbidden, (await ana.GetAsync("/api/dashboard")).StatusCode);
-        Assert.Equal(HttpStatusCode.Forbidden, (await mario.GetAsync("/api/dashboard")).StatusCode);
+        // El Dashboard está abierto a los tres roles (cada uno recibe su portada).
+        Assert.Equal(HttpStatusCode.OK, (await ana.GetAsync("/api/dashboard")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await mario.GetAsync("/api/dashboard")).StatusCode);
+        // Mi ambiente es exclusivo del Responsable.
         Assert.Equal(HttpStatusCode.Forbidden, (await ana.GetAsync("/api/mi-ambiente")).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await admin.GetAsync("/api/mi-ambiente")).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonimo.GetAsync("/api/dashboard")).StatusCode);

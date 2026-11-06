@@ -100,6 +100,24 @@ public sealed class ReservaRepository : IReservaRepository
             Rechazadas: De(EstadoReserva.Rechazada));
     }
 
+    public async Task<IReadOnlyList<AmbienteUsoDto>> UsoPorAmbienteAsync(CancellationToken cancellationToken)
+    {
+        var aprobadas = await _contexto.Reservas.AsNoTracking()
+            .Where(reserva => reserva.Estado == EstadoReserva.Aprobada)
+            .GroupBy(reserva => reserva.AmbienteId)
+            .Select(grupo => new { AmbienteId = grupo.Key, Cantidad = grupo.Count() })
+            .ToListAsync(cancellationToken);
+
+        var ambientes = await _contexto.Ambientes.AsNoTracking().ToListAsync(cancellationToken);
+        return ambientes
+            .OrderBy(ambiente => ambiente.Nombre)
+            .Select(ambiente => new AmbienteUsoDto(
+                ambiente.Id,
+                ambiente.Nombre,
+                aprobadas.FirstOrDefault(fila => fila.AmbienteId == ambiente.Id)?.Cantidad ?? 0))
+            .ToList();
+    }
+
     public async Task<IReadOnlyList<AmbienteUsoDto>> AmbientesMasUtilizadosAsync(CancellationToken cancellationToken)
     {
         var aprobadas = await _contexto.Reservas.AsNoTracking()

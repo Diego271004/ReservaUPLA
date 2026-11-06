@@ -17,6 +17,9 @@ public interface IReservaRepository
     /// <summary>El ambiente con más reservas Aprobadas; si hay empate, todos los empatados. Vacío si no hay ninguna Aprobada.</summary>
     Task<IReadOnlyList<AmbienteUsoDto>> AmbientesMasUtilizadosAsync(CancellationToken cancellationToken);
 
+    /// <summary>Todos los ambientes con su cantidad de reservas Aprobadas, para gráficos y tablas alternativas.</summary>
+    Task<IReadOnlyList<AmbienteUsoDto>> UsoPorAmbienteAsync(CancellationToken cancellationToken);
+
     /// <summary>
     /// La reserva Aprobada del ambiente que se cruza con el rango (RN-01), o null. `excluirReservaId` deja fuera a la
     /// propia reserva cuando se está aprobando.

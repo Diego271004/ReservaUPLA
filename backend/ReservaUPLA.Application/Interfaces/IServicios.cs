@@ -50,11 +50,14 @@ public interface IConsultaService
     /// <summary>Lista según el rol (Administrador todas, Solicitante las suyas, Responsable las de sus ambientes), con filtros y página.</summary>
     Task<ResultadoOperacion<PaginaDeReservasDto>> ListarAsync(ActorDto actor, ConsultaReservasDto consulta, CancellationToken cancellationToken);
 
-    Task<DashboardDto> ObtenerDashboardAsync(CancellationToken cancellationToken);
+    Task<DashboardDto> ObtenerDashboardAsync(ActorDto actor, CancellationToken cancellationToken);
 
     /// <summary>Mi ambiente: NoEncontrado si el ambiente pedido no está a cargo del responsable.</summary>
     Task<ResultadoOperacion<MiAmbienteDto>> ObtenerMiAmbienteAsync(
         int responsableId, int? ambienteId, int? pagina, CancellationToken cancellationToken);
+
+    Task<ResultadoOperacion<DisponibilidadDiaDto>> ObtenerDisponibilidadDiaAsync(
+        ActorDto actor, string fecha, CancellationToken cancellationToken);
 }
 
 /// <summary>Un incumplimiento de una regla de negocio: de un campo (400) o de conflicto con otras reservas (409).</summary>

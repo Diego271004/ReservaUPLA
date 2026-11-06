@@ -6,7 +6,7 @@ using ReservaUPLA.Application.Interfaces;
 namespace ReservaUPLA.API.Controllers;
 
 /// <summary>
-/// Pantallas de solo lectura con indicadores: el Dashboard (solo Administrador, RF-08) y Mi ambiente (solo Responsable).
+/// Pantallas de solo lectura con indicadores: el Dashboard por rol (RF-08) y Mi ambiente (solo Responsable).
 /// Controlador delgado: delega en <see cref="IConsultaService"/>.
 /// </summary>
 [ApiController]
@@ -22,10 +22,10 @@ public sealed class PanelesController : ControllerBase
 
     /// <summary>Indicadores, ambiente más utilizado (todos los empatados) y las 5 pendientes más antiguas con el total de pendientes.</summary>
     [HttpGet("api/dashboard")]
-    [Authorize(Roles = Roles.Administrador)]
+    [Authorize(Roles = Roles.Administrador + "," + Roles.Solicitante + "," + Roles.Responsable)]
     [ProducesResponseType(typeof(DashboardDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<DashboardDto>> Dashboard(CancellationToken cancellationToken) =>
-        Ok(await _consultas.ObtenerDashboardAsync(cancellationToken));
+        Ok(await _consultas.ObtenerDashboardAsync(User.ObtenerActor(), cancellationToken));
 
     /// <summary>El ambiente del Responsable (o el que elija entre los suyos), con indicadores acotados a él y sus reservas.</summary>
     [HttpGet("api/mi-ambiente")]

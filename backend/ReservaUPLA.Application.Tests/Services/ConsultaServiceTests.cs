@@ -127,18 +127,39 @@ public class ConsultaServiceTests
         _escenario.Reservas.MasUtilizadosARetornar.Add(new AmbienteUsoDto(2, "Auditorio Principal", 14));
         _escenario.Reservas.PaginaARetornar = new PaginaDeReservasDto(new List<ReservaDto>(), 7, 1, 5);
 
-        var dashboard = await _escenario.CrearServicioDeConsulta().ObtenerDashboardAsync(CancellationToken.None);
+        var dashboard = await _escenario.CrearServicioDeConsulta().ObtenerDashboardAsync(new ActorDto(1, RolUsuario.Administrador), CancellationToken.None);
 
         Assert.Equal(new IndicadoresDto(48, 7, 31, 10), dashboard.Indicadores);
         Assert.Equal(["Laboratorio de Cómputo 2", "Auditorio Principal"], dashboard.AmbientesMasUtilizados.Select(a => a.Nombre));
         Assert.Equal(7, dashboard.PendientesMasAntiguas.Total);
-        var filtro = Assert.Single(_escenario.Reservas.Filtros);
-        Assert.Equal(EstadoReserva.Pendiente, filtro.Estado);
-        Assert.Equal(OrdenReservas.PorAntiguedad, filtro.Orden);
-        Assert.Equal(5, filtro.Tamano);
-        Assert.Equal(1, filtro.Pagina);
-        Assert.Null(filtro.UsuarioId);
+        var filtroPendiente = Assert.Single(_escenario.Reservas.Filtros, filtro => filtro.Estado == EstadoReserva.Pendiente);
+        Assert.Equal(OrdenReservas.PorAntiguedad, filtroPendiente.Orden);
+        Assert.Equal(5, filtroPendiente.Tamano);
+        Assert.Equal(1, filtroPendiente.Pagina);
+        Assert.Null(filtroPendiente.UsuarioId);
+        var filtroAprobadoHoy = Assert.Single(_escenario.Reservas.Filtros, filtro => filtro.Estado == EstadoReserva.Aprobada);
+        Assert.Equal(1000, filtroAprobadoHoy.Tamano);
         Assert.Equal([(int?)null], _escenario.Reservas.AmbientesContados);
+    }
+
+    [Fact]
+    public async Task Dashboard_solicitante_no_consulta_reservas_ajenas()
+    {
+        var dashboard = await _escenario.CrearServicioDeConsulta().ObtenerDashboardAsync(new ActorDto(42, RolUsuario.Solicitante), CancellationToken.None);
+
+        Assert.NotNull(dashboard.InicioSolicitante);
+        Assert.All(_escenario.Reservas.Filtros, filtro => Assert.Equal(42, filtro.UsuarioId));
+        Assert.All(_escenario.Reservas.Filtros, filtro => Assert.Null(filtro.ResponsableId));
+    }
+
+    [Fact]
+    public async Task Dashboard_responsable_no_consulta_ambientes_ajenos()
+    {
+        var dashboard = await _escenario.CrearServicioDeConsulta().ObtenerDashboardAsync(new ActorDto(77, RolUsuario.Responsable), CancellationToken.None);
+
+        Assert.NotNull(dashboard.InicioResponsable);
+        Assert.All(_escenario.Reservas.Filtros, filtro => Assert.Equal(77, filtro.ResponsableId));
+        Assert.All(_escenario.Reservas.Filtros, filtro => Assert.Null(filtro.UsuarioId));
     }
 
     // ---------------------------------------------------------------- Mi ambiente
@@ -205,5 +226,42 @@ public class ConsultaServiceTests
 
         Assert.Equal(EstadoOperacion.DatosInvalidos, resultado.Estado);
         Assert.Equal(MensajesValidacion.PaginaInvalida, resultado.Errores[CamposFormulario.Pagina][0]);
+    }
+
+    [Fact]
+    public async Task Disponibilidad_solicitante_oculta_motivo_y_nombre_de_reservas_ajenas()
+    {
+        _escenario.Reservas.PaginaARetornar = new PaginaDeReservasDto(
+            [
+                new ReservaDto(10, ReservaFixture.Laboratorio, "Laboratorio de Cómputo 2", _escenario.Solicitante.UsuarioId,
+                    "Ana Torres", "2030-05-20", "10:00", "12:00", "Motivo propio", "Aprobada"),
+                new ReservaDto(11, ReservaFixture.Laboratorio, "Laboratorio de Cómputo 2", _escenario.OtraSolicitante.UsuarioId,
+                    "Luis Quispe", "2030-05-20", "12:00", "13:00", "Motivo ajeno", "Pendiente"),
+            ], 2, 1, 1000);
+
+        var resultado = await _escenario.CrearServicioDeConsulta().ObtenerDisponibilidadDiaAsync(
+            _escenario.Solicitante, "2030-05-20", CancellationToken.None);
+
+        Assert.Equal(EstadoOperacion.Exitoso, resultado.Estado);
+        var laboratorio = resultado.Valor!.Ambientes.Single(a => a.Id == ReservaFixture.Laboratorio);
+        Assert.Equal("Ana Torres", laboratorio.Bloques[0].SolicitanteNombre);
+        Assert.Equal("Motivo propio", laboratorio.Bloques[0].Motivo);
+        Assert.True(laboratorio.Bloques[0].Propia);
+        Assert.Null(laboratorio.Bloques[1].SolicitanteNombre);
+        Assert.Null(laboratorio.Bloques[1].Motivo);
+        Assert.False(laboratorio.Bloques[1].Propia);
+    }
+
+    [Fact]
+    public async Task Disponibilidad_responsable_consulta_solo_sus_ambientes()
+    {
+        var resultado = await _escenario.CrearServicioDeConsulta().ObtenerDisponibilidadDiaAsync(
+            _escenario.Responsable, "2030-05-20", CancellationToken.None);
+
+        Assert.Equal(EstadoOperacion.Exitoso, resultado.Estado);
+        Assert.Equal(
+            ["Laboratorio de Cómputo 2", "Sala de Reuniones A"],
+            resultado.Valor!.Ambientes.Select(a => a.Nombre));
+        Assert.Equal(_escenario.Responsable.UsuarioId, _escenario.Reservas.UltimoFiltro!.ResponsableId);
     }
 }

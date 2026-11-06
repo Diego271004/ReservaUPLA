@@ -43,6 +43,17 @@ public sealed class ReservasController : ControllerBase
             await _consultas.ListarAsync(User.ObtenerActor(), new ConsultaReservasDto(estado, ambienteId, desde, hasta, pagina), cancellationToken),
             Ok);
 
+    /// <summary>Disponibilidad diaria. Cada rol mantiene su alcance; el Solicitante no recibe motivo ni nombre ajeno.</summary>
+    [HttpGet("disponibilidad-dia")]
+    [Authorize(Roles = Roles.Administrador + "," + Roles.Solicitante + "," + Roles.Responsable)]
+    [ProducesResponseType(typeof(DisponibilidadDiaDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DisponibilidadDia(
+        [FromQuery] string fecha,
+        CancellationToken cancellationToken) =>
+        this.Traducir(
+            await _consultas.ObtenerDisponibilidadDiaAsync(User.ObtenerActor(), fecha, cancellationToken),
+            Ok);
+
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(ReservaDetalleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

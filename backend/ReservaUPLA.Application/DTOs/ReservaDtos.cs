@@ -70,6 +70,27 @@ public sealed record ConsultaReservasDto(string? Estado, int? AmbienteId, string
 /// <summary>Una página de reservas y cuántas hay en total con esos filtros.</summary>
 public sealed record PaginaDeReservasDto(IReadOnlyList<ReservaDto> Elementos, int Total, int Pagina, int Tamano);
 
+/// <summary>Bloque visible en la cuadrícula de disponibilidad. Solicitante solo recibe datos privados de reservas propias.</summary>
+public sealed record BloqueDisponibilidadDto(
+    int? Id,
+    string HoraInicio,
+    string HoraFin,
+    string Estado,
+    string? SolicitanteNombre,
+    string? Motivo,
+    bool Propia);
+
+public sealed record DisponibilidadDiaAmbienteDto(
+    int Id,
+    string Nombre,
+    string Estado,
+    IReadOnlyList<BloqueDisponibilidadDto> Bloques);
+
+public sealed record DisponibilidadDiaDto(
+    string Fecha,
+    bool SoloLectura,
+    IReadOnlyList<DisponibilidadDiaAmbienteDto> Ambientes);
+
 /// <summary>Indicadores por estado. <c>Total</c> cuenta todas las reservas, también las Canceladas.</summary>
 public sealed record IndicadoresDto(int Total, int Pendientes, int Aprobadas, int Rechazadas);
 
@@ -80,10 +101,38 @@ public sealed record AmbienteUsoDto(int AmbienteId, string Nombre, int ReservasA
 /// Dashboard del Administrador. Las pendientes más antiguas son las 5 solicitudes más viejas (por fecha de creación);
 /// su <c>Total</c> es el total de pendientes («Mostrando 5 de 7»).
 /// </summary>
+public sealed record SolicitudDecisionDto(
+    ReservaDto Reserva,
+    bool ChoqueAprobada,
+    bool AmbienteEnMantenimiento);
+
+public sealed record AgendaAmbienteDto(
+    int Id,
+    string Nombre,
+    string Estado,
+    IReadOnlyList<ReservaDto> Reservas);
+
+public sealed record InicioSolicitanteDto(
+    ReservaDto? ProximaReserva,
+    IReadOnlyList<ReservaDto> Solicitudes,
+    IReadOnlyList<IndicadorEstadoDto> ResumenPorEstado);
+
+public sealed record IndicadorEstadoDto(string Estado, int Total);
+
+public sealed record InicioResponsableDto(
+    IReadOnlyList<AmbienteResumenDto> Ambientes,
+    IReadOnlyList<ReservaDto> Hoy,
+    IReadOnlyList<ReservaDto> Proximas);
+
 public sealed record DashboardDto(
     IndicadoresDto Indicadores,
     IReadOnlyList<AmbienteUsoDto> AmbientesMasUtilizados,
-    PaginaDeReservasDto PendientesMasAntiguas);
+    PaginaDeReservasDto PendientesMasAntiguas,
+    IReadOnlyList<SolicitudDecisionDto> SolicitudesRequierenDecision,
+    IReadOnlyList<AgendaAmbienteDto> HoyEnLosAmbientes,
+    IReadOnlyList<AmbienteUsoDto> UsoPorAmbiente,
+    InicioSolicitanteDto? InicioSolicitante,
+    InicioResponsableDto? InicioResponsable);
 
 public sealed record AmbienteResumenDto(int Id, string Nombre, string Ubicacion, int Capacidad, string Estado);
 
