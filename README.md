@@ -59,6 +59,10 @@ psql @psql -d ReservaUPLADB -f database/07_pruebas_reglas.sql
 - `00` borra la base y el rol; vuelve a empezar desde cero.
 - Cada script empieza con `\encoding UTF8`: sin eso, psql en Windows lee los scripts con la página de códigos de la consola y las tildes quedan guardadas dos veces codificadas ("HuamÃ¡n"). `06_verificacion.sql` falla si detecta ese problema.
 - `07_pruebas_reglas.sql` comprueba RN-01, RN-03 y RN-04 y no deja datos (termina en `ROLLBACK`).
+- `07_datos_demo.sql` (opcional): puebla la base con reservas activas en fechas relativas (`CURRENT_DATE` y días siguientes) para Solicitante, Responsable y Administrador (aprobadas, pendientes y un conflicto 409 de prueba). Es idempotente y no requiere contraseñas:
+  ```powershell
+  psql @psql -d ReservaUPLADB -f database/07_datos_demo.sql
+  ```
 - Si PostgreSQL pide clave en cada comando, define `PGPASSWORD` como arriba (solo en esa sesión de terminal).
 
 ## Secretos (`dotnet user-secrets`)
