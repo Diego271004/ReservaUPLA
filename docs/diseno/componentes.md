@@ -12,7 +12,7 @@ Catálogo y especificación técnica de los componentes del sistema de interfaz 
 - **`DateInput`**: Selector de fecha en formato institucional `dd/mm/aaaa` con icono de calendario.
 - **`TimeInput`**: Selector de hora en intervalos cerrados de 30 minutos (07:00 a 22:00) conforme a la regla de negocio RN-04.
 - **`InterruptorActivo`**: Toggle accesible (`role="switch"`) con etiquetas visibles «Activo» / «Inactivo» y alto táctil de 44 px.
-- **`SelectorDeAmbientes`**: Grupo de tarjetas seleccionables para la elección de ambiente (`role="radiogroup"` y `role="radio"`). Soporta navegación con flechas de cursor (WAI-ARIA Radio Group), selección con Espacio o Enter, avatares de responsables, capacidad, ubicación, e inhabilitación con motivo visible para ambientes en mantenimiento (RN-07).
+- **`SelectorDeAmbientes`**: Grupo de tarjetas seleccionables para la elección de ambiente (`role="radiogroup"` y `role="radio"`). Dispone de indicador radial de 24 px (`indicadorRadial`) con icono de marca (`marca`) al ser seleccionado, borde de 2 px en color primario, soporte completo de navegación con flechas de cursor (WAI-ARIA Radio Group), selección con Espacio o Enter, avatares de responsables, capacidad, ubicación, e inhabilitación con motivo visible para ambientes en mantenimiento (RN-07).
 
 ---
 
@@ -25,7 +25,7 @@ Catálogo y especificación técnica de los componentes del sistema de interfaz 
 - **`Insignia`**: Cápsulas semánticas para estados de reserva (Pendiente, Aprobada, Rechazada, Cancelada) y usuarios (Activo, Inactivo), siempre con icono SVG y texto explícito.
 - **`BarraDeOcupacion`**: Barra de progreso y ocupación de ambientes con descripción accesible `aria-valuenow` y `aria-valuemin/max`.
 - **`Avatar` / `CeldaDePersona`**: Representación gráfica con iniciales de usuarios y responsables con contraste garantizado.
-- **`EstadoVacio`**: Ilustración sobria en SVG, texto informativo del estado y botón de llamada a la acción con el siguiente paso recomendado (Nielsen 9).
+- **`EstadoVacio`**: Ilustración sobria en SVG que representa la silueta de un edificio institucional ilustrativo (podio, columnas, arco central, frontón con isotipo hexagonal y filete dorado `#EAA658`). Incluye texto informativo del estado y botón opcional de llamada a la acción con el siguiente paso recomendado (Nielsen 9). Marcada con `aria-hidden="true"` para accesibilidad total.
 
 ---
 
@@ -48,8 +48,8 @@ Catálogo y especificación técnica de los componentes del sistema de interfaz 
 
 ## 5. Experiencia especializada de reserva y disponibilidad
 
-- **`ResumenDeSolicitud`**: Panel vivo de dos columnas que actualiza en tiempo real ambiente, fecha completa en letras, horario, duración y motivo de la solicitud.
-- **`BarraResumenMovil`**: Barra adherida en la parte inferior para pantallas estrechas que mantiene visible el resumen de la reserva antes de accionar el botón de envío.
-- **`AtajosDeDuracion`**: Selector rápido de duración (1 h, 2 h, 3 h) en cuadrícula de tres columnas de 44 px de alto que completan automáticamente la hora de término de la reserva.
+- **`ResumenDeSolicitud`**: Panel vivo de dos columnas que actualiza en tiempo real ambiente, fecha completa en letras, horario, duración y motivo de la solicitud. Dispone de estados pendientes atenuados y transiciones suaves de 150 ms (`--transicion-corta`) al definirse cada valor.
+- **`BarraResumenMovil`**: Barra adherida en la parte inferior para pantallas estrechas que mantiene visible el resumen de la reserva antes de accionar el botón de envío, respetando el tamaño táctil mínimo de 44 px.
+- **`AtajosDeDuracion`**: Selector rápido de duración (1 h, 2 h, 3 h) en cuadrícula de tres columnas de ancho uniforme y 44 px de alto, con fondo sutil en hover y relleno primario en estado activo (`aria-pressed="true"`).
 - **`FranjaNuevaReserva`**: Barra interactiva de disponibilidad del ambiente seleccionado que previene solapamientos con reservas aprobadas.
-- **`BloquesDisponibilidad` / `EjeTiempo`**: Línea de tiempo diaria con bloques proporcionales de 07:00 a 22:00, sub-carriles para solapamientos y línea de tiempo actual «Ahora».
+- **`BloquesDisponibilidad` / `EjeTiempo`**: Línea de tiempo diaria con bloques proporcionales de 07:00 a 22:00, franjas alternas por fila (`--fondo-fila-alterna`), tramos libres en verde accesible (`--fondo-libre`), horas pasadas sombreadas con patrón de líneas y distintivo superior «Ahora HH:MM» con posicionamiento no solapante vía `clamp()`.

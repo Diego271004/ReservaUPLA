@@ -31,6 +31,14 @@ Insignias de la reserva, siempre con icono y texto: Pendiente (ámbar), Aprobada
 ## Tipografía
 Títulos en **Poppins SemiBold** y texto en **Montserrat**, como la web institucional de la UPLA. Ambas autoalojadas localmente con `@fontsource` en subset `latin` exclusivamente para los pesos usados (sin CDNs externas). Texto de campos de 16 px para evitar zoom indeseado en dispositivos iOS. Controles de al menos 44 px de alto (48 px en el Login). Foco visible con contorno `#1E73BE` de 3 px (`#FFFFFF` sobre el menú marino). Contraste AA verificado en el 100% de combinaciones.
 
+### Escala tipográfica formal de 4 niveles
+| Nivel | Token CSS | Tamaño | Peso / Familia | Aplicación |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Título de página** | `--tipo-titulo-pagina` | `1.5rem` (24 px) | Poppins 600 | Encabezado principal `h1` en cabeceras de página |
+| **2. Título de sección** | `--tipo-seccion` | `1.125rem` (18 px) | Poppins 600 | Títulos `h2` de secciones, tarjetas principales y modales |
+| **3. Etiqueta / Control** | `--tipo-etiqueta` | `0.875rem` (14 px) | Montserrat 600 | Etiquetas de campos, cabeceras de tabla, botones |
+| **4. Cuerpo de texto** | `--tipo-cuerpo` | `1rem` (16 px) | Montserrat 400/500 | Párrafos, campos de formulario ($\ge 16$ px sin zoom), celdas |
+
 ## Decisiones de diseño frente al Stitch de referencia
 Stitch sirvió como borrador visual de exploración, pero se aplicaron decisiones de ingeniería y accesibilidad superiores cuando Stitch chocaba con el contrato del proyecto:
 1. **Tipografía institucional**: Stitch sugería tipografías genéricas de CDN (Inter/Roboto). Se reemplazaron por Poppins SemiBold y Montserrat locales con cero peticiones a servidores de terceros.

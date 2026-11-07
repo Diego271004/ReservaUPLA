@@ -42,4 +42,17 @@ Experiencia de selección y confirmación:
 
 ## Login y Páginas de Error (`/login`, 403 y 404)
 - **Login a pantalla partida:** Fotografía institucional del campus con degradado lateral marino oscuro que garantiza contraste > 4.5:1; tarjeta blanca con logo oficial de la UPLA y controles de 48 px. Alternancia de contraseña accesible con `aria-pressed`, detector de Bloq Mayús no invasivo y estado de carga «Verificando credenciales…».
-- **403 y 404:** Ilustración sobria en `EstadoVacio`, redacción en lenguaje humano comprensible y enlace de retorno «Volver al inicio» con objetivo táctil >= 44 px y foco visible de 3 px.
+## 403 y 404
+- Ilustración institucional sobria en `EstadoVacio`, redacción en lenguaje humano comprensible y enlace de retorno «Volver al inicio» con objetivo táctil >= 44 px y foco visible de 3 px.
+
+---
+
+## Pulido visual y refinamiento (`feature/pulido-visual`)
+
+1. **Escala tipográfica de 4 niveles**: Erradicación de tamaños arbitrarios mediante tokens CSS (`--tipo-titulo-pagina` 24 px / Poppins 600, `--tipo-seccion` 18 px / Poppins 600, `--tipo-etiqueta` 14 px / Montserrat 600, `--tipo-cuerpo` 16 px / Montserrat 400-500). En entradas de texto, los 16 px evitan zoom indeseado en dispositivos móviles.
+2. **Selector de ambientes táctil refinado**: Cada tarjeta incorpora un indicador radial de 24 px (`indicadorRadial`) con icono de marca (`marca`) al ser elegida, borde primario de 2 px y microinteracción de elevación sutil.
+3. **Resumen de solicitud vivo**: Transición fluida de 150 ms (`--transicion-corta`) entre los estados pendientes y los valores elegidos, eliminando saltos visuales bruscos.
+4. **Línea de tiempo diaria con franjas alternas**: Bandas alternas sutiles (`--fondo-fila-alterna`) que guían la lectura horizontal de múltiples ambientes, tramos libres en verde suave accesible (`--fondo-libre`), horas pasadas sombreadas y distintivo «Ahora HH:MM» en fila superior independiente sin solapar etiquetas horarias.
+5. **Métricas destacadas y empates accesibles**: En el inicio de los tres roles, las cifras clave se presentan a 40 px en Poppins SemiBold con espaciado tabular (`tabular-nums`). El indicador de «Ambiente más utilizado» soporta empates ordenados con chips accesibles (`aria-label="Ambientes en empate"`).
+6. **Ilustración institucional en estados vacíos**: Componente `EstadoVacio` con la silueta de un edificio institucional ilustrativo (frontón con isotipo hexagonal y filete dorado `#EAA658`), accesible (`aria-hidden="true"`), ligero e integrado en Reservas, Usuarios, Ambientes y Mi Ambiente.
+7. **Topbar contextual y microinteracciones**: Título de sección en rutas raíz, migas de pan en vistas de detalle, y transiciones respetuosas de `@media (prefers-reduced-motion: reduce)`.
