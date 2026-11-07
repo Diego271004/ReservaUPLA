@@ -2,6 +2,7 @@ import { mkdirSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { BASE, CLAVE, abrirNavegador, aprobarReservaApi, crearReservaApi, iniciarSesion, leerSesion, nuevaPagina, RAIZ } from './lib.mjs'
 import { detenerEntorno, iniciarEntorno, reiniciarBaseYApi } from './entorno.mjs'
+import { comprobarSinRecorteDisponibilidad } from './recorte-helper.mjs'
 
 const DESTINO_FINAL = resolve(RAIZ, 'docs/evidencias/pulido/final')
 const DESTINO_PULIDO = resolve(RAIZ, 'docs/evidencias/pulido')
@@ -161,7 +162,7 @@ async function ejecutar() {
       '/disponibilidad?fecha=2026-11-24',
       sesionAdmin,
       RESOLUCIONES,
-      async (pag) => {
+      async (pag, ancho) => {
         await pag.waitForSelector('#fechaDisponibilidad', { timeout: 10000 })
         const valorFecha = await pag.inputValue('#fechaDisponibilidad')
         if (valorFecha !== '24/11/2026') {
@@ -172,14 +173,24 @@ async function ejecutar() {
         await pag.waitForSelector('[class*="mantenimiento"]', { timeout: 10000 })
         await pag.waitForSelector('[class*="libre"]:not(:disabled)', { timeout: 10000 })
 
-        // Comprobación de que ningún bloque en la línea de tiempo presenta elipsis o texto cortado
-        const textos = await pag.$$eval('[class*="bloque"] span', (spans) =>
-          spans.map((s) => s.textContent),
-        )
-        for (const t of textos) {
-          if (t.includes('…') || t.includes('...')) {
-            throw new Error(`Defecto: bloque con texto cortado: ${t}`)
-          }
+        // Comprobación real de no recorte en el navegador (scrollWidth <= clientWidth)
+        await comprobarSinRecorteDisponibilidad(pag, ancho)
+
+        // Comprobación dirigida a 188 px (zoom 200 % móvil)
+        if (ancho === 1280) {
+          const ctx188 = await pag.context().browser().newContext({
+            viewport: { width: 188, height: 600 },
+            locale: 'es-PE',
+          })
+          await ctx188.addInitScript(
+            (t) => sessionStorage.setItem('reservaupla.sesion', t),
+            sesionAdmin,
+          )
+          const pag188 = await ctx188.newPage()
+          await pag188.goto(pag.url(), { waitUntil: 'domcontentloaded' })
+          await esperarCargaCompleta(pag188)
+          await comprobarSinRecorteDisponibilidad(pag188, 188)
+          await ctx188.close()
         }
       },
     )
@@ -190,13 +201,14 @@ async function ejecutar() {
       '/disponibilidad?fecha=2026-11-25',
       sesionAdmin,
       RESOLUCIONES,
-      async (pag) => {
+      async (pag, ancho) => {
         await pag.waitForSelector('#fechaDisponibilidad', { timeout: 10000 })
         const valorFecha = await pag.inputValue('#fechaDisponibilidad')
         if (valorFecha !== '25/11/2026') {
           throw new Error(`Defecto: se esperaba fecha 25/11/2026 pero el campo tiene ${valorFecha}`)
         }
         await pag.waitForSelector('text=Día libre en todos los ambientes', { timeout: 10000 })
+        await comprobarSinRecorteDisponibilidad(pag, ancho)
       },
     )
 
@@ -206,7 +218,7 @@ async function ejecutar() {
       '/disponibilidad?fecha=2026-11-05',
       sesionAdmin,
       RESOLUCIONES,
-      async (pag) => {
+      async (pag, ancho) => {
         await pag.waitForSelector('#fechaDisponibilidad', { timeout: 10000 })
         const valorFecha = await pag.inputValue('#fechaDisponibilidad')
         if (valorFecha !== '05/11/2026') {
@@ -214,6 +226,7 @@ async function ejecutar() {
         }
         await pag.waitForSelector('[class*="pendiente"]', { timeout: 10000 })
         await pag.waitForSelector('[class*="mantenimiento"]', { timeout: 10000 })
+        await comprobarSinRecorteDisponibilidad(pag, ancho)
       },
     )
 

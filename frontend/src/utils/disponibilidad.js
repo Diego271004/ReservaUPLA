@@ -137,10 +137,14 @@ export function textoVisibleBloque(tramo) {
   const hFin = horaAbreviada(tramo.horaFin)
 
   if (tramo.tipo === 'libre') {
-    if (duracion <= 90) return 'Libre'
+    if (duracion <= 30) return ''
+    if (duracion <= 120) return 'Libre'
     return `Libre ${hInicio}–${hFin} h`
   }
 
+  if (duracion <= 45) {
+    return ''
+  }
   if (duracion <= 120) {
     return `${hInicio}–${hFin} h`
   }

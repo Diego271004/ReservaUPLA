@@ -4,6 +4,7 @@
 import { createRequire } from 'node:module'
 import { BASE } from '../e2e/lib.mjs'
 import { razon } from './contraste.mjs'
+import { comprobarSinRecorteDisponibilidad } from '../e2e/recorte-helper.mjs'
 
 const requerir = createRequire(import.meta.url)
 const RUTA_AXE = requerir.resolve('axe-core/axe.min.js')
@@ -186,6 +187,29 @@ export async function medirSubfaseA(navegador, sesionCarla) {
     const activas = await p.evaluate(() => document.getAnimations().map((a) => `${a.animationName ?? a.transitionProperty}`))
     if (reducir) linea(activas.length === 0, `con la preferencia REDUCIR no hay animaciones ni transiciones al abrir el panel (${activas.length})`)
     else L.push(`       sin preferencia: ${activas.length} animación(es)/transición(es) al abrir el panel (${[...new Set(activas)].join(', ') || 'ninguna'})`)
+    await p.context().close()
+  }
+
+  // ---- H7: disponibilidad sin recorte de texto (1280, 375 y 188 px)
+  L.push('', 'H7) Disponibilidad: texto de bloques sin recorte por CSS (scrollWidth <= clientWidth)')
+  for (const [ancho, alto] of [
+    [1280, 900],
+    [375, 812],
+    [188, 600],
+  ]) {
+    const p = await nueva(ancho, alto)
+    await p.goto(`${BASE}/disponibilidad?fecha=2026-11-05`, { waitUntil: 'domcontentloaded' })
+    await p.waitForSelector('h1', { state: 'visible', timeout: 10000 })
+    await p.waitForTimeout(300)
+    try {
+      await comprobarSinRecorteDisponibilidad(p, ancho)
+      linea(
+        true,
+        `${ancho} px: ningún bloque presenta recorte de texto (scrollWidth <= clientWidth)`,
+      )
+    } catch (err) {
+      linea(false, `${ancho} px: ${err.message}`)
+    }
     await p.context().close()
   }
 
