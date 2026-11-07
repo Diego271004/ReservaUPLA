@@ -54,6 +54,14 @@ async function capturarPantallaReal(
       locale: 'es-PE',
     })
 
+    // Asegurar estado expandido por defecto en cada captura borrando localStorage
+    await contexto.addInitScript(() => {
+      try {
+        localStorage.clear()
+        localStorage.setItem('reservaupla.menu-colapsado', '0')
+      } catch {}
+    })
+
     if (sesion) {
       await contexto.addInitScript(
         (texto) => sessionStorage.setItem('reservaupla.sesion', texto),
@@ -91,6 +99,12 @@ async function ejecutar() {
     console.log('== Autenticando usuarios de prueba ==')
     const obtenerSesionUsuario = async (correo) => {
       const contexto = await navegador.newContext({ locale: 'es-PE' })
+      await contexto.addInitScript(() => {
+        try {
+          localStorage.clear()
+          localStorage.setItem('reservaupla.menu-colapsado', '0')
+        } catch {}
+      })
       const pag = await contexto.newPage()
       await iniciarSesion(pag, correo, CLAVE)
       await pag.waitForURL('**/dashboard')

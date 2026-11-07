@@ -24,7 +24,9 @@
 
 .lateral[data-colapsado='true'] {
   width: var(--ancho-menu-colapsado);
-  flex-basis: var(--ancho-menu-colapsado);
+  min-width: var(--ancho-menu-colapsado);
+  max-width: var(--ancho-menu-colapsado);
+  flex: 0 0 var(--ancho-menu-colapsado);
 }
 
 /* Menú marino plano. En escritorio queda fijo a la altura de la ventana; en móvil es un panel (más abajo). */
@@ -205,10 +207,16 @@
 @media (min-width: 768px) {
   .menu[data-colapsado='true'] {
     width: var(--ancho-menu-colapsado);
-    flex-basis: var(--ancho-menu-colapsado);
+    min-width: var(--ancho-menu-colapsado);
+    max-width: var(--ancho-menu-colapsado);
+    flex: 0 0 var(--ancho-menu-colapsado);
+    padding: var(--espacio-2) var(--espacio-1);
   }
 
-  .menu[data-colapsado='true'] .marca,
+  .menu[data-colapsado='true'] .marca {
+    display: none;
+  }
+
   .menu[data-colapsado='true'] .textoOpcion {
     position: absolute;
     width: 1px;
@@ -217,14 +225,27 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
+
   .menu[data-colapsado='true'] .cabecera {
     justify-content: center;
   }
+
+  .menu[data-colapsado='true'] .identidad {
+    justify-content: center;
+    width: 100%;
+  }
+
   .menu[data-colapsado='true'] .opcion {
     position: relative;
     justify-content: center;
+    width: var(--alto-control);
+    min-width: var(--alto-control);
+    height: var(--alto-control);
+    min-height: var(--alto-control);
+    margin: 0 auto;
     padding: 0;
   }
+
   .menu[data-colapsado='true'] .contador {
     position: absolute;
     top: 2px;
@@ -234,8 +255,17 @@
     padding: 0 4px;
     font-size: 0.6875rem;
   }
+
   .menu[data-colapsado='true'] .pieMenu {
     justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lateral,
+  .menu,
+  .opcion {
+    transition: none !important;
   }
 }
 

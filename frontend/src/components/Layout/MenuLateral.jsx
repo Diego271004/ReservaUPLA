@@ -44,13 +44,22 @@ export default function MenuLateral({
   const opcionesReservas = opciones.filter((o) => !esAdminRuta(o.ruta))
   const opcionesAdmin = opciones.filter((o) => esAdminRuta(o.ruta))
 
-  const renderOpcion = (opcion) =>
-    opcion.ruta === origen ? (
+  const renderOpcion = (opcion) => {
+    const contador = opcion.ruta === '/reservas' ? pendientes : 0
+    const etiquetaAccesible =
+      contador > 0 ? `${opcion.texto}, ${textoPendientes(contador)}` : opcion.texto
+
+    const propsComunes = {
+      'aria-label': colapsado ? etiquetaAccesible : undefined,
+      title: colapsado ? opcion.texto : undefined,
+    }
+
+    return opcion.ruta === origen ? (
       <Link
         key={opcion.ruta}
         to={opcion.ruta}
         aria-current="true"
-        title={colapsado ? opcion.texto : undefined}
+        {...propsComunes}
         className={`${estilos.opcion} ${estilos.activa}`}
         onClick={alCerrar}
       >
@@ -61,13 +70,14 @@ export default function MenuLateral({
         key={opcion.ruta}
         to={opcion.ruta}
         end={opcion.exacta}
-        title={colapsado ? opcion.texto : undefined}
+        {...propsComunes}
         className={({ isActive }) => `${estilos.opcion} ${isActive ? estilos.activa : ''}`}
         onClick={alCerrar}
       >
         <Contenido opcion={opcion} pendientes={pendientes} />
       </NavLink>
     )
+  }
 
   return (
     <aside
@@ -124,6 +134,7 @@ export default function MenuLateral({
         <Button
           variante="sobreOscuroIcono"
           aria-label={colapsado ? TEXTOS.menuExpandir : TEXTOS.menuContraer}
+          title={colapsado ? TEXTOS.menuExpandir : TEXTOS.menuContraer}
           aria-expanded={!colapsado}
           aria-controls="menu-principal"
           onClick={alternarColapso}
