@@ -332,9 +332,9 @@ function informe(contraste, extra, foto = null, subfaseA = null, taste = null) {
     L.push('0 paradas sin foco visible; zoom 200 % en 188 px: 4 de 30 con desborde; 0 animaciones infinitas con movimiento reducido. Sin contador, menú contraído, barra superior ni menú de usuario.')
     L.push('DESPUÉS: las secciones A a F de este informe son la medición completa con el layout nuevo; lo siguiente mide de forma dirigida lo que antes no existía.', '', ...subfaseA.lineas)
   }
-  // ---- I) auditoría taste: equal edges, microinteracciones y reduced-motion
+  // ---- I) auditoría taste: equal edges, microinteracciones, movimiento reducido, menú lateral y ritmo vertical
   if (taste) {
-    L.push('', rayas, 'I) TASTE: alineación (equal edges), microinteracciones y movimiento reducido', rayas)
+    L.push('', rayas, 'I) TASTE: alineación (equal edges), microinteracciones, movimiento reducido, menú lateral y ritmo vertical', rayas)
     L.push(...taste.lineas)
   }
   return L.join('\n')
@@ -354,7 +354,7 @@ try {
   const extra = await extras(navegador)
   const foto = ETAPA === 'identidad' ? await medirContrasteSobreFoto(navegador, BASE) : null
   const subfaseA = ETAPA === 'experiencia' || ETAPA === 'pulido' || ETAPA === 'taste' ? await medirSubfaseA(navegador, extra.sesiones.carla) : null
-  const taste = ETAPA === 'taste' ? await medirTaste(navegador, extra.sesiones.carla) : null
+  const taste = ETAPA === 'taste' ? await medirTaste(navegador, extra.sesiones) : null
   const texto = informe(analizarContraste(), extra, foto, subfaseA, taste)
   writeFileSync(INFORME, texto + '\n', 'utf8')
   console.log(`\nInforme escrito en ${INFORME}`)

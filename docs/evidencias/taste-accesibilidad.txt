@@ -441,7 +441,7 @@ H7) Disponibilidad: texto de bloques sin recorte por CSS (scrollWidth <= clientW
 TOTAL: 0 comprobación(es) de la sub-fase A fallida(s).
 
 ==============================================================================================================
-I) TASTE: alineación (equal edges), microinteracciones y movimiento reducido
+I) TASTE: alineación (equal edges), microinteracciones, movimiento reducido, menú lateral y ritmo vertical
 ==============================================================================================================
 T1) Equal edges: bordes alineados entre secciones y contenedores (tolerancia ≤ 2 px)
   OK    Dashboard (1280 px): Agenda e Indicadores alineados en bordes (izq: dif 0 px, der: dif 0 px)
@@ -451,5 +451,21 @@ T2) Microinteracciones sobrias: duración de transición de controles
 
 T3) Movimiento reducido (prefers-reduced-motion: reduce): sin animaciones en tarjetas ni botones
   OK    Login con reduced-motion: 0 animaciones activas en ejecución (0)
+
+T4) Menú lateral colapsado vs expandido: simetría, área táctil y textos sin recorte
+  OK    Menú expandido: columna (.lateral: 260 px) coincide con el menú (.menu: 260 px, dif ≤ 1 px)
+  OK    Menú expandido: 0 controles interactivos con tamaño inferior a 44×44 px (0)
+  OK    Menú expandido: 0 textos visibles con desborde o recorte (0)
+  OK    Menú colapsado: columna (.lateral: 80 px) reducida a 80 px simétrica con el menú (.menu: 80 px, dif ≤ 1 px)
+  OK    Menú colapsado: texto del logo y etiquetas de grupos ocultas correctamente
+  OK    Menú colapsado: 0 controles interactivos con tamaño inferior a 44×44 px (0)
+  OK    Menú colapsado: 0 textos visibles con desborde o recorte (0)
+  OK    Menú colapsado: botón «Expandir menú» visible con nombre accesible
+  OK    Menú colapsado: persistencia en localStorage confirmada tras recargar (80 px)
+
+T5) Ritmo vertical homogéneo en Inicio: distancia uniforme de 24 px entre secciones
+  OK    Inicio Administrador: 4 separaciones verticales consecutivas a exactamente 24 px (24 px, 24 px, 24 px, 24 px)
+  OK    Inicio Solicitante: 2 separaciones verticales consecutivas a exactamente 24 px (24 px, 24 px)
+  OK    Inicio Responsable: 3 separaciones verticales consecutivas a exactamente 24 px (24 px, 24 px, 24 px)
 
 TOTAL: 0 comprobación(es) de auditoría taste fallida(s).

@@ -105,42 +105,95 @@ Consolidado del documento formal entregado en `docs/diseno/auditoria-taste.md`:
 
 ---
 
-## 5. Cifras Finales Medidas (Paso 4)
+## 5. Cifras Finales Medidas (Paso 4 y Paso 5)
 
 Todas las cifras fueron tomadas mediante comandos reales ejecutados sobre el sistema y están clasificadas como **Medida**.
 
 | Métrica | Valor Base (Paso 0) | Valor Final Medido | Tipo | Comando de Medición | Fecha / Hora (Local) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Pruebas unitarias frontend** | 1.304 pasadas (57 archivos) | **1.305 pasadas** (57 archivos, 0 fallos) | Medida | `npm --prefix frontend test -- --run` | 2026-11-07 16:27:33 -05:00 |
-| **Peso JS (producción)** | 408,83 kB (gzip: 127,24 kB) | **409,15 kB** (gzip: **127,36 kB**) | Medida | `npm --prefix frontend run build` | 2026-11-07 16:27:40 -05:00 |
-| **Peso CSS (producción)** | 80,60 kB (gzip: 13,71 kB) | **82,40 kB** (gzip: **13,95 kB**) | Medida | `npm --prefix frontend run build` | 2026-11-07 16:27:40 -05:00 |
-| **Pruebas backend con BD viva** | 230 pasadas (0 omitidas) | **230 pasadas** (0 omitidas, 0 fallos) | Medida | `dotnet test backend/ReservaUPLA.sln` | 2026-11-07 16:29:30 -05:00 |
-| **Pruebas de usabilidad (`node --test`)** | 19 pasadas (0 fallos) | **22 pasadas** (0 fallos) | Medida | `node --test tools/usabilidad/*.test.mjs tools/usabilidad/pruebas/*.test.mjs` | 2026-11-07 16:29:41 -05:00 |
-| **Linters (ESLint y Prettier)** | 0 errores, 0 advertencias | **0 errores, 0 advertencias** | Medida | `npm --prefix frontend run lint` y `format:check` | 2026-11-07 16:24:07 -05:00 |
-| **Accesibilidad final (`ETAPA=taste`)** | 0 axe, 0 contraste, 0 táctiles < 44 px | **0 axe, 0 contraste, 0 táctiles < 44 px, 0 foco, 0 scroll 188px, 0 reducida** | Medida | `$env:ETAPA="taste"; node tools/usabilidad/accesibilidad.mjs` | 2026-11-07 16:23:09 -05:00 |
-| **Suite E2E completa (`npm run todo`)** | 9 de 9 fases OK (242 s) | **9 de 9 fases OK** (221 s, todo correcto) | Medida | `npm --prefix tools/e2e run todo` | 2026-11-07 16:33:31 -05:00 |
+| **Pruebas unitarias frontend** | 1.304 pasadas (57 archivos) | **1.306 pasadas** (57 archivos, 0 fallos) | Medida | `npm --prefix frontend test -- --run` | 2026-11-07 17:55:00 -05:00 |
+| **Peso JS (producción)** | 408,83 kB (gzip: 127,24 kB) | **409,63 kB** (gzip: **127,46 kB**) | Medida | `npm --prefix frontend run build` | 2026-11-07 17:56:24 -05:00 |
+| **Peso CSS (producción)** | 80,60 kB (gzip: 13,71 kB) | **83,31 kB** (gzip: **14,07 kB**) | Medida | `npm --prefix frontend run build` | 2026-11-07 17:56:24 -05:00 |
+| **Pruebas backend con BD viva** | 230 pasadas (0 omitidas) | **230 pasadas** (0 omitidas, 0 fallos) | Medida | `dotnet test backend/ReservaUPLA.sln` | 2026-11-07 17:59:16 -05:00 |
+| **Pruebas de usabilidad (`node --test`)** | 19 pasadas (0 fallos) | **22 pasadas** (0 fallos) | Medida | `node --test tools/usabilidad/*.test.mjs tools/usabilidad/pruebas/*.test.mjs` | 2026-11-07 18:10:10 -05:00 |
+| **Linters (ESLint y Prettier)** | 0 errores, 0 advertencias | **0 errores, 0 advertencias** | Medida | `npm --prefix frontend run lint` y `format:check` | 2026-11-07 17:56:14 -05:00 |
+| **Accesibilidad final (`ETAPA=taste`)** | 0 axe, 0 contraste, 0 táctiles < 44 px | **0 axe, 0 contraste, 0 táctiles < 44 px, 0 foco, 0 scroll 188px, 0 reducida, 0 fallos taste (T1-T5 OK)** | Medida | `$env:ETAPA="taste"; node tools/usabilidad/accesibilidad.mjs` | 2026-11-07 18:10:10 -05:00 |
+| **Suite E2E completa (`npm run todo`)** | 9 de 9 fases OK (242 s) | **9 de 9 fases OK** (342 s, todo correcto) | Medida | `npm --prefix tools/e2e run todo` | 2026-11-07 18:20:21 -05:00 |
 
 ### Verificación de Metas Permanentes
 - **Axe-core**: 0 violaciones en 87 estados analizados (43 escritorio + 44 móvil).
 - **Contraste de tokens (WCAG 2.2 AA)**: 0 pares por debajo del umbral mínimo de 4.5:1 / 3.0:1.
-- **Objetivos táctiles**: 0 controles interactivos menores de 44×44 px en los 44 estados móviles.
+- **Objetivos táctiles**: 0 controles interactivos menores de 44×44 px en los 44 estados móviles y en el menú colapsado/expandido de escritorio.
 - **Teclado y foco**: 0 paradas sin foco visible; 0 paradas fuera de modales abiertos.
 - **Reflujo y zoom 200% a 188 px**: 0 de 30 combinaciones con desbordamiento o scroll horizontal.
 - **Movimiento reducido**: 0 animaciones infinitas activas bajo `prefers-reduced-motion: reduce`.
 - **Recorte de texto**: 0 textos cortados o con elipsis CSS en disponibilidad a 1280, 375 y 188 px (`scrollWidth <= clientWidth`).
-- **Auditoría Taste**: 0 fallos en las 3 comprobaciones medibles en navegador (equal edges en dashboard, duración sobria de transiciones y anulación de movimiento en login).
+- **Auditoría Taste (T1 a T5)**: 0 fallos en las 5 comprobaciones automatizadas:
+  - **T1 (Equal edges)**: Agenda e Indicadores alineados en bordes (diferencia 0 px izq, 0 px der). Formulario acotado a 760 px simétrico.
+  - **T2 (Microinteracciones sobrias)**: Transición de botones de 180 ms ($\le 200$–250 ms) y pulsación `:active translateY(1px)`.
+  - **T3 (Movimiento reducido)**: 0 animaciones activas en login y tarjetas bajo `prefers-reduced-motion: reduce`.
+  - **T4 (Menú lateral simétrico)**:
+    - Expandido: columna (`.lateral`: 260 px) coincide exactamente con el menú (`.menu`: 260 px), 0 interactivos < 44 px, 0 textos recortados.
+    - Colapsado: columna (`.lateral`: 80 px) reducida a 80 px según token `--ancho-menu-colapsado`, simétrica con el menú (`.menu`: 80 px, diferencia 0 px).
+    - Ocultación total de texto de marca (`.marca`) y etiquetas de grupos (`.etiquetaGrupo`), con separador sutil entre grupos.
+    - Opciones centradas con área táctil accesible de 44×44 px, `title` descriptivo y nombres accesibles sin recorte.
+    - Botón «Expandir menú» visible y accesible. Persistencia en `localStorage` confirmada tras recargar (80 px).
+  - **T5 (Ritmo vertical homogéneo en Inicio)**:
+    - Inicio Administrador: 4 separaciones consecutivas medidas en el navegador a exactamente 24 px (24 px, 24 px, 24 px, 24 px).
+    - Inicio Solicitante: 2 separaciones consecutivas medidas en el navegador a exactamente 24 px (24 px, 24 px).
+    - Inicio Responsable: 3 separaciones consecutivas medidas en el navegador a exactamente 24 px (24 px, 24 px, 24 px).
 
 ---
 
-## 6. Bitácora de Defectos Resueltos (desde #94)
+## 6. Correcciones Aplicadas en el Paso 5
+
+### 6.1 Identificación del Defecto del Menú Lateral Colapsado
+- **Commit de origen**: `0c48576f58de9e800eb1019dd99d46b9dd5fdbc8` (*«feat: barra superior contextual, menú lateral y microinteracciones accesibles»*).
+- **Causa raíz**: Dicho commit introdujo el contenedor envolvente `<div className={estilos.lateral}>` y agrupadores de navegación `.etiquetaGrupo`. Sin embargo, en `Layout.module.css`, la regla de ancho colapsado solo se aplicaba al selector `.menu[data-colapsado='true']` pero **no** a la columna `.lateral[data-colapsado='true']`, la cual continuaba reteniendo su ancho base de `260px` (`flex: 0 0 260px`). Como resultado, al colapsar el menú quedaba una franja marina de 260 px con iconos de ~50 px y textos de grupo recortados.
+- **Solución implementada**:
+  - En `Layout.module.css`: vinculación de `.lateral[data-colapsado='true']` y `.menu[data-colapsado='true']` al token institucional `--ancho-menu-colapsado` (80 px), garantizando simetría matemática estricta ($\text{diferencia} \le 1\text{ px}$).
+  - En modo colapsado, `.marca` y `.etiquetaGrupo` se ocultan con `display: none`, sustituyéndose las etiquetas por un separador horizontal discreto (`.grupoNav + .grupoNav { border-top: 1px solid var(--separador-sobre-oscuro); }`).
+  - Opciones de navegación centradas en bloques de 44×44 px (`--alto-control`), manteniendo `title` emergente y nombres accesibles sin afectar el cálculo de accesibilidad del enlace.
+  - En `MenuLateral.jsx`: condicional de `aria-label` en enlaces de navegación restringido al modo colapsado (`colapsado ? etiquetaAccesible : undefined`), permitiendo que en modo expandido los lectores de pantalla y pruebas unitarias lean transparentemente el nombre del enlace y la insignia de pendientes («Reservas, 6 pendientes»).
+  - En `capturar-taste-final.mjs`: inicialización garantizada de `localStorage` (`reservaupla.menu-colapsado = '0'`) antes de cada captura individual para asegurar estado expandido por defecto en T-02 y T-09.
+
+### 6.2 Ritmo Vertical Homogéneo de 24 px en Dashboards
+- **Causa raíz**: En los tres inicios (`InicioAdministrador`, `InicioSolicitante`, `InicioResponsable`), existían márgenes individuales dispares (`margin-bottom: var(--espacio-3)` en portadas y tarjetas, y `gap: var(--espacio-4)` en solicitante/responsable), lo que producía separaciones inconsistentes de 32 a 56 px.
+- **Solución implementada**:
+  - En `DashboardPage.module.css`, `InicioSolicitante.module.css` e `InicioResponsable.module.css`: contenedor flex `.contenedorInicio` con `gap: var(--espacio-3);` (24 px uniforme) y anulación estricta de márgenes en hijos directos (`.contenedorInicio > * { margin-top: 0 !important; margin-bottom: 0 !important; }`).
+  - Medición automatizada en navegador real (`taste-check.mjs` - T5): verifica que cada gap entre bounding boxes de secciones consecutivas cumpla $\text{gap} = 24 \pm 1\text{ px}$ en Administrador (4 gaps), Solicitante (2 gaps) y Responsable (3 gaps).
+
+### 6.3 Microcopy Humano y Orientador
+
+Se revisaron y restauraron los textos de asistencia y estados vacíos en `frontend/src/constants/messages.js` (`TEXTOS`), manteniendo rigurosamente inalterados todos los mensajes de validación y reglas de negocio (`MENSAJES` / RN-01 a RN-07):
+
+| Identificador | Texto Anterior (`pulido`) | Texto Refinado (`taste`) | Principio de Usabilidad | Justificación |
+|---|---|---|---|---|
+| `TEXTOS.noHayDatos` | `'No hay datos registrados.'` | `'Todavía no hay registros.'` | Nielsen #1 / Tono humano | Expresa temporalidad constructiva en lugar de negatividad terminal. |
+| `TEXTOS.sinReservas` | `'No se encontraron reservas con los filtros seleccionados.'` / `'No hay reservas registradas.'` | `'Todavía no hay reservas. Crea la primera con «Reservar un ambiente».'` | Nielsen #9 / Call-to-action directo | Orienta a los roles con permiso de reserva (Administrador, Solicitante) sobre la acción inmediata a seguir. |
+| `TEXTOS.sinReservasResponsable` | `'No hay reservas registradas.'` | `'Todavía no hay reservas.'` | Nielsen #5 / Prevención de frustración | El Responsable no cuenta con permiso de crear reservas; no debe inducirse a una acción inexistente. |
+| `TEXTOS.ayudaSoporte` | `'¿Problemas para ingresar? Contacta a soporte TI en soporte@upla.edu.pe'` | `'¿No recuerdas tu contraseña o tienes problemas para ingresar? Comunícate con Soporte TI en soporte@upla.edu.pe o al anexo 1234.'` | Nielsen #9 / Ayuda y documentación | Reconoce explícitamente el olvido de credenciales y provee canal telefónico institucional alternativo. |
+| `TEXTOS.atajosAyudaHoraInicio` | `'Selecciona una hora de inicio para ver atajos.'` | `'Elige primero la hora de inicio para sugerir duraciones frecuentes.'` | Nielsen #6 / Reconocimiento sobre recuerdo | Explica con claridad la función asistiva del atajo y marca el orden cronológico del formulario. |
+| `TEXTOS.ayudaFechaFiltro` | `'Filtra por fecha.'` | `'Filtra las reservas a partir de la fecha seleccionada.'` | Nielsen #1 / Visibilidad y claridad semántica | Precisa que el filtro opera como fecha mínima inclusiva y no como coincidencia exacta única. |
+| `TEXTOS.solicitudesPendientes` | `'Solicitudes pendientes'` | `'Solicitudes que requieren decisión'` | Nielsen #10 / Orientación al rol | Enfatiza la responsabilidad ejecutiva del Administrador de resolver las solicitudes con cruce. |
+| `TEXTOS.sinPendientes` | `'Todo al día: no hay solicitudes pendientes'` | `'No hay solicitudes pendientes.'` | Tono directo institucional (taste / corporate) | Conciso, sobrio y profesional, eliminando informalidades innecesarias. |
+| `TEXTOS.sinAmbienteAsignado` | `'No tienes ambiente asignado.'` | `'Aún no tienes un ambiente asignado. Coordina con Administración General.'` | Nielsen #9 / Ayuda en resolución | Indica la dependencia orgánica concreta con la que gestionar la asignación del ambiente. |
+
+---
+
+## 7. Bitácora de Defectos Resueltos (desde #94)
 
 | # | Defecto o Discrepancia Detectada | Causa Raíz | Corrección Aplicada | Prueba que lo Cubre |
 |---|---|---|---|---|
-| **#94** | Desalineación de borde derecho entre cabecera institucional (`PageHeader`) y formularios en escritorio. | Falta de contención simétrica (`equal edges`) en `FormularioTarjeta`. | Adición de clase `.contenedorSimple` con `max-width: 760px` y centrado simétrico en `FormularioTarjeta.module.css`. | Comprobación T1 en `tools/usabilidad/taste-check.mjs` y `taste-check.test.mjs`. |
-| **#95** | Falta de retroalimentación táctil física (`:active`) en botones, atajos de duración y tramos de disponibilidad. | Ausencia de microinteracción de pulsación rápida en los componentes interactivos. | Implementación de `:active:not(:disabled) { transform: translateY(1px); }` en `Button.module.css`, `AtajosDeDuracion.module.css` y `DisponibilidadPage.module.css`, con anulación estricta bajo `prefers-reduced-motion: reduce`. | Comprobación T2 en `taste-check.mjs`, `AtajosDeDuracion.test.jsx`. |
-| **#96** | Tablas operativas densas sin feedback visual en hover y columnas de capacidad centradas sin alineación numérica tabular. | Falta de soporte de alineación a la derecha y resalte de fila en `TableList`. | Inclusión de `tbody tr:hover` con `--fondo-fila-alterna`, soporte de `data-alineacion="derecha"` y `font-variant-numeric: tabular-nums` en `TableList.jsx`, y configuración en `AmbientesPage.jsx`. | `npm --prefix frontend test -- --run` (57 archivos, 1.305 pruebas) y `npm run todo`. |
-| **#97** | Ordenación del Inicio del Administrador subordinaba las solicitudes pendientes urgentes debajo de métricas históricas. | Estructura no alineada al principio Bento de priorización por urgencia decisional. | Reordenación de bloques en `InicioAdministrador.jsx`: 1) `RequierenDecision`, 2) `AgendaDeHoy`, 3) `GrupoDeIndicadores`, 4) `UsoYEstados`. | `DashboardPage.test.jsx` (103 pruebas pasadas) y `capturar-taste-final.mjs`. |
-| **#98** | Error de sintaxis DOM en `page.evaluate` al utilizar pseudo-selectores propios de Playwright (`:has-text(...)`). | En evaluación interna del navegador, `document.querySelector` solo admite sintaxis estándar CSS W3C. | Sustitución por selectores estándar `section[aria-labelledby="..."]` y `section[aria-label="..."]` en `taste-check.mjs`. | `taste-check.test.mjs` y ejecución limpia de `ETAPA=taste node accesibilidad.mjs`. |
+| **#94** | Desalineación de borde derecho entre cabecera institucional (`PageHeader`) y formularios en escritorio. | Falta de contención simétrica (`equal edges`) en `FormularioTarjeta`. | Adición de clase `.contenedorSimple` con `max-width: 760px` y centrado simétrico en `FormularioTarjeta.module.css`. | Comprobación T1 en `tools/usabilidad/taste-check.mjs`. |
+| **#95** | Falta de retroalimentación táctil física (`:active`) en botones, atajos de duración y tramos de disponibilidad. | Ausencia de microinteracción de pulsación rápida en los componentes interactivos. | Implementación de `:active:not(:disabled) { transform: translateY(1px); }` en `Button.module.css`, `AtajosDeDuracion.module.css` y `DisponibilidadPage.module.css`, con anulación estricta bajo `prefers-reduced-motion: reduce`. | Comprobación T2 en `taste-check.mjs`. |
+| **#96** | Tablas operativas densas sin feedback visual en hover y columnas de capacidad centradas sin alineación numérica tabular. | Falta de soporte de alineación a la derecha y resalte de fila en `TableList`. | Inclusión de `tbody tr:hover` con `--fondo-fila-alterna`, soporte de `data-alineacion="derecha"` y `font-variant-numeric: tabular-nums` en `TableList.jsx`, y configuración en `AmbientesPage.jsx`. | `npm --prefix frontend test -- --run` (57 archivos, 1.306 pruebas) y `npm run todo`. |
+| **#97** | Ordenación del Inicio del Administrador subordinaba las solicitudes pendientes urgentes debajo de métricas históricas. | Estructura no alineada al principio Bento de priorización por urgencia decisional. | Reordenación de bloques en `InicioAdministrador.jsx`: 1) `RequierenDecision`, 2) `AgendaDeHoy`, 3) `GrupoDeIndicadores`, 4) `UsoYEstados`. | `DashboardPage.test.jsx` y `capturar-taste-final.mjs`. |
+| **#98** | Error de sintaxis DOM en `page.evaluate` al utilizar pseudo-selectores propios de Playwright (`:has-text(...)`). | En evaluación interna del navegador, `document.querySelector` solo admite sintaxis estándar CSS W3C. | Sustitución por selectores estándar `section[aria-labelledby="..."]` y `section[aria-label="..."]` en `taste-check.mjs`. | Ejecución limpia de `ETAPA=taste node accesibilidad.mjs`. |
+| **#99** | Menú lateral colapsado mantenía la columna `.lateral` en 260 px, generando una franja marina vacía con textos recortados. | Introducido en `0c48576f58de9e800eb1019dd99d46b9dd5fdbc8`: `.lateral` no tenía selector para `data-colapsado="true"`. | Se aplicó `width: var(--ancho-menu-colapsado)` (80 px) a `.lateral[data-colapsado='true']`, se ocultó `.marca` y `.etiquetaGrupo`, y se centraron iconos en 44×44 px. | Comprobación T4 en `taste-check.mjs` (medición en navegador: ancho lateral == ancho menú == 80 px, 0 recortados, 0 táctiles < 44 px). |
+| **#100** | Fugas de estado colapsado en capturas T-02 y T-09 por `localStorage` persistido de ejecuciones previas. | Falta de reinicio explícito del almacenamiento web antes de cada captura. | Adición de `localStorage.clear()` y `localStorage.setItem('reservaupla.menu-colapsado', '0')` en `capturar-taste-final.mjs`. | Regeneración limpia de las 37 capturas T- con menú expandido verificado visual y programáticamente. |
+| **#101** | Ritmo vertical heterogéneo (32 a 56 px) entre secciones hermanas de los paneles de Inicio. | Márgenes CSS dispares en componentes hijos (`.portada`, `.seccion`, `gap: var(--espacio-4)`). | Unificación de contenedores `.contenedorInicio` con `gap: var(--espacio-3)` (24 px uniforme) y reseteo de márgenes en hijos directos. | Comprobación T5 en `taste-check.mjs` (4 gaps en Admin, 2 en Solicitante, 3 en Responsable a exactamente 24 px $\pm 1$ px). |
+| **#102** | Microcopy frío y poco orientador en estados vacíos y textos de asistencia. | Textos genéricos desalineados con los principios de usabilidad de Nielsen (#1, #5, #6, #9, #10). | Reemplazo por textos cálidos y humanos en `TEXTOS` (`messages.js`) y adición de suite de pruebas con literales completos en `messages.test.js`. | Pruebas unitarias en `messages.test.js` (65 pasadas con literales completos). |
 
 ---
 

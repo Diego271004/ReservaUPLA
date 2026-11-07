@@ -54,3 +54,27 @@ Este documento consolida la comparativa técnica y visual de las 18 pantallas de
 5. **Adaptación sobria de estados vacíos**:
    - La ilustración SVG del edificio UPLA se conservó por identidad institucional pero se redujo a dimensiones compactas (100x72 px base y 64x46 px en modo compacto), con espaciado vertical moderado (`--espacio-3` / `--espacio-2`), evitando pantallas vacías sobredimensionadas.
 
+6. **Menú lateral simétrico y accesible (colapsado y expandido)**:
+   - Se resolvió la asimetría originada en el commit `0c48576f58de9e800eb1019dd99d46b9dd5fdbc8`: la columna `.lateral` se colapsa estrictamente al ancho de `--ancho-menu-colapsado` (80 px), coincidiendo con `.menu` ($\text{diferencia} \le 1\text{ px}$).
+   - Ocultación total de texto de marca y etiquetas de grupos; las opciones de navegación se centran en objetivos táctiles de 44×44 px con `title` y nombre accesible sin recorte.
+   - En las capturas finales, cada pantalla se inicializa con `localStorage` limpio y menú en estado expandido.
+
+7. **Ritmo vertical homogéneo (24 px entre secciones)**:
+   - Se unificó el espaciado vertical entre secciones hermanas de los paneles de Inicio (Administrador, Solicitante, Responsable) a través de `.contenedorInicio` con `gap: var(--espacio-3)` (24 px uniforme $\pm 1$ px) y eliminación de márgenes individuales dispares. Comprobado mediante medición programática de cajas envolventes en navegador real.
+
+---
+
+## 3. Matriz de Refinamiento de Microcopy (Antes vs. Después)
+
+| Clave | Texto Anterior (`pulido`) | Texto Refinado (`taste`) | Principio de Usabilidad | Justificación |
+|---|---|---|---|---|
+| `noHayDatos` | `'No hay datos registrados.'` | `'Todavía no hay registros.'` | Nielsen #1 / Tono humano | Expresa temporalidad constructiva en lugar de negatividad terminal. |
+| `sinReservas` | `'No se encontraron reservas con los filtros seleccionados.'` / `'No hay reservas registradas.'` | `'Todavía no hay reservas. Crea la primera con «Reservar un ambiente».'` | Nielsen #9 / Call-to-action directo | Orienta a los roles con permiso de reserva sobre la acción inmediata a seguir. |
+| `sinReservasResponsable` | `'No hay reservas registradas.'` | `'Todavía no hay reservas.'` | Nielsen #5 / Prevención de frustración | El Responsable no cuenta con permiso de crear reservas; no debe inducirse a una acción inexistente. |
+| `ayudaSoporte` | `'¿Problemas para ingresar? Contacta a soporte TI en soporte@upla.edu.pe'` | `'¿No recuerdas tu contraseña o tienes problemas para ingresar? Comunícate con Soporte TI en soporte@upla.edu.pe o al anexo 1234.'` | Nielsen #9 / Ayuda y documentación | Reconoce explícitamente el olvido de credenciales y provee canal telefónico institucional alternativo. |
+| `atajosAyudaHoraInicio` | `'Selecciona una hora de inicio para ver atajos.'` | `'Elige primero la hora de inicio para sugerir duraciones frecuentes.'` | Nielsen #6 / Reconocimiento sobre recuerdo | Explica con claridad la función asistiva del atajo y marca el orden cronológico del formulario. |
+| `ayudaFechaFiltro` | `'Filtra por fecha.'` | `'Filtra las reservas a partir de la fecha seleccionada.'` | Nielsen #1 / Visibilidad y claridad semántica | Precisa que el filtro opera como fecha mínima inclusiva y no como coincidencia exacta única. |
+| `solicitudesPendientes` | `'Solicitudes pendientes'` | `'Solicitudes que requieren decisión'` | Nielsen #10 / Orientación al rol | Enfatiza la responsabilidad ejecutiva del Administrador de resolver las solicitudes con cruce. |
+| `sinPendientes` | `'Todo al día: no hay solicitudes pendientes'` | `'No hay solicitudes pendientes.'` | Tono directo institucional (taste / corporate) | Conciso, sobrio y profesional, eliminando informalidades innecesarias. |
+| `sinAmbienteAsignado` | `'No tienes ambiente asignado.'` | `'Aún no tienes un ambiente asignado. Coordina con Administración General.'` | Nielsen #9 / Ayuda en resolución | Indica la dependencia orgánica concreta con la que gestionar la asignación del ambiente. |
+
