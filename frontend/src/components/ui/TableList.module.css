@@ -100,9 +100,12 @@
 
 .activable {
   cursor: pointer;
-  transition: background-color var(--duracion-transicion) ease-out;
+  transition:
+    background-color var(--duracion-transicion) ease-out,
+    box-shadow var(--duracion-transicion) ease-out;
 }
 
 .activable:hover {
   background: var(--fondo-info);
+  box-shadow: var(--elevacion-tarjeta);
 }

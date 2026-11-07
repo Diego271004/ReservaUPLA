@@ -60,19 +60,22 @@ function Estructura({ sesion }) {
       {panelAbierto && (
         <div className={estilos.fondo} data-testid="fondo-del-menu" onClick={cerrarPanel} />
       )}
-      <MenuLateral
-        opciones={MENU_POR_ROL[sesion.rol] ?? []}
-        origen={origen}
-        pendientes={pendientes}
-        colapsado={colapsado}
-        alternarColapso={alternarColapso}
-        abierto={panelAbierto}
-        alCerrar={cerrarPanel}
-      />
+      <div className={estilos.lateral} data-colapsado={colapsado}>
+        <MenuLateral
+          opciones={MENU_POR_ROL[sesion.rol] ?? []}
+          origen={origen}
+          pendientes={pendientes}
+          colapsado={colapsado}
+          alternarColapso={alternarColapso}
+          abierto={panelAbierto}
+          alCerrar={cerrarPanel}
+        />
+      </div>
       <div className={estilos.columna}>
         <Topbar
           sesion={sesion}
           migas={migasDe(pathname, sesion.rol, state?.volverA)}
+          pathname={pathname}
           panelAbierto={panelAbierto}
           alAbrirPanel={() => setPanelAbierto(true)}
           alCerrarSesion={alCerrarSesion}

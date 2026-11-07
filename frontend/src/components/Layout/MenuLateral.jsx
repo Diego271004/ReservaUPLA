@@ -40,6 +40,35 @@ export default function MenuLateral({
   const panelRef = useRef(null)
   const alPulsarTecla = useTrampaDeFoco(abierto, panelRef, { alEscape: alCerrar })
 
+  const esAdminRuta = (ruta) => ruta === '/ambientes' || ruta === '/usuarios'
+  const opcionesReservas = opciones.filter((o) => !esAdminRuta(o.ruta))
+  const opcionesAdmin = opciones.filter((o) => esAdminRuta(o.ruta))
+
+  const renderOpcion = (opcion) =>
+    opcion.ruta === origen ? (
+      <Link
+        key={opcion.ruta}
+        to={opcion.ruta}
+        aria-current="true"
+        title={colapsado ? opcion.texto : undefined}
+        className={`${estilos.opcion} ${estilos.activa}`}
+        onClick={alCerrar}
+      >
+        <Contenido opcion={opcion} pendientes={pendientes} />
+      </Link>
+    ) : (
+      <NavLink
+        key={opcion.ruta}
+        to={opcion.ruta}
+        end={opcion.exacta}
+        title={colapsado ? opcion.texto : undefined}
+        className={({ isActive }) => `${estilos.opcion} ${isActive ? estilos.activa : ''}`}
+        onClick={alCerrar}
+      >
+        <Contenido opcion={opcion} pendientes={pendientes} />
+      </NavLink>
+    )
+
   return (
     <aside
       id="panel-menu"
@@ -63,30 +92,32 @@ export default function MenuLateral({
         </div>
       </div>
       <nav id="menu-principal" aria-label="Principal" className={estilos.navegacion}>
-        {opciones.map((opcion) =>
-          opcion.ruta === origen ? (
-            <Link
-              key={opcion.ruta}
-              to={opcion.ruta}
-              aria-current="true"
-              title={colapsado ? opcion.texto : undefined}
-              className={`${estilos.opcion} ${estilos.activa}`}
-              onClick={alCerrar}
-            >
-              <Contenido opcion={opcion} pendientes={pendientes} />
-            </Link>
-          ) : (
-            <NavLink
-              key={opcion.ruta}
-              to={opcion.ruta}
-              end={opcion.exacta}
-              title={colapsado ? opcion.texto : undefined}
-              className={({ isActive }) => `${estilos.opcion} ${isActive ? estilos.activa : ''}`}
-              onClick={alCerrar}
-            >
-              <Contenido opcion={opcion} pendientes={pendientes} />
-            </NavLink>
-          ),
+        <div className={estilos.grupoNav} role="group" aria-labelledby="grupo-reservas-titulo">
+          <span id="grupo-reservas-titulo" className={estilos.etiquetaGrupo}>
+            Reservas
+          </span>
+          <ul className={estilos.listaOpciones} role="list">
+            {opcionesReservas.map((opcion) => (
+              <li key={opcion.ruta} role="listitem">
+                {renderOpcion(opcion)}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {opcionesAdmin.length > 0 && (
+          <div className={estilos.grupoNav} role="group" aria-labelledby="grupo-admin-titulo">
+            <span id="grupo-admin-titulo" className={estilos.etiquetaGrupo}>
+              Administración
+            </span>
+            <ul className={estilos.listaOpciones} role="list">
+              {opcionesAdmin.map((opcion) => (
+                <li key={opcion.ruta} role="listitem">
+                  {renderOpcion(opcion)}
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </nav>
       <div className={estilos.pieMenu}>

@@ -117,11 +117,12 @@ describe('Layout: menú por rol (hallazgo G1: un solo layout)', () => {
 
   it('resalta solo la opción de la página actual', () => {
     mostrarLayout(SESIONES.administrador, '/reservas/nueva')
-    expect(screen.getByRole('link', { name: 'Nueva reserva' })).toHaveAttribute(
+    const enElMenu = within(screen.getByRole('navigation', { name: 'Principal' }))
+    expect(enElMenu.getByRole('link', { name: 'Nueva reserva' })).toHaveAttribute(
       'aria-current',
       'page',
     )
-    expect(screen.getByRole('link', { name: 'Reservas' })).not.toHaveAttribute('aria-current')
+    expect(enElMenu.getByRole('link', { name: 'Reservas' })).not.toHaveAttribute('aria-current')
   })
 
   it('Ambientes sigue activo en una subpágina (/ambientes/nuevo)', () => {

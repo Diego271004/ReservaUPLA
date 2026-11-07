@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import Button from '../components/ui/Button.jsx'
+import EstadoVacio from '../components/ui/EstadoVacio.jsx'
 import Insignia from '../components/ui/Insignia.jsx'
 import TableList from '../components/ui/TableList.jsx'
 import TextInput from '../components/ui/TextInput.jsx'
@@ -53,13 +55,7 @@ export default function UsuariosPage() {
 
   const renderContenido = (datos) => {
     if (datos.length === 0) {
-      return (
-        <TableList
-          titulo={TEXTOS.tituloUsuarios}
-          columnas={COLUMNAS}
-          filas={[]}
-        />
-      )
+      return <TableList titulo={TEXTOS.tituloUsuarios} columnas={COLUMNAS} filas={[]} />
     }
 
     const termino = busqueda.trim().toLowerCase()
@@ -74,18 +70,18 @@ export default function UsuariosPage() {
 
     if (usuariosFiltrados.length === 0) {
       return (
-        <p className={estilos.sinResultados}>
-          {textoSinUsuariosCoincidentes(busqueda)}
-        </p>
+        <EstadoVacio mensaje={textoSinUsuariosCoincidentes(busqueda)}>
+          {busqueda && (
+            <Button variante="secundario" onClick={() => setBusqueda('')}>
+              {TEXTOS.limpiarFiltros}
+            </Button>
+          )}
+        </EstadoVacio>
       )
     }
 
     return (
-      <TableList
-        titulo={TEXTOS.tituloUsuarios}
-        columnas={COLUMNAS}
-        filas={usuariosFiltrados}
-      />
+      <TableList titulo={TEXTOS.tituloUsuarios} columnas={COLUMNAS} filas={usuariosFiltrados} />
     )
   }
 

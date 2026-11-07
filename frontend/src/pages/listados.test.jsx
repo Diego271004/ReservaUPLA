@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MENSAJES } from '../constants/messages.js'
+import { MENSAJES, TEXTOS } from '../constants/messages.js'
 import { RESULTADO } from '../services/llamarApi.js'
 import {
   listarAmbientes,
@@ -166,6 +166,15 @@ describe('Ambientes: cabecera, ocupación y responsable', () => {
     await userEvent.click(botonTabla)
     expect(localStorage.getItem('reservaupla.vistaAmbientes')).toBe('tabla')
     expect(screen.getByRole('table')).toBeInTheDocument()
+  })
+
+  it('con lista de ambientes vacía muestra EstadoVacio con ilustración y acción Nuevo ambiente', async () => {
+    listarAmbientes.mockResolvedValue(exito([]))
+    mostrarAmbientes()
+    expect(await screen.findByText(TEXTOS.noHayDatos)).toBeInTheDocument()
+    const vacio = screen.getByTestId('estado-vacio')
+    expect(vacio.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
+    expect(within(vacio).getByRole('button', { name: TEXTOS.nuevoAmbiente })).toBeInTheDocument()
   })
 })
 

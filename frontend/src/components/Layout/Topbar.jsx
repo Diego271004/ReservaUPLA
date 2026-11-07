@@ -1,15 +1,26 @@
 import { Link } from 'react-router-dom'
 import { TEXTOS } from '../../constants/messages.js'
 import { fechaAIso, hoyEnLima } from '../../utils/fechas.js'
+import { seccionActualDe } from '../../utils/migas.js'
 import Button from '../ui/Button.jsx'
 import { Icono } from '../ui/Icono.jsx'
 import MenuDeUsuario from './MenuDeUsuario.jsx'
 import estilos from './Topbar.module.css'
 
 function Migas({ migas }) {
+  const padre = migas.find((m) => m.ruta)
   return (
     <nav aria-label={TEXTOS.migasDePan} className={estilos.migas}>
-      <ol>
+      {padre && (
+        <Link
+          to={padre.ruta}
+          className={estilos.enlaceRegresoMovil}
+          aria-label={`‹ ${padre.texto}`}
+        >
+          ‹ {padre.texto}
+        </Link>
+      )}
+      <ol className={estilos.listaEscritorio}>
         {migas.map((miga, indice) => (
           <li key={miga.texto}>
             {miga.ruta ? (
@@ -26,9 +37,18 @@ function Migas({ migas }) {
   )
 }
 
-/** Barra superior: hamburguesa (móvil), migas de pan, fecha de hoy en Lima y menú de usuario. */
-export default function Topbar({ sesion, migas, panelAbierto, alAbrirPanel, alCerrarSesion }) {
+/** Barra superior: hamburguesa (móvil), migas o título de sección, fecha de hoy en Lima y menú de usuario. */
+export default function Topbar({
+  sesion,
+  migas = [],
+  pathname = '',
+  panelAbierto,
+  alAbrirPanel,
+  alCerrarSesion,
+}) {
   const hoy = hoyEnLima()
+  const tituloSeccion = seccionActualDe(pathname, sesion?.rol)
+
   return (
     <header className={estilos.barra}>
       <div className={estilos.hamburguesa}>
@@ -42,7 +62,15 @@ export default function Topbar({ sesion, migas, panelAbierto, alAbrirPanel, alCe
           <Icono nombre="menu" tamano={22} />
         </Button>
       </div>
-      <Migas migas={migas} />
+      <div className={estilos.areaNavegacion}>
+        {migas.length > 0 ? (
+          <Migas migas={migas} />
+        ) : tituloSeccion ? (
+          <span className={estilos.tituloSeccion} aria-hidden="true">
+            {tituloSeccion}
+          </span>
+        ) : null}
+      </div>
       <p className={estilos.fecha}>
         <Icono nombre="calendario" tamano={18} />
         <span className="solo-lector">{TEXTOS.hoyEs}: </span>

@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import BarraDeOcupacion from '../components/ui/BarraDeOcupacion.jsx'
 import Button from '../components/ui/Button.jsx'
+import EstadoVacio from '../components/ui/EstadoVacio.jsx'
 import { Icono } from '../components/ui/Icono.jsx'
 import Insignia from '../components/ui/Insignia.jsx'
 import TableList from '../components/ui/TableList.jsx'
@@ -67,6 +69,7 @@ const columnas = (porAmbiente) =>
   )
 
 export default function AmbientesPage() {
+  const navigate = useNavigate()
   const ocupacion = useCarga(cargarOcupacionDeHoy, SIN_OCUPACION)
   const [modoVista, setModoVista] = useState(() => {
     try {
@@ -115,6 +118,14 @@ export default function AmbientesPage() {
   )
 
   const renderContenido = (datos) => {
+    if (datos.length === 0) {
+      return (
+        <EstadoVacio mensaje={TEXTOS.noHayDatos}>
+          <Button onClick={() => navigate('/ambientes/nuevo')}>{TEXTOS.nuevoAmbiente}</Button>
+        </EstadoVacio>
+      )
+    }
+
     if (modoVista === 'tarjetas') {
       return (
         <div className={estilos.rejillaTarjetas} role="region" aria-label="Ambientes en tarjetas">

@@ -102,11 +102,30 @@ describe('Barra superior: migas, fecha de hoy y saludo de la sesión', () => {
     expect(fecha).toHaveAttribute('dateTime', '2026-11-04')
   })
 
-  it('en una sección raíz no repite el título en la barra superior', () => {
-    montar(SESIONES.solicitante, '/reservas')
+  it('en una sección raíz de nivel 1 la barra superior queda limpia sin título ni migas de pan', () => {
+    montar(SESIONES.administrador, '/ambientes')
+    expect(screen.queryByRole('navigation', { name: 'Migas de pan' })).toBeNull()
+    expect(screen.queryByText('Administración', { selector: 'header span' })).toBeNull()
+  })
+
+  it('en Inicio (/dashboard) la barra superior queda limpia a la izquierda sin título ni migas', () => {
+    montar(SESIONES.administrador, '/dashboard')
+    expect(screen.queryByRole('navigation', { name: 'Migas de pan' })).toBeNull()
+    expect(screen.queryByText('Reservas', { selector: 'header span' })).toBeNull()
+  })
+
+  it('en nueva reserva muestra la miga completa hacia Reservas y el enlace móvil de regreso', () => {
+    montar(SESIONES.solicitante, '/reservas/nueva')
     const migas = screen.getByRole('navigation', { name: 'Migas de pan' })
-    expect(within(migas).queryAllByRole('link')).toHaveLength(0)
-    expect(within(migas).queryAllByRole('listitem')).toHaveLength(0)
+    expect(within(migas).getByRole('link', { name: 'Reservas' })).toHaveAttribute(
+      'href',
+      '/reservas',
+    )
+    expect(within(migas).getByRole('link', { name: '‹ Reservas' })).toHaveAttribute(
+      'href',
+      '/reservas',
+    )
+    expect(within(migas).getByText('Nueva reserva')).toHaveAttribute('aria-current', 'page')
   })
 
   it('en el detalle la miga del origen es un enlace de regreso', () => {

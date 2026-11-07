@@ -17,12 +17,33 @@
   display: none;
 }
 
+.areaNavegacion {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.tituloSeccion {
+  font-family: var(--fuente-titulo);
+  font-size: var(--tipo-seccion);
+  font-weight: 600;
+  color: var(--color-marino);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .migas {
   flex: 1;
   min-width: 0;
 }
 
-.migas ol {
+.enlaceRegresoMovil {
+  display: none;
+}
+
+.listaEscritorio {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -31,7 +52,7 @@
   list-style: none;
 }
 
-.migas li {
+.listaEscritorio li {
   display: flex;
   gap: 4px;
   align-items: center;
@@ -40,7 +61,7 @@
 }
 
 /* El separador es decorativo (contenido CSS): el lector de pantalla lee la lista, no los signos. */
-.migas li + li::before {
+.listaEscritorio li + li::before {
   content: '›';
   color: var(--color-texto-suave);
 }
@@ -78,11 +99,11 @@
     display: inline-flex;
   }
 
-  .migas ol {
+  .listaEscritorio {
     flex-wrap: nowrap;
   }
 
-  .migas li {
+  .listaEscritorio li {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -90,8 +111,6 @@
     overflow-wrap: normal;
   }
 
-  /* El enlace de una miga nunca se encoge (un «Inicio» de 15 px no se puede tocar): el que se recorta con puntos suspensivos
-     es el nombre de la página actual. */
   .migas a {
     flex-shrink: 0;
     white-space: nowrap;
@@ -103,5 +122,43 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .fecha {
+    display: none;
+  }
+
+  .listaEscritorio {
+    display: none;
+  }
+
+  .enlaceRegresoMovil {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 44px;
+    min-width: 44px;
+    color: var(--color-primario);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 188px) {
+  .barra {
+    padding: 2px 4px;
+    gap: 2px;
+  }
+
+  .enlaceRegresoMovil {
+    font-size: 0.8125rem;
+    max-width: 80px;
   }
 }

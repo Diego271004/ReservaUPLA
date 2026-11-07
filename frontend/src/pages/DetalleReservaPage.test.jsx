@@ -610,8 +610,6 @@ describe('Detalle de reserva: encabezado y línea de tiempo', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Ya existe una reserva aprobada en ese horario.',
     )
-    expect(
-      screen.getByRole('heading', { name: 'Detalle de la reserva' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Detalle de la reserva' })).toBeInTheDocument()
   })
 })

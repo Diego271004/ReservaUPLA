@@ -28,8 +28,5 @@ export const SinPermisoPage = () => (
 
 /** Una ruta que no existe. */
 export const NoEncontradaPage = () => (
-  <PaginaDeError
-    titulo={TEXTOS.paginaNoEncontrada}
-    texto={TEXTOS.paginaNoEncontradaDetalle}
-  />
+  <PaginaDeError titulo={TEXTOS.paginaNoEncontrada} texto={TEXTOS.paginaNoEncontradaDetalle} />
 )
