@@ -24,12 +24,13 @@ import { recorrer } from './estados.mjs'
 
 const requerir = createRequire(import.meta.url)
 const RUTA_AXE = requerir.resolve('axe-core/axe.min.js')
-const ETAPA = ['antes', 'despues', 'fase9', 'fase-ai', 'identidad', 'experiencia'].includes(process.env.ETAPA) ? process.env.ETAPA : 'antes'
+const ETAPA = ['antes', 'despues', 'fase9', 'fase-ai', 'identidad', 'experiencia', 'pulido'].includes(process.env.ETAPA) ? process.env.ETAPA : 'antes'
 const CARPETA_DE_CAPTURAS = {
   fase9: ['fase9', 'estados'],
   'fase-ai': ['fase-ai', 'estados'],
   identidad: ['identidad'],
   experiencia: ['experiencia', 'medicion'],
+  pulido: ['pulido', 'medicion'],
   antes: ['fase8', 'antes'],
   despues: ['fase8', 'despues'],
 }
@@ -48,6 +49,7 @@ const INFORME = resolve(
     'fase-ai': 'fase-ai-accesibilidad.txt',
     identidad: 'identidad-accesibilidad.txt',
     experiencia: 'experiencia-accesibilidad.txt',
+    pulido: 'pulido-accesibilidad.txt',
   }[ETAPA],
 )
 const ETIQUETAS_AXE = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice']
@@ -343,7 +345,7 @@ try {
   console.log('\n== Zoom y movimiento reducido')
   const extra = await extras(navegador)
   const foto = ETAPA === 'identidad' ? await medirContrasteSobreFoto(navegador, BASE) : null
-  const subfaseA = ETAPA === 'experiencia' ? await medirSubfaseA(navegador, extra.sesiones.carla) : null
+  const subfaseA = ETAPA === 'experiencia' || ETAPA === 'pulido' ? await medirSubfaseA(navegador, extra.sesiones.carla) : null
   const texto = informe(analizarContraste(), extra, foto, subfaseA)
   writeFileSync(INFORME, texto + '\n', 'utf8')
   console.log(`\nInforme escrito en ${INFORME}`)
