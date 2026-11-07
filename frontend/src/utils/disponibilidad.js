@@ -122,6 +122,34 @@ export function claseDuracionLibre(inicio, fin) {
   return 'medio'
 }
 
+export function horaAbreviada(hora) {
+  if (!hora) return ''
+  const [h, m] = hora.split(':').map(Number)
+  return m === 0 ? String(h) : `${h}:${String(m).padStart(2, '0')}`
+}
+
+export function textoVisibleBloque(tramo) {
+  if (!tramo) return ''
+  const inicio = minutosDeHora(tramo.horaInicio)
+  const fin = minutosDeHora(tramo.horaFin)
+  const duracion = fin - inicio
+  const hInicio = horaAbreviada(tramo.horaInicio)
+  const hFin = horaAbreviada(tramo.horaFin)
+
+  if (tramo.tipo === 'libre') {
+    if (duracion <= 90) return 'Libre'
+    return `Libre ${hInicio}–${hFin} h`
+  }
+
+  if (duracion <= 120) {
+    return `${hInicio}–${hFin} h`
+  }
+  if (duracion <= 180) {
+    return `${hInicio}–${hFin} h · ${tramo.estado}`
+  }
+  return `${tramo.horaInicio}–${tramo.horaFin} · ${tramo.estado}`
+}
+
 /**
  * El porcentaje del día (07:00 a 22:00) que un ambiente tiene reservado con reservas APROBADAS (redondeado), o null si
  * el ambiente está en mantenimiento. Las pendientes no cuentan: todavía no ocupan el ambiente (RN-01).

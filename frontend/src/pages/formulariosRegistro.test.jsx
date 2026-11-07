@@ -898,7 +898,9 @@ describe('Nueva reserva', () => {
       mostrar()
       await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
       expect(within(resumen()).getAllByText('Sin elegir')).toHaveLength(3)
-      expect(within(resumen()).getByText(/^\w+, \d{1,2} de \w+ de \d{4}$/)).toBeInTheDocument()
+      expect(
+        within(resumen()).getByText(/^[a-záéíóúñ]+, \d{1,2} de [a-záéíóúñ]+ de \d{4}$/i),
+      ).toBeInTheDocument()
       expect(within(resumen()).getByText(/Pendiente/)).toBeInTheDocument()
     })
 

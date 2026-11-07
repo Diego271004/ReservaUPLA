@@ -1,6 +1,6 @@
 import { mkdirSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { BASE, CLAVE, abrirNavegador, aprobarReservaApi, iniciarSesion, leerSesion, nuevaPagina, RAIZ } from './lib.mjs'
+import { BASE, CLAVE, abrirNavegador, aprobarReservaApi, crearReservaApi, iniciarSesion, leerSesion, nuevaPagina, RAIZ } from './lib.mjs'
 import { detenerEntorno, iniciarEntorno, reiniciarBaseYApi } from './entorno.mjs'
 
 const DESTINO_FINAL = resolve(RAIZ, 'docs/evidencias/pulido/final')
@@ -90,23 +90,21 @@ async function ejecutar() {
 
   try {
     console.log('== Autenticando usuarios de prueba ==')
-    const paginaAuth = await nuevaPagina(navegador, 'escritorio')
+    const obtenerSesionUsuario = async (correo) => {
+      const contexto = await navegador.newContext({ locale: 'es-PE' })
+      const pag = await contexto.newPage()
+      await iniciarSesion(pag, correo, CLAVE)
+      await pag.waitForURL('**/dashboard')
+      const sesion = await leerSesion(pag)
+      await contexto.close()
+      return sesion
+    }
 
-    await iniciarSesion(paginaAuth, 'carla.rojas@upla.edu.pe', CLAVE)
-    await paginaAuth.waitForURL('**/dashboard')
-    const sesionAdmin = await leerSesion(paginaAuth)
+    const sesionAdmin = await obtenerSesionUsuario('carla.rojas@upla.edu.pe')
+    const sesionSolicitante = await obtenerSesionUsuario('ana.torres@upla.edu.pe')
+    const sesionResponsable = await obtenerSesionUsuario('mario.huaman@upla.edu.pe')
 
-    await iniciarSesion(paginaAuth, 'ana.torres@upla.edu.pe', CLAVE)
-    await paginaAuth.waitForURL('**/dashboard')
-    const sesionSolicitante = await leerSesion(paginaAuth)
-
-    await iniciarSesion(paginaAuth, 'mario.huaman@upla.edu.pe', CLAVE)
-    await paginaAuth.waitForURL('**/dashboard')
-    const sesionResponsable = await leerSesion(paginaAuth)
-
-    await paginaAuth.close()
-
-    console.log('\n== Generando las 32 capturas finales del sistema real (16 pantallas x 2 res) ==')
+    console.log('\n== Generando las 36 capturas finales del sistema real (18 pantallas x 2 res) ==')
 
     const cap = (nom, rut, ses, res = RESOLUCIONES, acc = null, dest = DESTINO_FINAL) =>
       capturarPantallaReal(navegador, nom, rut, ses, res, acc, dest, maxMtimeSrc)
@@ -118,8 +116,8 @@ async function ejecutar() {
     await cap('04-inicio-responsable', '/dashboard', sesionResponsable)
     await cap('05-nueva-reserva', '/reservas/nueva', sesionAdmin)
     await cap('06-nueva-reserva-cierre', '/reservas/nueva', sesionAdmin, RESOLUCIONES, async (pag) => {
-      await pag.waitForSelector('button:has-text("Auditorio Principal")', { timeout: 10000 })
-      await pag.click('button:has-text("Auditorio Principal")')
+      await pag.waitForSelector('[role="radio"]:has-text("Auditorio Principal")', { timeout: 10000 })
+      await pag.click('[role="radio"]:has-text("Auditorio Principal")')
       await pag.waitForTimeout(300)
     })
     await cap('07-detalle-reserva', '/reservas/1', sesionAdmin)
@@ -132,14 +130,79 @@ async function ejecutar() {
     await cap('14-403-sin-permiso', '/usuarios', sesionSolicitante)
     await cap('15-404-no-encontrada', '/ruta-inexistente-404', sesionAdmin)
 
-    // Aprobar la reserva 2 (Taller de bases de datos, 05/11/2026 en Laboratorio 2) para que en 16-disponibilidad
-    // convivan en una sola pantalla: Libre («+»), Aprobada (verde), Pendiente (ámbar) y Mantenimiento (gris).
+    // Crear reservas en fecha futura (2026-11-24) para que en 16-disponibilidad
+    // convivan en una sola pantalla interactiva: Libre («+» habilitado), Aprobada (verde),
+    // Pendiente (ámbar) y Mantenimiento (gris).
     const tokenCarla = JSON.parse(sesionAdmin).token
-    await aprobarReservaApi(tokenCarla, 2)
+    const tokenAna = JSON.parse(sesionSolicitante).token
 
-    // 16-disponibilidad (datos reales de semilla: fecha 2026-11-05 con Aprobada, Pendiente, Libre y Mantenimiento)
+    const idAprobada = await crearReservaApi(
+      tokenAna,
+      1,
+      '2026-11-24',
+      '10:00',
+      '12:00',
+      'Taller de redes y servidores',
+    )
+    await aprobarReservaApi(tokenCarla, idAprobada)
+
+    await crearReservaApi(
+      tokenAna,
+      1,
+      '2026-11-24',
+      '14:00',
+      '16:00',
+      'Capacitación docente',
+    )
+
+    // 16-disponibilidad (fecha futura 2026-11-24 interactiva con Aprobada, Pendiente, Libre y Mantenimiento)
     await cap(
       '16-disponibilidad',
+      '/disponibilidad?fecha=2026-11-24',
+      sesionAdmin,
+      RESOLUCIONES,
+      async (pag) => {
+        await pag.waitForSelector('#fechaDisponibilidad', { timeout: 10000 })
+        const valorFecha = await pag.inputValue('#fechaDisponibilidad')
+        if (valorFecha !== '24/11/2026') {
+          throw new Error(`Defecto: se esperaba fecha 24/11/2026 pero el campo tiene ${valorFecha}`)
+        }
+        await pag.waitForSelector('[class*="aprobada"]', { timeout: 10000 })
+        await pag.waitForSelector('[class*="pendiente"]', { timeout: 10000 })
+        await pag.waitForSelector('[class*="mantenimiento"]', { timeout: 10000 })
+        await pag.waitForSelector('[class*="libre"]:not(:disabled)', { timeout: 10000 })
+
+        // Comprobación de que ningún bloque en la línea de tiempo presenta elipsis o texto cortado
+        const textos = await pag.$$eval('[class*="bloque"] span', (spans) =>
+          spans.map((s) => s.textContent),
+        )
+        for (const t of textos) {
+          if (t.includes('…') || t.includes('...')) {
+            throw new Error(`Defecto: bloque con texto cortado: ${t}`)
+          }
+        }
+      },
+    )
+
+    // 17-disponibilidad-dia-libre (fecha futura 2026-11-25 sin reservas, mostrando aviso de día libre y tramos disponibles)
+    await cap(
+      '17-disponibilidad-dia-libre',
+      '/disponibilidad?fecha=2026-11-25',
+      sesionAdmin,
+      RESOLUCIONES,
+      async (pag) => {
+        await pag.waitForSelector('#fechaDisponibilidad', { timeout: 10000 })
+        const valorFecha = await pag.inputValue('#fechaDisponibilidad')
+        if (valorFecha !== '25/11/2026') {
+          throw new Error(`Defecto: se esperaba fecha 25/11/2026 pero el campo tiene ${valorFecha}`)
+        }
+        await pag.waitForSelector('text=Día libre en todos los ambientes', { timeout: 10000 })
+      },
+    )
+
+    // 18-disponibilidad-dia-pasado (fecha 2026-11-05 en el pasado, con reservas atenuadas y de solo lectura)
+    await cap(
+      '18-disponibilidad-dia-pasado',
       '/disponibilidad?fecha=2026-11-05',
       sesionAdmin,
       RESOLUCIONES,
@@ -149,76 +212,29 @@ async function ejecutar() {
         if (valorFecha !== '05/11/2026') {
           throw new Error(`Defecto: se esperaba fecha 05/11/2026 pero el campo tiene ${valorFecha}`)
         }
-        await pag.waitForSelector('[class*="aprobada"]', { timeout: 10000 })
         await pag.waitForSelector('[class*="pendiente"]', { timeout: 10000 })
         await pag.waitForSelector('[class*="mantenimiento"]', { timeout: 10000 })
-      },
-    )
-
-    // 17-disponibilidad-dia-libre (fecha 2026-11-20 sin reservas, mostrando aviso de día libre y tramos disponibles)
-    await cap(
-      '17-disponibilidad-dia-libre',
-      '/disponibilidad?fecha=2026-11-20',
-      sesionAdmin,
-      RESOLUCIONES,
-      async (pag) => {
-        await pag.waitForSelector('#fechaDisponibilidad', { timeout: 10000 })
-        const valorFecha = await pag.inputValue('#fechaDisponibilidad')
-        if (valorFecha !== '20/11/2026') {
-          throw new Error(`Defecto: se esperaba fecha 20/11/2026 pero el campo tiene ${valorFecha}`)
-        }
-        await pag.waitForSelector('text=Día libre en todos los ambientes', { timeout: 10000 })
       },
     )
 
     console.log('\n== Regenerando capturas intermedias P1 a P5 con el sistema real ==')
     // P1
     await cap('P1-resumen-vivo-vacio', '/reservas/nueva', sesionAdmin, RESOLUCIONES, null, DESTINO_PULIDO)
-    await cap(
-      'P1-tarjeta-ambiente-seleccionada',
-      '/reservas/nueva',
-      sesionAdmin,
-      RESOLUCIONES,
-      async (pag) => {
-        await pag.waitForSelector('button:has-text("Auditorio Principal")', { timeout: 10000 })
-        await pag.click('button:has-text("Auditorio Principal")')
-        await pag.waitForTimeout(300)
-      },
-      DESTINO_PULIDO,
-    )
-    await cap(
-      'P1-atajos-duracion',
-      '/reservas/nueva',
-      sesionAdmin,
-      RESOLUCIONES,
-      async (pag) => {
-        await pag.waitForSelector('button:has-text("Auditorio Principal")', { timeout: 10000 })
-        await pag.click('button:has-text("Auditorio Principal")')
-        await pag.fill('input[type="date"]', '2026-11-20')
-        await pag.selectOption('select[aria-label="Hora de inicio"]', '09:00')
+    const prepararReserva = async (pag, conHoras = false, conMotivo = false) => {
+      await pag.waitForSelector('[role="radio"]:has-text("Auditorio Principal")', { timeout: 10000 })
+      await pag.click('[role="radio"]:has-text("Auditorio Principal")')
+      if (conHoras) {
+        await pag.fill('input[name="fecha"]', '20/11/2026')
+        await pag.selectOption('select[name="horaInicio"]', '09:00')
         await pag.waitForTimeout(200)
         await pag.click('button:has-text("2 h")')
-        await pag.waitForTimeout(300)
-      },
-      DESTINO_PULIDO,
-    )
-    await cap(
-      'P1-resumen-vivo-elegido',
-      '/reservas/nueva',
-      sesionAdmin,
-      RESOLUCIONES,
-      async (pag) => {
-        await pag.waitForSelector('button:has-text("Auditorio Principal")', { timeout: 10000 })
-        await pag.click('button:has-text("Auditorio Principal")')
-        await pag.fill('input[type="date"]', '2026-11-20')
-        await pag.selectOption('select[aria-label="Hora de inicio"]', '09:00')
-        await pag.waitForTimeout(200)
-        await pag.click('button:has-text("2 h")')
-        await pag.fill('textarea', 'Conferencia académica de sistemas')
-        await pag.waitForTimeout(300)
-      },
-      DESTINO_PULIDO,
-    )
+      }
+      if (conMotivo) await pag.fill('textarea[name="motivo"]', 'Conferencia académica de sistemas')
+      await pag.waitForTimeout(300)
+    }
+    await cap('P1-tarjeta-ambiente-seleccionada', '/reservas/nueva', sesionAdmin, RESOLUCIONES, (p) => prepararReserva(p), DESTINO_PULIDO)
+    await cap('P1-atajos-duracion', '/reservas/nueva', sesionAdmin, RESOLUCIONES, (p) => prepararReserva(p, true), DESTINO_PULIDO)
+    await cap('P1-resumen-vivo-elegido', '/reservas/nueva', sesionAdmin, RESOLUCIONES, (p) => prepararReserva(p, true, true), DESTINO_PULIDO)
 
     // P2
     await cap('P2-columna-ambientes', '/disponibilidad?fecha=2026-11-05', sesionAdmin, RESOLUCIONES, null, DESTINO_PULIDO)

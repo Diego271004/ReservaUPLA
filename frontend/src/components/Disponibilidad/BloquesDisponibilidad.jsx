@@ -7,6 +7,7 @@ import { minutosDeHora } from '../../utils/fechas.js'
 import {
   asignarCarrilesReservas,
   leftPorCentaje,
+  textoVisibleBloque,
   tramoPorCentaje,
   tramosFusionados,
   tramosLibresBase,
@@ -171,9 +172,7 @@ export function BloquesEscritorio({
                       }}
                     >
                       <Icono nombre="mas" />
-                      <span className={estilos.textoLibre}>
-                        {duracion <= 90 ? 'Libre' : `Libre ${tramo.horaInicio}–${tramo.horaFin}`}
-                      </span>
+                      <span className={estilos.textoLibre}>{textoVisibleBloque(tramo)}</span>
                     </Button>
                   )
                 })}
@@ -205,7 +204,7 @@ export function BloquesEscritorio({
                       onClick={() => alElegirReserva?.(tramo, ambiente)}
                     >
                       <Icono nombre={tramo.estado === 'Aprobada' ? 'marca' : 'reloj'} />
-                      <span>{`${tramo.horaInicio}–${tramo.horaFin} · ${tramo.estado}`}</span>
+                      <span>{textoVisibleBloque({ tipo: 'ocupado', ...tramo })}</span>
                     </Button>
                   )
                 })}
