@@ -188,7 +188,7 @@ describe('Mi ambiente', () => {
       ),
     )
     mostrar()
-    expect(await screen.findByText(TEXTOS.sinReservas)).toBeInTheDocument()
+    expect(await screen.findByText(TEXTOS.sinReservasResponsable)).toBeInTheDocument()
   })
 
   it('pie «Mostrando 4 de 4» y, con 23, paginación que pide la página 2', async () => {

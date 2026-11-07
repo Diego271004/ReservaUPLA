@@ -87,7 +87,7 @@ export default function ReservasPage() {
       </Button>
     </EstadoVacio>
   ) : (
-    <EstadoVacio mensaje={TEXTOS.sinReservas}>
+    <EstadoVacio mensaje={puedeReservar ? TEXTOS.sinReservas : TEXTOS.sinReservasResponsable}>
       {puedeReservar && <Button onClick={irANueva}>{TEXTOS.reservarUnAmbiente}</Button>}
     </EstadoVacio>
   )

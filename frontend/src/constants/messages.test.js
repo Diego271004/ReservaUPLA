@@ -88,9 +88,36 @@ describe('mensajes del frontend y del backend', () => {
   })
 })
 
-describe('textos de la interfaz', () => {
-  it('usa solo el nombre "ReservaUPLA" y el ejemplo con el dominio @upla.edu.pe', () => {
+describe('textos de la interfaz con literales explícitos', () => {
+  it('estados vacíos y textos orientadores con literales directos', () => {
+    expect(TEXTOS.noHayDatos).toBe('Todavía no hay registros.')
+    expect(TEXTOS.sinReservas).toBe(
+      'Todavía no hay reservas. Crea la primera con «Reservar un ambiente».',
+    )
+    expect(TEXTOS.sinReservasResponsable).toBe('Todavía no hay reservas.')
+    expect(TEXTOS.sinReservasConFiltros).toBe('No hay reservas con esos filtros.')
+    expect(TEXTOS.sinPendientes).toBe('No hay solicitudes pendientes.')
+    expect(TEXTOS.sinAmbienteAsignado).toBe(
+      'Todavía no tienes un ambiente a cargo. Cuando se te asigne uno, aparecerá aquí.',
+    )
+    expect(TEXTOS.usoSinDatos).toBe('Todavía no hay reservas aprobadas.')
+  })
+
+  it('ayudas, avisos y microcopy humano con literales directos', () => {
     expect(TEXTOS.nombreProducto).toBe('ReservaUPLA')
     expect(TEXTOS.ayudaCorreo).toBe('Ejemplo: nombre.apellido@upla.edu.pe')
+    expect(TEXTOS.ayudaSoporte).toBe('Comunícate con Soporte TI de la universidad')
+    expect(TEXTOS.atajosAyudaHoraInicio).toBe('Elige primero la hora de inicio.')
+    expect(TEXTOS.ayudaHorario).toBe('Horario permitido: 07:00 a 22:00')
+    expect(TEXTOS.ayudaFechaFiltro).toBe('Formato dd/mm/aaaa. Vacía, no filtra.')
+    expect(TEXTOS.solicitudesPendientes).toBe('Solicitudes pendientes de aprobación')
+    expect(TEXTOS.requierenDecision).toBe('Requieren tu decisión')
+    expect(TEXTOS.ambienteEnMantenimiento).toBe('En mantenimiento (no disponible)')
+    expect(TEXTOS.ambienteEnMantenimientoAviso).toBe('El ambiente está en mantenimiento.')
+    expect(TEXTOS.conflictoAprobada).toBe('Choca con una reserva ya aprobada.')
+    expect(TEXTOS.menuAbrir).toBe('Menú')
+    expect(TEXTOS.menuCerrar).toBe('Cerrar menú')
+    expect(TEXTOS.menuContraer).toBe('Contraer menú')
+    expect(TEXTOS.menuExpandir).toBe('Expandir menú')
   })
 })

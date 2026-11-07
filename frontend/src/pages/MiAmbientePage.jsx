@@ -104,14 +104,14 @@ export default function MiAmbientePage() {
           <GrupoDeIndicadores indicadores={indicadoresDeEstado(indicadores)} />
           <div className={estilos.uso}>
             {reservas.elementos.length === 0 ? (
-              <EstadoVacio mensaje={TEXTOS.sinReservas} />
+              <EstadoVacio mensaje={TEXTOS.sinReservasResponsable} />
             ) : (
               <>
                 <TableList
                   titulo={TEXTOS.usoDelAmbiente}
                   columnas={columnas}
                   filas={reservas.elementos}
-                  textoVacio={TEXTOS.sinReservas}
+                  textoVacio={TEXTOS.sinReservasResponsable}
                 />
                 <PieDeLista pagina={{ ...reservas, alCambiar: irAPagina }} />
               </>
