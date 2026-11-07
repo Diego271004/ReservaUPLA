@@ -45,7 +45,7 @@ export default function InicioResponsable({ ahora = new Date(), alVerDetalle }) 
   const fechaHoy = fechaLarga(hoy(ahora))
 
   return (
-    <>
+    <div className={estilos.contenedorInicio}>
       <section className={estilos.portada} aria-labelledby="portada-responsable-titulo">
         <svg
           className={estilos.marca}
@@ -177,6 +177,6 @@ export default function InicioResponsable({ ahora = new Date(), alVerDetalle }) 
           </ul>
         )}
       </section>
-    </>
+    </div>
   )
 }

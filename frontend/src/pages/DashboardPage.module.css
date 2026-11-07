@@ -1,10 +1,21 @@
+.contenedorInicio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3); /* 24 px uniforme */
+}
+
+.contenedorInicio > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
 .saludo {
   margin: 0 0 var(--espacio-2);
   font-size: 1.125rem;
   color: var(--color-texto-suave);
 }
 .seccion {
-  margin-top: var(--espacio-3);
+  margin: 0;
   padding: var(--espacio-2);
   background: var(--color-superficie);
   border: 1px solid var(--color-borde);

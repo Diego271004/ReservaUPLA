@@ -67,161 +67,163 @@ export default function InicioSolicitante({ ahora = new Date() }) {
         <AlertMessage tipo={decision.alerta.tipo}>{decision.alerta.mensaje}</AlertMessage>
       )}
 
-      <section className={estilos.portada} aria-labelledby="portada-solicitante-titulo">
-        <svg
-          className={estilos.marca}
-          viewBox="0 0 220 160"
-          width="220"
-          height="160"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path d="M60 10 100 33v46L60 102 20 79V33z" />
-          <path d="M130 50 170 73v46l-40 23-40-23V73z" />
-          <path d="M150 -10 190 13v46l-40 23-40-23V13z" />
-        </svg>
-        <div className={estilos.textoPortada}>
-          <p className={estilos.fechaPortada}>{fechaHoy}</p>
-          <h2 id="portada-solicitante-titulo" className={estilos.tituloPortada}>
-            {proxima ? 'Tienes una reserva programada' : 'Todo listo para tu próxima reserva'}
-          </h2>
-          <p className={estilos.detallePortada}>
-            {proxima
-              ? `${proxima.ambienteNombre} · ${proxima.horaInicio} a ${proxima.horaFin}`
-              : 'No tienes reservas próximas. Elige un ambiente para comenzar.'}
-          </p>
-        </div>
-        <Button
-          variante="secundario"
-          className={estilos.accionPortada}
-          onClick={() => navigate('/reservas/nueva')}
-        >
-          Reservar un ambiente
-        </Button>
-      </section>
-
-      {proxima ? (
-        <section className={estilos.seccion} aria-labelledby="proxima-titulo">
-          <div className={estilos.cabeceraSeccion}>
-            <h2 id="proxima-titulo">Tu próxima reserva</h2>
-            <Insignia tipo={tipoInsignia(proxima.estado)}>{proxima.estado}</Insignia>
-          </div>
-          <article className={estilos.tarjetaProxima}>
-            <div className={estilos.cuerpoProxima}>
-              <div className={estilos.iconoAmbiente} aria-hidden="true">
-                <Icono nombre="ambientes" tamano={24} />
-              </div>
-              <div className={estilos.infoProxima}>
-                <h3 className={estilos.nombreAmbiente}>{proxima.ambienteNombre}</h3>
-                <div className={estilos.datosReserva}>
-                  <span>
-                    <Icono nombre="calendario" tamano={16} />
-                    {isoAFecha(proxima.fecha)}
-                  </span>
-                  <span>
-                    <Icono nombre="reloj" tamano={16} />
-                    {proxima.horaInicio} – {proxima.horaFin}
-                  </span>
-                  {proxima.motivo && (
-                    <span className={estilos.motivoReserva}>{proxima.motivo}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className={estilos.accionesReserva}>
-              <Button
-                variante="secundario"
-                onClick={() =>
-                  navigate(`/reservas/${proxima.id}`, { state: { volverA: '/dashboard' } })
-                }
-              >
-                Ver detalle
-              </Button>
-              {puedeCancelar(proxima.estado) && (
-                <Button variante="rechazar" onClick={() => decision.abrir('cancelar', proxima)}>
-                  Cancelar reserva
-                </Button>
-              )}
-            </div>
-          </article>
-        </section>
-      ) : (
-        <section className={estilos.seccion} aria-labelledby="proxima-titulo">
-          <h2 id="proxima-titulo">Tu próxima reserva</h2>
-          <div className={estilos.vacio}>
-            <Icono nombre="calendario" tamano={32} />
-            <p className={estilos.vacioTitulo}>No tienes una próxima reserva.</p>
-            <p className={estilos.vacioTexto}>
-              No tienes reservas próximas. Elige un ambiente para comenzar.
+      <div className={estilos.contenedorInicio}>
+        <section className={estilos.portada} aria-labelledby="portada-solicitante-titulo">
+          <svg
+            className={estilos.marca}
+            viewBox="0 0 220 160"
+            width="220"
+            height="160"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M60 10 100 33v46L60 102 20 79V33z" />
+            <path d="M130 50 170 73v46l-40 23-40-23V73z" />
+            <path d="M150 -10 190 13v46l-40 23-40-23V13z" />
+          </svg>
+          <div className={estilos.textoPortada}>
+            <p className={estilos.fechaPortada}>{fechaHoy}</p>
+            <h2 id="portada-solicitante-titulo" className={estilos.tituloPortada}>
+              {proxima ? 'Tienes una reserva programada' : 'Todo listo para tu próxima reserva'}
+            </h2>
+            <p className={estilos.detallePortada}>
+              {proxima
+                ? `${proxima.ambienteNombre} · ${proxima.horaInicio} a ${proxima.horaFin}`
+                : 'No tienes reservas próximas. Elige un ambiente para comenzar.'}
             </p>
-            <Button onClick={() => navigate('/reservas/nueva')}>Reservar un ambiente</Button>
           </div>
+          <Button
+            variante="secundario"
+            className={estilos.accionPortada}
+            onClick={() => navigate('/reservas/nueva')}
+          >
+            Reservar un ambiente
+          </Button>
         </section>
-      )}
 
-      <section className={estilos.seccion} aria-labelledby="resumen-solicitudes">
-        <div className={estilos.cabeceraSeccion}>
-          <h2 id="resumen-solicitudes">Tus solicitudes</h2>
-          <Link to="/reservas" className={estilos.enlaceVerTodas}>
-            Ver todas las solicitudes →
-          </Link>
-        </div>
-        <div className={estilos.resumenEstados}>
-          {resumen.map((item) => {
-            const icono = iconoPorEstado(item.estado)
-            const tono = tonoPorEstado(item.estado)
-            return (
-              <Button
-                key={item.estado}
-                variante="secundario"
-                className={estilos.resumenCard}
-                onClick={() => navigate(`/reservas?estado=${encodeURIComponent(item.estado)}`)}
-                aria-label={`Ver solicitudes ${item.estado.toLowerCase()}: ${item.total}`}
-              >
-                <div className={estilos.tarjetaHeader}>
-                  <span className={`${estilos.iconoEstado} ${estilos[tono]}`} aria-hidden="true">
-                    <Icono nombre={icono} />
-                  </span>
-                  <span className={estilos.flechaTarjeta} aria-hidden="true">
-                    →
-                  </span>
+        {proxima ? (
+          <section className={estilos.seccion} aria-labelledby="proxima-titulo">
+            <div className={estilos.cabeceraSeccion}>
+              <h2 id="proxima-titulo">Tu próxima reserva</h2>
+              <Insignia tipo={tipoInsignia(proxima.estado)}>{proxima.estado}</Insignia>
+            </div>
+            <article className={estilos.tarjetaProxima}>
+              <div className={estilos.cuerpoProxima}>
+                <div className={estilos.iconoAmbiente} aria-hidden="true">
+                  <Icono nombre="ambientes" tamano={24} />
                 </div>
-                <strong className={estilos.numeroResumen}>{item.total}</strong>
-                <span className={estilos.etiquetaResumen}>{item.estado}</span>
-              </Button>
-            )
-          })}
-        </div>
+                <div className={estilos.infoProxima}>
+                  <h3 className={estilos.nombreAmbiente}>{proxima.ambienteNombre}</h3>
+                  <div className={estilos.datosReserva}>
+                    <span>
+                      <Icono nombre="calendario" tamano={16} />
+                      {isoAFecha(proxima.fecha)}
+                    </span>
+                    <span>
+                      <Icono nombre="reloj" tamano={16} />
+                      {proxima.horaInicio} – {proxima.horaFin}
+                    </span>
+                    {proxima.motivo && (
+                      <span className={estilos.motivoReserva}>{proxima.motivo}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className={estilos.accionesReserva}>
+                <Button
+                  variante="secundario"
+                  onClick={() =>
+                    navigate(`/reservas/${proxima.id}`, { state: { volverA: '/dashboard' } })
+                  }
+                >
+                  Ver detalle
+                </Button>
+                {puedeCancelar(proxima.estado) && (
+                  <Button variante="rechazar" onClick={() => decision.abrir('cancelar', proxima)}>
+                    Cancelar reserva
+                  </Button>
+                )}
+              </div>
+            </article>
+          </section>
+        ) : (
+          <section className={estilos.seccion} aria-labelledby="proxima-titulo">
+            <h2 id="proxima-titulo">Tu próxima reserva</h2>
+            <div className={estilos.vacio}>
+              <Icono nombre="calendario" tamano={32} />
+              <p className={estilos.vacioTitulo}>No tienes una próxima reserva.</p>
+              <p className={estilos.vacioTexto}>
+                No tienes reservas próximas. Elige un ambiente para comenzar.
+              </p>
+              <Button onClick={() => navigate('/reservas/nueva')}>Reservar un ambiente</Button>
+            </div>
+          </section>
+        )}
 
-        {solicitudes.length > 0 && (
-          <div className={estilos.bloqueSolicitudes}>
-            <h3 className={estilos.subtituloSolicitudes}>Últimas solicitudes</h3>
-            <ul className={estilos.listaSolicitudes} aria-label="Solicitudes recientes">
-              {solicitudes.slice(0, 5).map((res) => (
-                <li key={res.id} className={estilos.itemSolicitud}>
-                  <div className={estilos.columnaAmbiente}>
-                    <strong>{res.ambienteNombre}</strong>
-                    <span className={estilos.datosFecha}>
-                      <Icono nombre="calendario" tamano={14} />
-                      {isoAFecha(res.fecha)} · {res.horaInicio}–{res.horaFin}
+        <section className={estilos.seccion} aria-labelledby="resumen-solicitudes">
+          <div className={estilos.cabeceraSeccion}>
+            <h2 id="resumen-solicitudes">Tus solicitudes</h2>
+            <Link to="/reservas" className={estilos.enlaceVerTodas}>
+              Ver todas las solicitudes →
+            </Link>
+          </div>
+          <div className={estilos.resumenEstados}>
+            {resumen.map((item) => {
+              const icono = iconoPorEstado(item.estado)
+              const tono = tonoPorEstado(item.estado)
+              return (
+                <Button
+                  key={item.estado}
+                  variante="secundario"
+                  className={estilos.resumenCard}
+                  onClick={() => navigate(`/reservas?estado=${encodeURIComponent(item.estado)}`)}
+                  aria-label={`Ver solicitudes ${item.estado.toLowerCase()}: ${item.total}`}
+                >
+                  <div className={estilos.tarjetaHeader}>
+                    <span className={`${estilos.iconoEstado} ${estilos[tono]}`} aria-hidden="true">
+                      <Icono nombre={icono} />
+                    </span>
+                    <span className={estilos.flechaTarjeta} aria-hidden="true">
+                      →
                     </span>
                   </div>
-                  <Insignia tipo={tipoInsignia(res.estado)}>{res.estado}</Insignia>
-                  <Button
-                    variante="secundario"
-                    className={estilos.botonDetalleItem}
-                    onClick={() =>
-                      navigate(`/reservas/${res.id}`, { state: { volverA: '/dashboard' } })
-                    }
-                  >
-                    Ver detalle
-                  </Button>
-                </li>
-              ))}
-            </ul>
+                  <strong className={estilos.numeroResumen}>{item.total}</strong>
+                  <span className={estilos.etiquetaResumen}>{item.estado}</span>
+                </Button>
+              )
+            })}
           </div>
-        )}
-      </section>
+
+          {solicitudes.length > 0 && (
+            <div className={estilos.bloqueSolicitudes}>
+              <h3 className={estilos.subtituloSolicitudes}>Últimas solicitudes</h3>
+              <ul className={estilos.listaSolicitudes} aria-label="Solicitudes recientes">
+                {solicitudes.slice(0, 5).map((res) => (
+                  <li key={res.id} className={estilos.itemSolicitud}>
+                    <div className={estilos.columnaAmbiente}>
+                      <strong>{res.ambienteNombre}</strong>
+                      <span className={estilos.datosFecha}>
+                        <Icono nombre="calendario" tamano={14} />
+                        {isoAFecha(res.fecha)} · {res.horaInicio}–{res.horaFin}
+                      </span>
+                    </div>
+                    <Insignia tipo={tipoInsignia(res.estado)}>{res.estado}</Insignia>
+                    <Button
+                      variante="secundario"
+                      className={estilos.botonDetalleItem}
+                      onClick={() =>
+                        navigate(`/reservas/${res.id}`, { state: { volverA: '/dashboard' } })
+                      }
+                    >
+                      Ver detalle
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
+      </div>
 
       <ModalDeReserva
         accion={decision.decision?.accion}

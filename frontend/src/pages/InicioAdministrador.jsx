@@ -13,6 +13,7 @@ import { obtenerDashboard } from '../services/recursosService.js'
 import { ambienteMasUtilizado } from '../utils/filtrosDeReservas.js'
 import { horaEnLima } from '../utils/fechas.js'
 import { indicadoresDeEstado } from '../utils/indicadores.js'
+import estilos from './DashboardPage.module.css'
 
 const DASHBOARD_VACIO = Object.freeze({
   indicadores: { total: 0, pendientes: 0, aprobadas: 0, rechazadas: 0 },
@@ -65,7 +66,7 @@ export default function InicioAdministrador({ ahora = new Date() }) {
       {error && <AvisoDeError mensaje={error} alReintentar={recargar} />}
       {cargando && <p role="status">{TEXTOS.cargando}</p>}
       {!error && !cargando && (
-        <>
+        <div className={estilos.contenedorInicio}>
           <Portada pendientes={pendientesMasAntiguas.total} ahora={ahora} />
           <RequierenDecision
             solicitudes={solicitudesPorAtender(datos)}
@@ -90,7 +91,7 @@ export default function InicioAdministrador({ ahora = new Date() }) {
             ]}
           />
           <UsoYEstados uso={uso} indicadores={indicadores} />
-        </>
+        </div>
       )}
       <ModalDeReserva
         accion={decision.decision?.accion}
