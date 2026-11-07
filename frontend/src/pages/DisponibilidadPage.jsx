@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
 import Button from '../components/ui/Button.jsx'
 import DateInput from '../components/ui/DateInput.jsx'
@@ -15,6 +15,13 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { obtenerDisponibilidadDia } from '../services/recursosService.js'
 import { esAnteriorAHoy, fechaAIso, hoy, isoAFecha } from '../utils/fechas.js'
 import estilos from './DisponibilidadPage.module.css'
+
+function normalizarFechaParam(param) {
+  if (!param) return null
+  if (/^\d{4}-\d{2}-\d{2}$/.test(param)) return isoAFecha(param)
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(param)) return param
+  return null
+}
 
 function agregarDia(valor, dias) {
   const iso = fechaAIso(valor) ?? fechaAIso(hoy())
@@ -44,8 +51,13 @@ export function horaLima(fecha = new Date()) {
   }).format(fecha)
 }
 
-export default function DisponibilidadPage() {
-  const [fecha, setFecha] = useState(hoy)
+export default function DisponibilidadPage({ ahora: ahoraInyectado } = {}) {
+  const [searchParams] = useSearchParams()
+  const [fechaManual, setFechaManual] = useState(null)
+  const fecha = fechaManual ?? normalizarFechaParam(searchParams.get('fecha')) ?? hoy()
+  const setFecha = (nueva) => {
+    setFechaManual(typeof nueva === 'function' ? nueva(fecha) : nueva)
+  }
   const [movil, setMovil] = useState(false)
   const [reservaModal, setReservaModal] = useState(null)
 
@@ -70,7 +82,7 @@ export default function DisponibilidadPage() {
     ? formatearFechaDisponibilidad(datos.fecha)
     : formatearFechaDisponibilidad(fechaAIso(fecha))
   const past = esAnteriorAHoy(fecha)
-  const keyAhora = useMemo(() => new Date(), [])
+  const keyAhora = useMemo(() => ahoraInyectado ?? new Date(), [ahoraInyectado])
 
   const totalReservas = useMemo(
     () =>
@@ -127,12 +139,13 @@ export default function DisponibilidadPage() {
 
       <div className={estilos.leyenda} aria-label="Leyenda">
         {[
-          ['libre', 'exito', 'Libre'],
+          ['libre', 'mas', 'Libre'],
           ['pendiente', 'reloj', 'Pendiente'],
           ['aprobada', 'marca', 'Aprobada'],
           ['mantenimiento', 'aviso', 'Mantenimiento'],
+          ['pasada', 'calendario', 'Horas pasadas'],
         ].map(([tipo, icono, texto]) => (
-          <span key={tipo}>
+          <span key={tipo} className={estilos[`leyenda_${tipo}`] ?? ''}>
             <Icono nombre={icono} /> <span>{texto}</span>
           </span>
         ))}

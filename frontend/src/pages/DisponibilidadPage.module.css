@@ -41,8 +41,7 @@
 .fechas input {
   height: var(--alto-control);
   width: 150px;
-  border: 1px solid var(--color-borde-control);
-  border-radius: var(--radio);
+  border: 0;
 }
 .leyenda {
   display: flex;
@@ -59,6 +58,19 @@
   font-size: var(--texto-sm);
   white-space: nowrap;
 }
+.leyenda_libre {
+  color: var(--color-primario);
+}
+.leyenda_pendiente {
+  color: var(--color-aviso);
+}
+.leyenda_aprobada {
+  color: var(--color-exito);
+}
+.leyenda_mantenimiento,
+.leyenda_pasada {
+  color: var(--color-texto-suave);
+}
 .vista {
   border: 1px solid var(--color-borde);
   border-radius: var(--radio);
@@ -69,7 +81,7 @@
   min-width: 0;
   padding: var(--espacio-1);
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
+  grid-template-columns: 220px minmax(0, 1fr);
 }
 .nombreEje {
   min-height: 44px;
@@ -77,9 +89,13 @@
 .filaAmbiente {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
+  grid-template-columns: 220px minmax(0, 1fr);
   min-height: 64px;
   border-top: 1px solid var(--color-borde);
+  transition: background-color var(--duracion-transicion);
+}
+.filaAmbiente:nth-child(even) {
+  background: var(--fondo-fila-alterna);
 }
 .nombreAmbiente {
   display: flex;
@@ -87,6 +103,8 @@
   padding: var(--espacio-1);
   border-right: 1px solid var(--color-borde);
   font-weight: 700;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .lineaTiempo {
   position: relative;
@@ -106,24 +124,31 @@
   gap: 0.25rem;
   white-space: nowrap;
   font-size: 0.875rem;
+  z-index: 2;
 }
 .bloque span {
-  overflow: visible;
-  text-overflow: clip;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .libreMuyCorto .textoLibre {
   display: none;
 }
-.libreCorto .textoLibre {
-  white-space: nowrap;
-}
+.libreCorto .textoLibre,
 .libreMedio .textoLibre {
   white-space: nowrap;
 }
 .libre {
-  color: var(--color-exito);
-  border: 1px solid var(--color-borde-control);
+  color: var(--color-primario);
+  border: 1.5px dashed var(--color-primario);
   background: var(--color-superficie);
+  transition:
+    background-color var(--duracion-transicion),
+    border-color var(--duracion-transicion);
+}
+.libre:hover:not(:disabled) {
+  background: var(--fondo-libre-hover);
+  border-color: var(--color-primario);
 }
 .aprobada {
   color: var(--color-exito);
@@ -140,9 +165,19 @@
   border: 2px dashed var(--color-borde-control);
   background: var(--fondo-neutro);
 }
+.franjaPasada {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--fondo-franja-pasada);
+  border-right: 2px dashed var(--color-borde-control);
+  z-index: 3;
+  pointer-events: none;
+}
 .lineaAhora {
   position: absolute;
-  z-index: 4;
+  z-index: 1;
   top: -8px;
   bottom: -8px;
   width: 2px;
@@ -157,7 +192,7 @@
 }
 .carrilEsqueleto {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
+  grid-template-columns: 220px minmax(0, 1fr);
   height: 64px;
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-tarjeta);
@@ -177,19 +212,19 @@
   gap: var(--espacio-2);
   align-items: center;
 }
-.esqueletoBloque1 {
-  width: 30%;
+.esqueletoBloque1,
+.esqueletoBloque2 {
   height: 48px;
   border-radius: var(--radio-pequeno);
   background: var(--fondo-neutro);
   animation: pulsoEsqueleto 1.5s ease-in-out infinite;
 }
+.esqueletoBloque1 {
+  width: 30%;
+}
 .esqueletoBloque2 {
   width: 45%;
-  height: 48px;
-  border-radius: var(--radio-pequeno);
-  background: var(--fondo-neutro);
-  animation: pulsoEsqueleto 1.5s ease-in-out infinite 0.2s;
+  animation-delay: 0.2s;
 }
 @keyframes pulsoEsqueleto {
   0%,
@@ -220,7 +255,6 @@
 .mobile {
   display: none;
 }
-
 @media (max-width: 767px) {
   .leyenda {
     flex-wrap: wrap;
@@ -299,7 +333,6 @@
     height: 44px;
   }
 }
-
 @media (max-width: 320px) {
   .fechas {
     grid-template-columns: 44px minmax(0, 1fr) 44px;

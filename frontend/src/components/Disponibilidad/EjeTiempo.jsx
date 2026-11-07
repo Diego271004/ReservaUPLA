@@ -9,26 +9,13 @@ export default function EjeTiempo({ ahora, hoy = false, compacto = false }) {
   const etiquetaAhora = mostrarAhora
     ? `Ahora ${String(ahora.getHours()).padStart(2, '0')}:${minutoAhora}`
     : null
-  const cercaDeEtiqueta = mostrarAhora && horas.some((hora) => Math.abs(hora - horaAhora) < 0.75)
 
   return (
     <div className={estilos.contenedor} aria-label="Eje de horas">
-      <div className={estilos.eje}>
-        {horas.map((hora) => (
-          <span
-            key={hora}
-            style={{ left: leftPorCentaje(`${String(hora).padStart(2, '0')}:00`) }}
-            className={
-              cercaDeEtiqueta && Math.abs(hora - horaAhora) < 0.75 ? estilos.etiquetaOculta : ''
-            }
-          >
-            {`${String(hora).padStart(2, '0')}:00`}
-          </span>
-        ))}
-      </div>
       {mostrarAhora && (
-        <div className={estilos.carrilAhora}>
+        <div className={estilos.filaAhora}>
           <span
+            className={estilos.etiquetaAhora}
             aria-label={etiquetaAhora}
             style={{
               left: `clamp(2.75rem, ${leftPorCentaje(`${String(ahora.getHours()).padStart(2, '0')}:${minutoAhora}`)}, calc(100% - 2.75rem))`,
@@ -38,6 +25,13 @@ export default function EjeTiempo({ ahora, hoy = false, compacto = false }) {
           </span>
         </div>
       )}
+      <div className={estilos.eje}>
+        {horas.map((hora) => (
+          <span key={hora} style={{ left: leftPorCentaje(`${String(hora).padStart(2, '0')}:00`) }}>
+            {`${String(hora).padStart(2, '0')}:00`}
+          </span>
+        ))}
+      </div>
     </div>
   )
 }

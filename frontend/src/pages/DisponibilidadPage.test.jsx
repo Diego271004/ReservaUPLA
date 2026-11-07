@@ -93,7 +93,9 @@ describe('Disponibilidad', () => {
         name: 'Día libre en todos los ambientes: puedes reservar el que necesites',
       }),
     ).toBeInTheDocument()
-    expect(screen.queryByRole('region', { name: 'Cargando disponibilidad' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('region', { name: 'Cargando disponibilidad' }),
+    ).not.toBeInTheDocument()
   })
 
   it('muestra día sin reservas con tramos libres y prerrellena Nueva reserva al usar Enter', async () => {
@@ -212,5 +214,82 @@ describe('Disponibilidad', () => {
     await userEvent.click(botonSiguiente)
     await userEvent.click(botonHoy)
     expect(screen.getByLabelText('Fecha')).toBeInTheDocument()
+  })
+
+  it('inicializa la fecha desde el parámetro ?fecha= de la URL', async () => {
+    obtenerDisponibilidadDia.mockResolvedValue(exito([]))
+    renderEnRuta(<DisponibilidadPage />, { ruta: '/disponibilidad?fecha=2026-11-05' })
+    await waitFor(() => expect(screen.getByLabelText('Fecha')).toHaveValue('05/11/2026'))
+  })
+
+  it('horas pasadas con tiempo inyectado (07:00, 12:00, 21:00) y tramo libre habilitado', async () => {
+    obtenerDisponibilidadDia.mockResolvedValue(
+      exito([{ id: 1, nombre: 'Laboratorio de Cómputo 2', estado: 'Disponible', bloques: [] }]),
+    )
+    const d07 = new Date()
+    d07.setHours(7, 0, 0, 0)
+    const { unmount: u1 } = renderEnRuta(<DisponibilidadPage ahora={d07} />, {
+      ruta: '/disponibilidad',
+    })
+    await screen.findByText('Laboratorio de Cómputo 2')
+    expect(screen.queryByRole('region', { name: 'Horas pasadas' })).toBeNull()
+    u1()
+
+    const d12 = new Date()
+    d12.setHours(12, 0, 0, 0)
+    const { unmount: u2 } = renderEnRuta(<DisponibilidadPage ahora={d12} />, {
+      ruta: '/disponibilidad',
+    })
+    await screen.findByText('Laboratorio de Cómputo 2')
+    expect(screen.getByRole('region', { name: 'Horas pasadas' })).toBeInTheDocument()
+    u2()
+
+    const d21 = new Date()
+    d21.setHours(21, 0, 0, 0)
+    renderEnRuta(<DisponibilidadPage ahora={d21} />, { ruta: '/disponibilidad' })
+    await screen.findByText('Laboratorio de Cómputo 2')
+    expect(screen.getByRole('region', { name: 'Horas pasadas' })).toBeInTheDocument()
+  })
+
+  it('los nombres de ambientes incluyen título accesible y tramos libres tienen borde punteado e icono', async () => {
+    obtenerDisponibilidadDia.mockResolvedValue(
+      exito([
+        {
+          id: 1,
+          nombre: 'Laboratorio de Cómputo 2',
+          estado: 'Disponible',
+          bloques: [
+            {
+              id: 10,
+              horaInicio: '08:00',
+              horaFin: '22:00',
+              estado: 'Aprobada',
+            },
+          ],
+        },
+      ]),
+    )
+    renderEnRuta(<DisponibilidadPage />, { ruta: '/disponibilidad' })
+    const nombre = await screen.findByText('Laboratorio de Cómputo 2')
+    expect(nombre).toHaveAttribute('title', 'Laboratorio de Cómputo 2')
+    expect(nombre).toHaveAttribute('aria-label', 'Laboratorio de Cómputo 2')
+
+    // Tramo de 07:00 a 08:00 (60 min <= 90 min): texto visible es "Libre", pero title y aria-label contienen horas
+    const libre = screen.getByRole('button', {
+      name: /Laboratorio de Cómputo 2: libre, 07:00 a 08:00/i,
+    })
+    expect(libre.className).toMatch(/libre/)
+    expect(libre.textContent).toContain('Libre')
+    expect(libre.textContent).not.toContain('07:00–08:00')
+    expect(libre.querySelector('svg')).toBeInTheDocument()
+
+    // Leyenda completa incluye los 5 estados explicados
+    const leyenda = screen.getByRole('generic', { name: 'Leyenda' })
+    expect(leyenda).toBeInTheDocument()
+    expect(leyenda.textContent).toContain('Libre')
+    expect(leyenda.textContent).toContain('Pendiente')
+    expect(leyenda.textContent).toContain('Aprobada')
+    expect(leyenda.textContent).toContain('Mantenimiento')
+    expect(leyenda.textContent).toContain('Horas pasadas')
   })
 })

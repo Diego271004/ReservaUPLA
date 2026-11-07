@@ -19,12 +19,9 @@ export function elementosFila(ambiente) {
     : tramosFusionados(ambiente.bloques)
 }
 
-function iconoEstado(tramo) {
-  if (tramo.tipo === 'libre') return 'exito'
-  if (tramo.estado === 'Aprobada') return 'marca'
-  if (tramo.estado === 'Pendiente') return 'reloj'
-  return 'aviso'
-}
+const ICONOS_ESTADO = { libre: 'mas', Aprobada: 'marca', Pendiente: 'reloj' }
+const iconoEstado = (tramo) =>
+  ICONOS_ESTADO[tramo.tipo === 'libre' ? 'libre' : tramo.estado] ?? 'aviso'
 
 export function BloquesEscritorio({
   ambientes,
@@ -38,13 +35,11 @@ export function BloquesEscritorio({
 }) {
   const navigate = useNavigate()
   const refs = useRef({})
+  const minutosAhora = ahora ? ahora.getHours() * 60 + ahora.getMinutes() : 0
 
   const registrarRef = (clave) => (el) => {
-    if (el) {
-      refs.current[clave] = el
-    } else {
-      delete refs.current[clave]
-    }
+    if (el) refs.current[clave] = el
+    else delete refs.current[clave]
   }
 
   const textoBloque = (ambiente, tramo) => {
@@ -62,181 +57,173 @@ export function BloquesEscritorio({
   }
 
   const moverFoco = (fila, elemento, direccion, vertical) => {
-    const base = Object.values(refs.current).filter(
-      (item) => item && document.body.contains(item),
-    )
+    const base = Object.values(refs.current).filter((item) => item && document.body.contains(item))
     const enFila = base.filter((item) => item?.dataset.fila === String(fila))
     if (vertical) {
       const otraFila = base.filter((item) => item?.dataset.fila === String(fila + direccion))
       if (otraFila.length > 0) {
         const rectActual = elemento.getBoundingClientRect()
-        let masCercano = otraFila[0]
-        let menorDistancia = Math.abs(masCercano.getBoundingClientRect().left - rectActual.left)
-        for (const item of otraFila) {
-          const dist = Math.abs(item.getBoundingClientRect().left - rectActual.left)
-          if (dist < menorDistancia) {
-            menorDistancia = dist
-            masCercano = item
-          }
-        }
+        const masCercano = otraFila.reduce((mejor, item) => {
+          const dMejor = Math.abs(mejor.getBoundingClientRect().left - rectActual.left)
+          const dItem = Math.abs(item.getBoundingClientRect().left - rectActual.left)
+          return dItem < dMejor ? item : mejor
+        }, otraFila[0])
         masCercano?.focus()
       }
       return
     }
     const actual = enFila.findIndex((item) => item === elemento)
     if (actual !== -1) {
-      const siguiente = enFila[Math.max(0, Math.min(enFila.length - 1, actual + direccion))]
-      siguiente?.focus()
+      enFila[Math.max(0, Math.min(enFila.length - 1, actual + direccion))]?.focus()
     }
+  }
+
+  const manejarTeclado = (evento, fila, alAccionar) => {
+    if (evento.key === 'ArrowRight') moverFoco(fila, evento.currentTarget, 1, false)
+    else if (evento.key === 'ArrowLeft') moverFoco(fila, evento.currentTarget, -1, false)
+    else if (evento.key === 'ArrowDown') moverFoco(fila, evento.currentTarget, 1, true)
+    else if (evento.key === 'ArrowUp') moverFoco(fila, evento.currentTarget, -1, true)
+    else if (evento.key === 'Enter' || evento.key === ' ') {
+      evento.preventDefault()
+      alAccionar()
+      return
+    }
+    if (evento.key.startsWith('Arrow')) evento.preventDefault()
   }
 
   return (
     <div className={estilos.desktop}>
       <div className={estilos.nombreEje} />
       <EjeTiempo ahora={ahora} hoy={hoySeleccionado} />
-      {ambientes.map((ambiente, fila) => (
-        <div className={estilos.filaAmbiente} key={ambiente.id}>
-          <div className={estilos.nombreAmbiente}>{ambiente.nombre}</div>
-          <div
-            className={estilos.lineaTiempo}
-            style={{
-              height: `${Math.max(64, 64 + asignarCarrilesReservas(ambiente.bloques ?? []).reduce((maximo, bloque) => Math.max(maximo, bloque.carril), 0) * 56)}px`,
-            }}
-          >
-            {ambiente.estado === 'En mantenimiento' && (
-              <Button
-                variante="secundario"
-                className={`${estilos.bloque} ${estilos.mantenimiento}`}
-                deshabilitado
-                aria-label={`${ambiente.nombre}: mantenimiento, todo el día`}
-                title={`${ambiente.nombre}: mantenimiento, todo el día`}
-                style={{
-                  left: leftPorCentaje('07:00'),
-                  width: tramoPorCentaje(420, 1320),
-                  top: '8px',
-                }}
-              >
-                <Icono nombre="aviso" />
-                <span>Mantenimiento</span>
-              </Button>
-            )}
-            {ambiente.estado !== 'En mantenimiento' &&
-              tramosLibresBase(ambiente.bloques ?? []).map((tramo, indice) => {
-                const inicio = minutosDeHora(tramo.horaInicio)
-                const fin = minutosDeHora(tramo.horaFin)
-                const deshabilitado =
-                  past || datos.soloLectura || ambiente.estado === 'En mantenimiento' || responsable
-                const duracion = fin - inicio
-                const claseDuracion =
-                  duracion <= 30
-                    ? estilos.libreMuyCorto
-                    : duracion <= 60
-                      ? estilos.libreCorto
-                      : estilos.libreMedio
-                return (
-                  <Button
-                    key={`libre-${tramo.horaInicio}`}
-                    variante="secundario"
-                    className={`${estilos.bloque} ${estilos.libre} ${claseDuracion}`}
-                    deshabilitado={deshabilitado}
-                    aria-label={textoBloque(ambiente, tramo)}
-                    title={textoBloque(ambiente, tramo)}
-                    data-fila={fila}
-                    data-indice={indice}
-                    inputRef={registrarRef(`libre-${fila}-${indice}-${tramo.horaInicio}`)}
-                    onKeyDown={(evento) => {
-                      if (evento.key === 'ArrowRight')
-                        moverFoco(fila, evento.currentTarget, 1, false)
-                      if (evento.key === 'ArrowLeft')
-                        moverFoco(fila, evento.currentTarget, -1, false)
-                      if (evento.key === 'ArrowDown') moverFoco(fila, evento.currentTarget, 1, true)
-                      if (evento.key === 'ArrowUp') moverFoco(fila, evento.currentTarget, -1, true)
-                      if (evento.key.startsWith('Arrow')) evento.preventDefault()
-                      if (evento.key === 'Enter' || evento.key === ' ') {
-                        if (!deshabilitado) {
-                          evento.preventDefault()
-                          navigate(
-                            `/reservas/nueva?ambienteId=${ambiente.id}&fecha=${datos.fecha}&horaInicio=${tramo.horaInicio}&horaFin=${tramo.horaFin}`,
-                          )
-                        }
+      {ambientes.map((ambiente, fila) => {
+        const carriles = asignarCarrilesReservas(ambiente.bloques ?? [])
+        const altoLinea = `${Math.max(64, 64 + carriles.reduce((m, b) => Math.max(m, b.carril), 0) * 56)}px`
+        return (
+          <div className={estilos.filaAmbiente} key={ambiente.id}>
+            <div
+              className={estilos.nombreAmbiente}
+              title={ambiente.nombre}
+              aria-label={ambiente.nombre}
+            >
+              {ambiente.nombre}
+            </div>
+            <div className={estilos.lineaTiempo} style={{ height: altoLinea }}>
+              {hoySeleccionado && minutosAhora > 420 && (
+                <div
+                  className={estilos.franjaPasada}
+                  style={{ left: 0, width: tramoPorCentaje(420, Math.min(minutosAhora, 1320)) }}
+                  role="region"
+                  aria-label="Horas pasadas"
+                />
+              )}
+              {ambiente.estado === 'En mantenimiento' && (
+                <Button
+                  variante="secundario"
+                  className={`${estilos.bloque} ${estilos.mantenimiento}`}
+                  deshabilitado
+                  aria-label={`${ambiente.nombre}: mantenimiento, todo el día`}
+                  title={`${ambiente.nombre}: mantenimiento, todo el día`}
+                  style={{
+                    left: leftPorCentaje('07:00'),
+                    width: tramoPorCentaje(420, 1320),
+                    top: '8px',
+                  }}
+                >
+                  <Icono nombre="aviso" />
+                  <span>Mantenimiento</span>
+                </Button>
+              )}
+              {ambiente.estado !== 'En mantenimiento' &&
+                tramosLibresBase(ambiente.bloques ?? []).map((tramo, indice) => {
+                  const inicio = minutosDeHora(tramo.horaInicio)
+                  const fin = minutosDeHora(tramo.horaFin)
+                  const deshabilitado =
+                    past ||
+                    datos.soloLectura ||
+                    ambiente.estado === 'En mantenimiento' ||
+                    responsable
+                  const duracion = fin - inicio
+                  const claseDuracion =
+                    duracion <= 30
+                      ? estilos.libreMuyCorto
+                      : duracion <= 60
+                        ? estilos.libreCorto
+                        : estilos.libreMedio
+                  const destinoNueva = `/reservas/nueva?ambienteId=${ambiente.id}&fecha=${datos.fecha}&horaInicio=${tramo.horaInicio}&horaFin=${tramo.horaFin}`
+                  return (
+                    <Button
+                      key={`libre-${tramo.horaInicio}`}
+                      variante="secundario"
+                      className={`${estilos.bloque} ${estilos.libre} ${claseDuracion}`}
+                      deshabilitado={deshabilitado}
+                      aria-label={textoBloque(ambiente, tramo)}
+                      title={textoBloque(ambiente, tramo)}
+                      data-fila={fila}
+                      data-indice={indice}
+                      inputRef={registrarRef(`libre-${fila}-${indice}-${tramo.horaInicio}`)}
+                      onKeyDown={(evento) =>
+                        manejarTeclado(evento, fila, () => !deshabilitado && navigate(destinoNueva))
                       }
-                    }}
-                    onClick={() => {
-                      if (!deshabilitado)
-                        navigate(
-                          `/reservas/nueva?ambienteId=${ambiente.id}&fecha=${datos.fecha}&horaInicio=${tramo.horaInicio}&horaFin=${tramo.horaFin}`,
-                        )
-                    }}
-                    style={{
-                      left: leftPorCentaje(tramo.horaInicio),
-                      width: tramoPorCentaje(inicio, fin),
-                    }}
-                  >
-                    <Icono nombre="exito" />
-                    <span className={estilos.textoLibre}>
-                      {tramo.horaInicio === '07:00'
-                        ? `Libre ${tramo.horaInicio}–${tramo.horaFin}`
-                        : `${tramo.horaInicio}–${tramo.horaFin}`}
-                    </span>
-                  </Button>
-                )
-              })}
-            {ambiente.estado !== 'En mantenimiento' &&
-              asignarCarrilesReservas(ambiente.bloques ?? []).map((tramo, indice) => {
-                const inicio = minutosDeHora(tramo.horaInicio)
-                const fin = minutosDeHora(tramo.horaFin)
-                const clase = tramo.estado === 'Aprobada' ? estilos.aprobada : estilos.pendiente
-                return (
-                  <Button
-                    key={`reserva-${tramo.id ?? indice}-${tramo.horaInicio}`}
-                    variante="secundario"
-                    className={`${estilos.bloque} ${clase}`}
-                    aria-label={textoBloque(ambiente, { tipo: 'ocupado', ...tramo })}
-                    title={textoBloque(ambiente, { tipo: 'ocupado', ...tramo })}
-                    data-fila={fila}
-                    data-indice={indice}
-                    inputRef={registrarRef(
-                      `reserva-${fila}-${indice}-${tramo.id ?? tramo.horaInicio}`,
-                    )}
-                    style={{
-                      left: leftPorCentaje(tramo.horaInicio),
-                      width: tramoPorCentaje(inicio, fin),
-                      top: `${8 + tramo.carril * 56}px`,
-                    }}
-                    onKeyDown={(evento) => {
-                      if (evento.key === 'ArrowRight')
-                        moverFoco(fila, evento.currentTarget, 1, false)
-                      if (evento.key === 'ArrowLeft')
-                        moverFoco(fila, evento.currentTarget, -1, false)
-                      if (evento.key === 'ArrowDown') moverFoco(fila, evento.currentTarget, 1, true)
-                      if (evento.key === 'ArrowUp') moverFoco(fila, evento.currentTarget, -1, true)
-                      if (evento.key.startsWith('Arrow')) evento.preventDefault()
-                      if (evento.key === 'Enter' || evento.key === ' ') {
-                        evento.preventDefault()
-                        alElegirReserva?.(tramo, ambiente)
+                      onClick={() => !deshabilitado && navigate(destinoNueva)}
+                      style={{
+                        left: leftPorCentaje(tramo.horaInicio),
+                        width: tramoPorCentaje(inicio, fin),
+                      }}
+                    >
+                      <Icono nombre="mas" />
+                      <span className={estilos.textoLibre}>
+                        {duracion <= 90 ? 'Libre' : `Libre ${tramo.horaInicio}–${tramo.horaFin}`}
+                      </span>
+                    </Button>
+                  )
+                })}
+              {ambiente.estado !== 'En mantenimiento' &&
+                carriles.map((tramo, indice) => {
+                  const inicio = minutosDeHora(tramo.horaInicio)
+                  const fin = minutosDeHora(tramo.horaFin)
+                  const clase = tramo.estado === 'Aprobada' ? estilos.aprobada : estilos.pendiente
+                  return (
+                    <Button
+                      key={`reserva-${tramo.id ?? indice}-${tramo.horaInicio}`}
+                      variante="secundario"
+                      className={`${estilos.bloque} ${clase}`}
+                      aria-label={textoBloque(ambiente, { tipo: 'ocupado', ...tramo })}
+                      title={textoBloque(ambiente, { tipo: 'ocupado', ...tramo })}
+                      data-fila={fila}
+                      data-indice={indice}
+                      inputRef={registrarRef(
+                        `reserva-${fila}-${indice}-${tramo.id ?? tramo.horaInicio}`,
+                      )}
+                      style={{
+                        left: leftPorCentaje(tramo.horaInicio),
+                        width: tramoPorCentaje(inicio, fin),
+                        top: `${8 + tramo.carril * 56}px`,
+                      }}
+                      onKeyDown={(evento) =>
+                        manejarTeclado(evento, fila, () => alElegirReserva?.(tramo, ambiente))
                       }
-                    }}
-                    onClick={() => alElegirReserva?.(tramo, ambiente)}
-                  >
-                    <Icono nombre={tramo.estado === 'Aprobada' ? 'marca' : 'reloj'} />
-                    <span>{`${tramo.horaInicio}–${tramo.horaFin} · ${tramo.estado}`}</span>
-                  </Button>
-                )
-              })}
-            {hoySeleccionado && (
-              <div
-                className={estilos.lineaAhora}
-                style={{
-                  left: leftPorCentaje(
-                    `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`,
-                  ),
-                }}
-                aria-hidden="true"
-              />
-            )}
+                      onClick={() => alElegirReserva?.(tramo, ambiente)}
+                    >
+                      <Icono nombre={tramo.estado === 'Aprobada' ? 'marca' : 'reloj'} />
+                      <span>{`${tramo.horaInicio}–${tramo.horaFin} · ${tramo.estado}`}</span>
+                    </Button>
+                  )
+                })}
+              {hoySeleccionado && (
+                <div
+                  className={estilos.lineaAhora}
+                  style={{
+                    left: leftPorCentaje(
+                      `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`,
+                    ),
+                  }}
+                  aria-hidden="true"
+                />
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

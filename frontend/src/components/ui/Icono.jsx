@@ -41,6 +41,7 @@ const TRAZOS = {
   marca: <path d="m5 12.5 4.5 4.5L19 7.5" />,
   equis: <path d="m6 6 12 12M18 6 6 18" />,
   menos: <path d="M6 12h12" />,
+  mas: <path d="M12 5v14M5 12h14" />,
   punto: <circle cx="12" cy="12" r="4" fill="currentColor" />,
   // Menú y barra superior
   dashboard: (
