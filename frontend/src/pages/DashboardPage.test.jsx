@@ -157,7 +157,7 @@ describe('Dashboard: pendientes', () => {
     )
   })
 
-  it('sin pendientes dice «No hay solicitudes pendientes.» y no ofrece «Ver todas las pendientes»', async () => {
+  it('sin pendientes dice «No tienes solicitudes pendientes por atender.» y no ofrece «Ver todas las pendientes»', async () => {
     obtenerDashboard.mockResolvedValue(exito(panel({ pendientes: [] })))
     mostrar()
     expect(await screen.findByText(TEXTOS.sinPendientes)).toBeInTheDocument()

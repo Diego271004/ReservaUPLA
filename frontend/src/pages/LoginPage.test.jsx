@@ -195,14 +195,10 @@ describe('Login: enlace de ayuda (soporte)', () => {
     const enlace = screen.getByRole('button', { name: '¿Olvidaste tu contraseña?' })
     expect(enlace).toHaveAttribute('aria-expanded', 'false')
     await userEvent.click(enlace)
-    expect(screen.getByText('Comunícate con Soporte TI de la universidad')).toBeInTheDocument()
-    expect(screen.getByText('Comunícate con Soporte TI de la universidad').textContent).not.toMatch(
-      /@|anexo|\d{6,}/,
-    )
+    expect(screen.getByText(TEXTOS.ayudaSoporte)).toBeInTheDocument()
+    expect(screen.getByText(TEXTOS.ayudaSoporte).textContent).not.toMatch(/@|anexo|\d{6,}/)
     await userEvent.click(enlace)
-    expect(
-      screen.queryByText('Comunícate con Soporte TI de la universidad'),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText(TEXTOS.ayudaSoporte)).not.toBeInTheDocument()
   })
 })
 

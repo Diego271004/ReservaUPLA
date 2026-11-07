@@ -34,7 +34,7 @@ export default function AtajosDeDuracion({ horaInicio, horaFin, alElegir }) {
               aria-describedby={sinInicio ? idAyuda : undefined}
               title={
                 sinInicio
-                  ? 'Elige primero la hora de inicio'
+                  ? TEXTOS.atajosAyudaHoraInicio
                   : fin === null
                     ? 'Pasaría de las 22:00'
                     : undefined

@@ -2,7 +2,7 @@
    izquierda y, a la derecha, una tarjeta blanca con el logo y el formulario sobre un fondo gris azulado. */
 .pagina {
   display: grid;
-  grid-template-columns: minmax(0, 64fr) minmax(380px, 36fr);
+  grid-template-columns: minmax(0, 58fr) minmax(400px, 42fr);
   min-height: 100vh;
   background: var(--fondo-login);
 }
@@ -193,5 +193,11 @@
 
   .tarjeta {
     padding: var(--espacio-2) var(--espacio-1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta {
+    animation: none !important;
   }
 }

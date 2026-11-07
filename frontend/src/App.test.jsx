@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MENSAJES } from './constants/messages.js'
+import { MENSAJES, TEXTOS } from './constants/messages.js'
 import { RESULTADO } from './services/llamarApi.js'
 import {
   listarAmbientes,
@@ -323,7 +323,7 @@ describe('listado de Usuarios', () => {
   it('sin registros muestra el texto de estado vacío', async () => {
     listarUsuarios.mockResolvedValue({ tipo: RESULTADO.exito, data: [] })
     await renderApp('/usuarios', SESIONES.administrador)
-    expect(await screen.findByText('Todavía no hay registros.')).toBeInTheDocument()
+    expect(await screen.findByText(TEXTOS.noHayDatos)).toBeInTheDocument()
   })
 })
 

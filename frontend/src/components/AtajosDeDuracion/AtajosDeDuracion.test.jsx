@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { TEXTOS } from '../../constants/messages.js'
 import AtajosDeDuracion from './AtajosDeDuracion.jsx'
 
 describe('AtajosDeDuracion (atajos rápidos 1 h, 2 h, 3 h)', () => {
@@ -23,18 +24,18 @@ describe('AtajosDeDuracion (atajos rápidos 1 h, 2 h, 3 h)', () => {
     const botones = screen.getAllByRole('button')
     for (const b of botones) {
       expect(b).toBeDisabled()
-      expect(b).toHaveAttribute('title', 'Elige primero la hora de inicio')
+      expect(b).toHaveAttribute('title', TEXTOS.atajosAyudaHoraInicio)
       expect(b).toHaveAttribute('aria-describedby', 'ayuda-atajos-inicio')
       expect(b).toHaveAttribute('aria-pressed', 'false')
     }
-    expect(screen.getByText('Elige primero la hora de inicio.')).toBeInTheDocument()
+    expect(screen.getByText(TEXTOS.atajosAyudaHoraInicio)).toBeInTheDocument()
   })
 
   it('con hora de inicio disponible los botones están activos, clicables y el texto explicativo desaparece', async () => {
     const alElegir = vi.fn()
     render(<AtajosDeDuracion horaInicio="10:00" horaFin="" alElegir={alElegir} />)
 
-    expect(screen.queryByText('Elige primero la hora de inicio.')).toBeNull()
+    expect(screen.queryByText(TEXTOS.atajosAyudaHoraInicio)).toBeNull()
     const boton2h = screen.getByRole('button', { name: '2 h' })
     expect(boton2h).not.toBeDisabled()
     expect(boton2h).toHaveAttribute('aria-pressed', 'false')

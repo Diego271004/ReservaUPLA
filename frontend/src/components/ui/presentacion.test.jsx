@@ -88,6 +88,13 @@ describe('EstadoVacio', () => {
     expect(svg).toHaveAttribute('focusable', 'false')
     expect(svg.querySelectorAll('button, a, input, [tabindex]')).toHaveLength(0)
   })
+
+  it('admite la variante compacta con dimensiones reducidas para tablas y listas', () => {
+    const { container } = render(<EstadoVacio mensaje="Sin registros." compacto />)
+    const svg = container.querySelector('svg')
+    expect(svg).toHaveAttribute('width', '64')
+    expect(svg).toHaveAttribute('height', '46')
+  })
 })
 
 describe('EstadoVacio sin mensaje (paginas de error)', () => {

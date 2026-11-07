@@ -5,14 +5,17 @@ import estilos from './EstadoVacio.module.css'
  * ilustrativo y el emblema de la UPLA, mensaje semántico y siguiente paso claro.
  * Accesible: la ilustración tiene aria-hidden="true" y focusable="false".
  */
-export default function EstadoVacio({ mensaje = null, children = null }) {
+export default function EstadoVacio({ mensaje = null, children = null, compacto = false }) {
   return (
-    <div className={estilos.vacio} data-testid="estado-vacio">
+    <div
+      className={`${estilos.vacio} ${compacto ? estilos.compacto : ''}`}
+      data-testid="estado-vacio"
+    >
       <svg
         className={estilos.ilustracion}
         viewBox="0 0 140 100"
-        width="140"
-        height="100"
+        width={compacto ? '64' : '100'}
+        height={compacto ? '46' : '72'}
         aria-hidden="true"
         focusable="false"
       >

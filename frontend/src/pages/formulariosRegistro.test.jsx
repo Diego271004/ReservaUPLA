@@ -947,7 +947,7 @@ describe('Nueva reserva', () => {
       await screen.findByRole('radio', { name: /Laboratorio de Cómputo 2/ })
       for (const duracion of ['1 h', '2 h', '3 h']) {
         expect(boton(duracion)).toBeDisabled()
-        expect(boton(duracion)).toHaveAttribute('title', 'Elige primero la hora de inicio')
+        expect(boton(duracion)).toHaveAttribute('title', TEXTOS.atajosAyudaHoraInicio)
       }
     })
 
