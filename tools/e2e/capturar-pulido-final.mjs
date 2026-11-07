@@ -90,26 +90,21 @@ async function ejecutar() {
 
   try {
     console.log('== Autenticando usuarios de prueba ==')
-    const ctxAdmin = await navegador.newContext()
-    const pagAdmin = await ctxAdmin.newPage()
-    await iniciarSesion(pagAdmin, 'carla.rojas@upla.edu.pe', CLAVE)
-    await pagAdmin.waitForURL('**/dashboard')
-    const sesionAdmin = await leerSesion(pagAdmin)
-    await ctxAdmin.close()
+    const paginaAuth = await nuevaPagina(navegador, 'escritorio')
 
-    const ctxSol = await navegador.newContext()
-    const pagSol = await ctxSol.newPage()
-    await iniciarSesion(pagSol, 'ana.torres@upla.edu.pe', CLAVE)
-    await pagSol.waitForURL('**/dashboard')
-    const sesionSolicitante = await leerSesion(pagSol)
-    await ctxSol.close()
+    await iniciarSesion(paginaAuth, 'carla.rojas@upla.edu.pe', CLAVE)
+    await paginaAuth.waitForURL('**/dashboard')
+    const sesionAdmin = await leerSesion(paginaAuth)
 
-    const ctxResp = await navegador.newContext()
-    const pagResp = await ctxResp.newPage()
-    await iniciarSesion(pagResp, 'mario.huaman@upla.edu.pe', CLAVE)
-    await pagResp.waitForURL('**/dashboard')
-    const sesionResponsable = await leerSesion(pagResp)
-    await ctxResp.close()
+    await iniciarSesion(paginaAuth, 'ana.torres@upla.edu.pe', CLAVE)
+    await paginaAuth.waitForURL('**/dashboard')
+    const sesionSolicitante = await leerSesion(paginaAuth)
+
+    await iniciarSesion(paginaAuth, 'mario.huaman@upla.edu.pe', CLAVE)
+    await paginaAuth.waitForURL('**/dashboard')
+    const sesionResponsable = await leerSesion(paginaAuth)
+
+    await paginaAuth.close()
 
     console.log('\n== Generando las 32 capturas finales del sistema real (16 pantallas x 2 res) ==')
 
@@ -123,8 +118,8 @@ async function ejecutar() {
     await cap('04-inicio-responsable', '/dashboard', sesionResponsable)
     await cap('05-nueva-reserva', '/reservas/nueva', sesionAdmin)
     await cap('06-nueva-reserva-cierre', '/reservas/nueva', sesionAdmin, RESOLUCIONES, async (pag) => {
-      await pag.waitForSelector('[role="radio"]:has-text("Auditorio Principal")', { timeout: 10000 })
-      await pag.click('[role="radio"]:has-text("Auditorio Principal")')
+      await pag.waitForSelector('button:has-text("Auditorio Principal")', { timeout: 10000 })
+      await pag.click('button:has-text("Auditorio Principal")')
       await pag.waitForTimeout(300)
     })
     await cap('07-detalle-reserva', '/reservas/1', sesionAdmin)
@@ -185,8 +180,8 @@ async function ejecutar() {
       sesionAdmin,
       RESOLUCIONES,
       async (pag) => {
-        await pag.waitForSelector('[role="radio"]:has-text("Auditorio Principal")', { timeout: 10000 })
-        await pag.click('[role="radio"]:has-text("Auditorio Principal")')
+        await pag.waitForSelector('button:has-text("Auditorio Principal")', { timeout: 10000 })
+        await pag.click('button:has-text("Auditorio Principal")')
         await pag.waitForTimeout(300)
       },
       DESTINO_PULIDO,
@@ -197,10 +192,10 @@ async function ejecutar() {
       sesionAdmin,
       RESOLUCIONES,
       async (pag) => {
-        await pag.waitForSelector('[role="radio"]:has-text("Auditorio Principal")', { timeout: 10000 })
-        await pag.click('[role="radio"]:has-text("Auditorio Principal")')
-        await pag.fill('input[name="fecha"]', '20/11/2026')
-        await pag.selectOption('select[name="horaInicio"]', '09:00')
+        await pag.waitForSelector('button:has-text("Auditorio Principal")', { timeout: 10000 })
+        await pag.click('button:has-text("Auditorio Principal")')
+        await pag.fill('input[type="date"]', '2026-11-20')
+        await pag.selectOption('select[aria-label="Hora de inicio"]', '09:00')
         await pag.waitForTimeout(200)
         await pag.click('button:has-text("2 h")')
         await pag.waitForTimeout(300)
@@ -213,13 +208,13 @@ async function ejecutar() {
       sesionAdmin,
       RESOLUCIONES,
       async (pag) => {
-        await pag.waitForSelector('[role="radio"]:has-text("Auditorio Principal")', { timeout: 10000 })
-        await pag.click('[role="radio"]:has-text("Auditorio Principal")')
-        await pag.fill('input[name="fecha"]', '20/11/2026')
-        await pag.selectOption('select[name="horaInicio"]', '09:00')
+        await pag.waitForSelector('button:has-text("Auditorio Principal")', { timeout: 10000 })
+        await pag.click('button:has-text("Auditorio Principal")')
+        await pag.fill('input[type="date"]', '2026-11-20')
+        await pag.selectOption('select[aria-label="Hora de inicio"]', '09:00')
         await pag.waitForTimeout(200)
         await pag.click('button:has-text("2 h")')
-        await pag.fill('textarea[name="motivo"]', 'Conferencia académica de sistemas')
+        await pag.fill('textarea', 'Conferencia académica de sistemas')
         await pag.waitForTimeout(300)
       },
       DESTINO_PULIDO,
@@ -242,17 +237,7 @@ async function ejecutar() {
 
     // P5
     await cap('P5-vacio-reservas', '/reservas?estado=Cancelada&ambienteId=1', sesionAdmin, RESOLUCIONES, null, DESTINO_PULIDO)
-    await cap(
-      'P5-vacio-usuarios',
-      '/usuarios',
-      sesionAdmin,
-      [[1280, 900]],
-      async (pag) => {
-        await pag.fill('input[name="buscarUsuario"]', 'Zzz Inexistente')
-        await pag.waitForTimeout(300)
-      },
-      DESTINO_PULIDO,
-    )
+    await cap('P5-vacio-usuarios', '/usuarios?buscar=inexistente', sesionAdmin, [[1280, 900]], null, DESTINO_PULIDO)
     await cap('P5-vacio-mi-ambiente', '/mi-ambiente', sesionResponsable, [[1280, 900]], null, DESTINO_PULIDO)
 
     console.log('\n== Verificación final de capturas completada con éxito ==')
