@@ -67,6 +67,12 @@ export default function InicioAdministrador({ ahora = new Date() }) {
       {!error && !cargando && (
         <>
           <Portada pendientes={pendientesMasAntiguas.total} ahora={ahora} />
+          <RequierenDecision
+            solicitudes={solicitudesPorAtender(datos)}
+            totalPendientes={pendientesMasAntiguas.total}
+            alDecidir={decision.abrir}
+          />
+          <AgendaDeHoy ambientes={datos.hoyEnLosAmbientes} horaActual={horaEnLima(ahora)} />
           <GrupoDeIndicadores
             indicadores={[
               ...indicadoresConFiltros,
@@ -83,12 +89,6 @@ export default function InicioAdministrador({ ahora = new Date() }) {
               },
             ]}
           />
-          <RequierenDecision
-            solicitudes={solicitudesPorAtender(datos)}
-            totalPendientes={pendientesMasAntiguas.total}
-            alDecidir={decision.abrir}
-          />
-          <AgendaDeHoy ambientes={datos.hoyEnLosAmbientes} horaActual={horaEnLima(ahora)} />
           <UsoYEstados uso={uso} indicadores={indicadores} />
         </>
       )}

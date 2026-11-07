@@ -22,7 +22,7 @@ export default function TableList({
         <thead>
           <tr>
             {columnas.map((columna) => (
-              <th key={columna.clave} scope="col">
+              <th key={columna.clave} scope="col" data-alineacion={columna.alineacion}>
                 {columna.titulo}
               </th>
             ))}
@@ -50,7 +50,11 @@ export default function TableList({
                 }
               >
                 {columnas.map((columna) => (
-                  <td key={columna.clave} data-etiqueta={columna.titulo}>
+                  <td
+                    key={columna.clave}
+                    data-etiqueta={columna.titulo}
+                    data-alineacion={columna.alineacion}
+                  >
                     {columna.render ? columna.render(fila) : fila[columna.clave]}
                   </td>
                 ))}

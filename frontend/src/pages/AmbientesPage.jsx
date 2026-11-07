@@ -26,7 +26,7 @@ const COLUMNAS_BASE = [
     titulo: 'Nombre',
     render: (ambiente) => <CeldaConDetalle principal={ambiente.nombre} detalle={ambiente.tipo} />,
   },
-  { clave: 'capacidad', titulo: 'Capacidad' },
+  { clave: 'capacidad', titulo: 'Capacidad', alineacion: 'derecha' },
   { clave: 'ubicacion', titulo: 'Ubicación' },
   {
     clave: 'estado',

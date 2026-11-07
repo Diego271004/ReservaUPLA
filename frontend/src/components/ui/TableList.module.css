@@ -32,6 +32,21 @@
   border-bottom: 1px solid var(--color-borde);
 }
 
+.tabla tbody tr {
+  transition: background-color var(--transicion-corta);
+}
+
+.tabla tbody tr:hover {
+  background-color: var(--fondo-fila-alterna);
+}
+
+.tabla th[data-alineacion='derecha'],
+.tabla td[data-alineacion='derecha'],
+.tabla td[data-etiqueta='Capacidad'] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .tabla td {
   padding: var(--espacio-2);
   color: var(--color-texto-suave);
@@ -108,4 +123,11 @@
 .activable:hover {
   background: var(--fondo-info);
   box-shadow: var(--elevacion-tarjeta);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabla tbody tr,
+  .activable {
+    transition: none;
+  }
 }
