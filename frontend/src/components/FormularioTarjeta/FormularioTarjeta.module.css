@@ -1,3 +1,7 @@
+.contenedorSimple {
+  max-width: 760px;
+}
+
 .tarjeta {
   max-width: 760px;
   padding: var(--espacio-3);

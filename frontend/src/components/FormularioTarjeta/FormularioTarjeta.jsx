@@ -20,7 +20,7 @@ export default function FormularioTarjeta({
   barraInferior = null,
   children,
 }) {
-  return (
+  const contenido = (
     <>
       <PageHeader titulo={titulo} />
       <div className={lateral ? estilos.conLateral : undefined}>
@@ -46,4 +46,9 @@ export default function FormularioTarjeta({
       </div>
     </>
   )
+
+  if (!lateral) {
+    return <div className={estilos.contenedorSimple}>{contenido}</div>
+  }
+  return contenido
 }
