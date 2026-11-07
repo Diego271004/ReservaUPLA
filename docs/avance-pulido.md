@@ -84,21 +84,22 @@ Todas las cifras fueron tomadas mediante comandos ejecutados en la terminal con 
 
 | Métrica | Valor Base | Valor Pulido | Tipo | Comando de Medición | Fecha / Hora |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Pruebas frontend (Vitest)** | 1.272 (53 arch.) | **1.304 pasadas (57 arch.)** | Medida | `cd frontend; npx vitest run` | 2026-11-07 11:34:27 |
-| **ESLint Frontend** | 0 advertencias | **0 errores, 0 advertencias** | Medida | `cd frontend; npm run lint` | 2026-11-07 11:26:45 |
-| **Prettier Format** | Limpio | **100% verificado (All matched files use Prettier)** | Medida | `cd frontend; npm run format:check` | 2026-11-07 11:26:50 |
-| **Peso JS producción** | 403,97 kB (gzip: 125,97) | **408,81 kB (gzip: 127,23 kB)** | Medida | `cd frontend; npm run build` | 2026-11-07 11:35:39 |
-| **Peso CSS producción** | 74,53 kB (gzip: 12,67) | **80,60 kB (gzip: 13,71 kB)** | Medida | `cd frontend; npm run build` | 2026-11-07 11:35:39 |
-| **Pruebas backend con BD viva** | 230 pasadas | **230 pasadas (0 omitidas)** | Medida | `dotnet test backend/ReservaUPLA.sln` | 2026-11-07 11:35:31 |
-| **Pruebas suite usabilidad** | 18 pasadas | **18 pasadas (0 fallos)** | Medida | `node --test tools/usabilidad/pruebas/*.test.mjs` | 2026-11-07 11:35:53 |
-| **Suite E2E (`npm run todo`)** | 9 fases aprobadas | **9 de 9 fases OK (211 s)** | Medida | `cd tools/e2e; npm run todo` | 2026-11-07 11:42:40 |
-| **Violaciones axe** | 0 | **0 en 87 estados** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
-| **Contraste < umbral AA** | 0 | **0 pares fallidos** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
-| **Objetivos < 44 px** | 0 | **0 en 44 estados móviles** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
-| **Paradas de foco ausentes** | 0 | **0 paradas sin foco** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
-| **Scroll horizontal a 188 px** | 0 en 30 | **0 en 30 combinaciones** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
-| **Animaciones en reduced motion** | 0 | **0 animaciones infinitas** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
-| **Comprobaciones sub-fase A** | 0 fallos | **0 fallos** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
+| **Pruebas frontend (Vitest)** | 1.272 (53 arch.) | **1.304 pasadas (57 arch.)** | Medida | `npm --prefix frontend test -- --run` | 2026-11-07 12:21:21 |
+| **ESLint Frontend** | 0 advertencias | **0 errores, 0 advertencias** | Medida | `npm --prefix frontend run lint` | 2026-11-07 12:18:16 |
+| **Prettier Format** | Limpio | **100% verificado (All matched files use Prettier)** | Medida | `npm --prefix frontend run format:check` | 2026-11-07 12:47:44 |
+| **Peso JS producción** | 403,97 kB (gzip: 125,97) | **408,83 kB (gzip: 127,24 kB)** | Medida | `npm --prefix frontend run build` | 2026-11-07 12:21:28 |
+| **Peso CSS producción** | 74,53 kB (gzip: 12,67) | **80,60 kB (gzip: 13,71 kB)** | Medida | `npm --prefix frontend run build` | 2026-11-07 12:21:28 |
+| **Pruebas backend con BD viva** | 230 pasadas | **230 pasadas (0 omitidas)** | Medida | `dotnet test backend/` | 2026-11-07 12:48:56 |
+| **Pruebas suite usabilidad** | 18 pasadas | **18 pasadas (0 fallos)** | Medida | `node --test tools/usabilidad/*.test.mjs tools/usabilidad/pruebas/*.test.mjs` | 2026-11-07 12:49:02 |
+| **Suite E2E (`npm run todo`)** | 9 fases aprobadas | **9 de 9 fases OK (210 s, todo correcto)** | Medida | `npm --prefix tools/e2e run todo` | 2026-11-07 12:52:44 |
+| **Violaciones axe** | 0 | **0 en 87 estados** | Medida | `$env:ETAPA="pulido"; node tools/usabilidad/accesibilidad.mjs` | 2026-11-07 12:55:57 |
+| **Contraste < umbral AA** | 0 | **0 pares fallidos** | Medida | `$env:ETAPA="pulido"; node tools/usabilidad/accesibilidad.mjs` | 2026-11-07 12:55:57 |
+| **Objetivos < 44 px** | 0 | **0 en 44 estados móviles** | Medida | `$env:ETAPA="pulido"; node tools/usabilidad/accesibilidad.mjs` | 2026-11-07 12:55:57 |
+| **Paradas de foco ausentes** | 0 | **0 paradas sin foco** | Medida | `$env:ETAPA="pulido"; node tools/usabilidad/accesibilidad.mjs` | 2026-11-07 12:55:57 |
+| **Scroll horizontal a 188 px** | 0 en 30 | **0 en 30 combinaciones** | Medida | `$env:ETAPA="pulido"; node tools/usabilidad/accesibilidad.mjs` | 2026-11-07 12:55:57 |
+| **Animaciones en reduced motion** | 0 | **0 animaciones infinitas** | Medida | `$env:ETAPA="pulido"; node tools/usabilidad/accesibilidad.mjs` | 2026-11-07 12:55:57 |
+| **Comprobaciones sub-fase A** | 0 fallos | **0 fallos (H1 a H7)** | Medida | `$env:ETAPA="pulido"; node tools/usabilidad/accesibilidad.mjs` | 2026-11-07 12:55:57 |
+| **Textos cortados disponibilidad** | 0 | **CERO textos cortados (1280, 375, 188 px)** | Medida | H7 de `$env:ETAPA="pulido"; node tools/usabilidad/accesibilidad.mjs` | 2026-11-07 12:55:57 |
 
 ---
 
@@ -168,7 +169,30 @@ Conforme a las reglas del proyecto: formato «tipo: descripción» en español c
 | **10** | `feat: formato sin recorte en bloques cortos de disponibilidad y nuevas capturas` | `frontend/src/utils/disponibilidad.js`<br>`frontend/src/utils/disponibilidad.test.js`<br>`frontend/src/components/Disponibilidad/BloquesDisponibilidad.jsx`<br>`frontend/src/components/Disponibilidad/BloquesDisponibilidad.test.jsx`<br>`frontend/src/pages/DisponibilidadPage.module.css`<br>`frontend/src/pages/formulariosRegistro.test.jsx`<br>`tools/e2e/capturar-pulido-final.mjs`<br>`docs/evidencias/pulido/` | Formato abreviado conciso (`10–12 h`, `Libre 7–10 h`) sin elipsis, pruebas unitarias dedicadas y generación de capturas 16 (futura 24/11 con reservas), 17 (día libre 25/11) y 18 (día pasado 05/11). |
 | **11** | `feat: script de datos de demostración con fechas relativas` | `database/07_datos_demo.sql`<br>`README.md` | Script SQL opcional e idempotente con fechas relativas (`CURRENT_DATE + 1`, `+ 2`) que puebla reservas aprobadas, pendientes y conflicto 409 respetando RN-01 a RN-07. |
 | **12** | `docs: actualización de avance y comparativa visual con capturas finales` | `docs/avance-pulido.md`<br>`docs/diseno/pulido-antes-despues.md` | Actualización de bitácora con mediciones reales actualizadas, documentación de limitación técnica en horas pasadas de hoy y comparativa visual con las 18 pantallas. |
+| **13** | `fix: texto de los tramos de disponibilidad sin recorte, con comprobación real en el navegador` | `frontend/src/utils/disponibilidad.js`<br>`frontend/src/utils/disponibilidad.test.js`<br>`tools/e2e/recorte-helper.mjs`<br>`tools/e2e/capturar-pulido-final.mjs`<br>`tools/usabilidad/subfase-a.mjs`<br>`docs/evidencias/pulido/` | Corrección de umbral de texto visible en bloques libres y ocupados ($\le 120$ min muestra solo «Libre» o «H–H h» sin horas/sufijo que causaban elipsis CSS «+ Libre 12…»). Pruebas unitarias de bordes (90, 120 y 121 min). Comprobación real en navegador en `capturar-pulido-final.mjs` y sección H7 de `subfase-a.mjs` / `accesibilidad.mjs` (`scrollWidth <= clientWidth`) a 1280, 375 y 188 px con cero textos cortados. Regeneración de capturas de disponibilidad 16, 17 y 18. |
 
 ---
 
-**ESTADO ACTUAL**: Tarea completada al 100%. 0 defectos detectados. Todas las pruebas (unitarias 1.304 vitest, 230 backend, 18 usabilidad, E2E 9/9 y accesibilidad 0 violaciones) verificadas exitosamente. Árbol de trabajo limpio y aislado.
+## 6. Verificación Real de Commits en Worktree Temporal (Paso 16)
+
+Cada commit desde `834ce5e` hasta `1a5c4da` fue verificado de forma **real e independiente** en un worktree temporal aislado (`..\worktree-verify`), enlazando `node_modules` para agilidad y ejecutando en cada uno `npm run build` y `npm test -- --run` (en los commits con impacto en `frontend/`):
+
+| Commit | Descripción | Build (`npm run build`) | Pruebas frontend (`npm test -- --run`) | Observaciones / Dependencia |
+| :--- | :--- | :--- | :--- | :--- |
+| `834ce5e` | refactor: escala tipográfica formal de 4 niveles y tokens visuales | exitoso | 52 pasadas, 1 fallida | La prueba fallida es `formulariosRegistro.test.jsx`: expresión regular de validación de fecha dependía del formato sin acento (fallaba en día sábado por «sábado» con tilde), corregida formalmente en commit posterior `a110cc0`. |
+| `fcb5a8d` | feat: selector de ambientes táctil, atajos de duración y resumen vivo | exitoso | 54 pasadas, 1 fallida | Mismo caso de `formulariosRegistro.test.jsx` (formato de fecha con tilde en sábado). |
+| `2e6b564` | feat: línea de tiempo de disponibilidad con tramos libres y leyenda | exitoso | 54 pasadas, 1 fallida | Mismo caso de `formulariosRegistro.test.jsx` (formato de fecha con tilde en sábado). |
+| `ebdea5a` | feat: indicadores de inicio con soporte de empate y estado vacío ilustrado | exitoso | 54 pasadas, 1 fallida | Mismo caso de `formulariosRegistro.test.jsx` (formato de fecha con tilde en sábado). |
+| `0c48576` | feat: barra superior contextual, menú lateral y microinteracciones accesibles | exitoso | 54 pasadas, 1 fallida | Mismo caso de `formulariosRegistro.test.jsx` (formato de fecha con tilde en sábado). |
+| `1c60924` | chore: guiones de captura e2e y suite de accesibilidad por etapas | exitoso | No aplica (commit chore/tools sin cambios en frontend) | Build ejecutado y verificado exitosamente. |
+| `25a3606` | docs: actualización de especificaciones, comparativa visual y evidencias | exitoso | No aplica (commit docs sin cambios en frontend) | Build ejecutado y verificado exitosamente. |
+| `2c5f54d` | chore: validación de fecha y de antigüedad en el guion de capturas final | exitoso | No aplica (commit chore sin cambios en frontend) | Build ejecutado y verificado exitosamente. |
+| `2954e04` | chore: retirar del control de versiones las capturas descartadas | exitoso | No aplica (commit chore sin cambios en frontend) | Build ejecutado y verificado exitosamente. |
+| `a110cc0` | feat: formato sin recorte en bloques cortos de disponibilidad y nuevas capturas | exitoso | **1.304 pasadas, 0 fallidas (57 archivos)** | Corrige la expresión regular de sábado en `formulariosRegistro.test.jsx`. Todas las pruebas pasaron limpiamente. |
+| `f1d2e41` | feat: script de datos de demostración con fechas relativas | exitoso | No aplica (commit database/docs sin cambios en frontend) | Build ejecutado y verificado exitosamente. |
+| `b7ed668` | docs: actualización de avance y comparativa visual con capturas finales | exitoso | No aplica (commit docs sin cambios en frontend) | Build ejecutado y verificado exitosamente. |
+| `1a5c4da` | fix: texto de los tramos de disponibilidad sin recorte, con comprobación real en el navegador | exitoso | **1.304 pasadas, 0 fallidas (57 archivos)** | Ajuste de umbral $\le 120$ min, pruebas de borde 90, 120 y 121 min y comprobación real de no recorte (`scrollWidth <= clientWidth`). Todas las pruebas pasaron limpiamente. |
+
+---
+
+**ESTADO ACTUAL**: Tarea completada al 100%. 0 defectos detectados. Todas las pruebas (unitarias 1.304 vitest, 230 backend, 18 usabilidad, E2E 9/9 y accesibilidad 0 violaciones con cero textos cortados en disponibilidad) verificadas exitosamente. Árbol de trabajo limpio y aislado.

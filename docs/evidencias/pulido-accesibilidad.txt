@@ -433,4 +433,9 @@ H6) prefers-reduced-motion: transiciones y animaciones del layout
        sin preferencia: 1 animación(es)/transición(es) al abrir el panel (transform)
   OK    con la preferencia REDUCIR no hay animaciones ni transiciones al abrir el panel (0)
 
+H7) Disponibilidad: texto de bloques sin recorte por CSS (scrollWidth <= clientWidth)
+  OK    1280 px: ningún bloque presenta recorte de texto (scrollWidth <= clientWidth)
+  OK    375 px: ningún bloque presenta recorte de texto (scrollWidth <= clientWidth)
+  OK    188 px: ningún bloque presenta recorte de texto (scrollWidth <= clientWidth)
+
 TOTAL: 0 comprobación(es) de la sub-fase A fallida(s).
