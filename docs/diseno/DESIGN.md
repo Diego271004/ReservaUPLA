@@ -48,3 +48,10 @@ Stitch sirvió como borrador visual de exploración, pero se aplicaron decisione
 5. **Contadores de caracteres y validación reactiva**: Formularios con contadores `X de Y caracteres` conectados en vivo vía `aria-describedby` y requisitos de contraseña visibles de inmediato.
 6. **Barra de resumen adherida en móvil**: Para el flujo de reserva en dispositivos móviles, se implementó una barra adherida sobre el botón de envío que resume ambiente, fecha y horas sin tapar controles ni requerir desplazamientos continuos.
 7. **Microcopy exacto y estandarizado**: Se erradicaron verbos ambiguos («Guardar», «Aceptar», «Cancelar» para salir). Cada acción emplea su verbo unívoco: «Registrar X», «Nuevo X», «Volver», «Limpiar formulario» y «Cancelar reserva».
+8. **Refinamiento Taste (Microinteracciones tangibles, Bento y Densidad Tabular)**:
+   - **Equal edges**: Guías de alineación unificadas en paneles, formularios y cabeceras (`FormularioTarjeta` acotado a 760 px alineado con la guía institucional). Grilla estricta de 4 columnas en desktop y 2 en tablet en métricas, erradicando huecos asimétricos.
+   - **Microinteracciones sobrias**: Pulsación táctil física `:active` (`translateY(1px)`) en botones primarios, secundarios, tramos libres y atajos; elevación de hover $\le 2$ px; anulación total con `@media (prefers-reduced-motion: reduce)`.
+   - **Ordenación Bento por urgencia**: En el Inicio del Administrador, jerarquía estricta: primero lo que requiere decisión urgente, luego la agenda operativa en tiempo real, seguido de las métricas clave y el análisis por ambiente.
+   - **Densidad tabular de alta legibilidad**: Celdas numéricas alineadas a la derecha con `font-variant-numeric: tabular-nums` y resalte interactivo sutil de fila bajo el cursor (`--fondo-fila-alterna`).
+   - **Proporción de login editorial**: Ajuste a proporción 58% (visual institucional) / 42% (formulario) con tarjeta contenida y sin animaciones infinitas.
+   - **Estados vacíos compactos**: Silueta de edificio UPLA escalada a 100x72 px base y 64x46 px en modo compacto con espaciado vertical moderado.

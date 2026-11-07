@@ -15,3 +15,11 @@ test('accesibilidad.mjs soporta la etapa pulido y su archivo pulido-accesibilida
   assert.ok(codigo.includes("ETAPA === 'pulido'"), 'debe activar subfase A para pulido')
 })
 
+test('accesibilidad.mjs soporta la etapa taste y su archivo taste-accesibilidad.txt', () => {
+  assert.ok(codigo.includes("'taste'"), 'debe incluir la etapa taste en la lista permitida')
+  assert.ok(codigo.includes("taste: ['taste']"), 'debe mapear la etapa taste a su subcarpeta docs/evidencias/taste')
+  assert.ok(codigo.includes("taste: 'taste-accesibilidad.txt'"), 'debe guardar el informe en taste-accesibilidad.txt')
+  assert.ok(codigo.includes("ETAPA === 'taste'"), 'debe activar subfase A para taste')
+  assert.ok(codigo.includes("medirTaste"), 'debe integrar la medición de taste')
+})
+

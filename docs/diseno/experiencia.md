@@ -56,3 +56,13 @@ Experiencia de selección y confirmación:
 5. **Métricas destacadas y empates accesibles**: En el inicio de los tres roles, las cifras clave se presentan a 40 px en Poppins SemiBold con espaciado tabular (`tabular-nums`). El indicador de «Ambiente más utilizado» soporta empates ordenados con chips accesibles (`aria-label="Ambientes en empate"`).
 6. **Ilustración institucional en estados vacíos**: Componente `EstadoVacio` con la silueta de un edificio institucional ilustrativo (frontón con isotipo hexagonal y filete dorado `#EAA658`), accesible (`aria-hidden="true"`), ligero e integrado en Reservas, Usuarios, Ambientes y Mi Ambiente.
 7. **Topbar contextual y microinteracciones**: Título de sección en rutas raíz, migas de pan en vistas de detalle, y transiciones respetuosas de `@media (prefers-reduced-motion: reduce)`.
+
+---
+
+## Refinamiento Taste y Sistemas de Diseño (`feature/taste`)
+
+1. **Equal edges y contención simétrica de formularios**: Guía de alineación compartida entre cabeceras institucionales y tarjetas de formulario (`FormularioTarjeta` con ancho máximo de 760 px). En métricas, grilla de 4 columnas en desktop y 2 en tablet sin huecos asimétricos.
+2. **Microinteracciones tangibles y sobrias**: Estados `:active` con pulsación física de 1 px (`translateY(1px)`) en botones (`Button`), tramos libres interactivos (`DisponibilidadPage`), atajos de duración (`AtajosDeDuracion`) y selector de ambientes. Elevación de tarjetas contenida a $\le 2$ px.
+3. **Ordenación Bento orientada a la toma de decisiones**: En el Inicio del Administrador, jerarquía adaptada a la urgencia operativa: primero lo que requiere decisión (solicitudes pendientes con solapamiento advertido), luego la agenda operativa en tiempo real, seguido de los indicadores clave y el desglose analítico.
+4. **Densidad de datos y alineación tabular**: Tablas institucionales con resalte interactivo sutil al pasar el cursor (`--fondo-fila-alterna`), columnas numéricas alineadas a la derecha (`data-alineacion="derecha"`) y números tabulares `tabular-nums`.
+5. **Proporción de login editorial y estados vacíos compactos**: Pantalla de acceso en proporción 58% (visual institucional) / 42% (formulario) con supresión de animaciones bajo `prefers-reduced-motion`. Ilustración de edificio UPLA escalada a proporciones compactas (100x72 px base y 64x46 px en modo compacto).

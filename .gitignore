@@ -30,3 +30,6 @@ frontend/src/assets/logo-upla.webp
 # Evidencias intermedias obsoletas
 docs/evidencias/pulido/descartadas/
 
+# Sesiones temporales de playwright-cli
+.playwright-cli/
+

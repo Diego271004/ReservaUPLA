@@ -20,17 +20,19 @@ import { detenerEntorno, iniciarEntorno, reiniciarBaseYApi } from '../e2e/entorn
 import { analizarContraste } from './contraste.mjs'
 import { medirContrasteSobreFoto } from './contraste-foto.mjs'
 import { medirSubfaseA } from './subfase-a.mjs'
+import { medirTaste } from './taste-check.mjs'
 import { recorrer } from './estados.mjs'
 
 const requerir = createRequire(import.meta.url)
 const RUTA_AXE = requerir.resolve('axe-core/axe.min.js')
-const ETAPA = ['antes', 'despues', 'fase9', 'fase-ai', 'identidad', 'experiencia', 'pulido'].includes(process.env.ETAPA) ? process.env.ETAPA : 'antes'
+const ETAPA = ['antes', 'despues', 'fase9', 'fase-ai', 'identidad', 'experiencia', 'pulido', 'taste'].includes(process.env.ETAPA) ? process.env.ETAPA : 'antes'
 const CARPETA_DE_CAPTURAS = {
   fase9: ['fase9', 'estados'],
   'fase-ai': ['fase-ai', 'estados'],
   identidad: ['identidad'],
   experiencia: ['experiencia', 'medicion'],
   pulido: ['pulido', 'medicion'],
+  taste: ['taste'],
   antes: ['fase8', 'antes'],
   despues: ['fase8', 'despues'],
 }
@@ -50,6 +52,7 @@ const INFORME = resolve(
     identidad: 'identidad-accesibilidad.txt',
     experiencia: 'experiencia-accesibilidad.txt',
     pulido: 'pulido-accesibilidad.txt',
+    taste: 'taste-accesibilidad.txt',
   }[ETAPA],
 )
 const ETIQUETAS_AXE = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice']
@@ -238,7 +241,7 @@ async function extras(navegador) {
 // ---------------------------------------------------------------- Informe
 const unicos = (lista) => [...new Set(lista)]
 
-function informe(contraste, extra, foto = null, subfaseA = null) {
+function informe(contraste, extra, foto = null, subfaseA = null, taste = null) {
   const L = []
   const rayas = '='.repeat(110)
   L.push(`ACCESIBILIDAD MEDIDA DEL SISTEMA REAL (${ETAPA.toUpperCase()}) — ${new Date().toISOString().slice(0, 10)}`)
@@ -329,6 +332,11 @@ function informe(contraste, extra, foto = null, subfaseA = null) {
     L.push('0 paradas sin foco visible; zoom 200 % en 188 px: 4 de 30 con desborde; 0 animaciones infinitas con movimiento reducido. Sin contador, menú contraído, barra superior ni menú de usuario.')
     L.push('DESPUÉS: las secciones A a F de este informe son la medición completa con el layout nuevo; lo siguiente mide de forma dirigida lo que antes no existía.', '', ...subfaseA.lineas)
   }
+  // ---- I) auditoría taste: equal edges, microinteracciones y reduced-motion
+  if (taste) {
+    L.push('', rayas, 'I) TASTE: alineación (equal edges), microinteracciones y movimiento reducido', rayas)
+    L.push(...taste.lineas)
+  }
   return L.join('\n')
 }
 
@@ -345,8 +353,9 @@ try {
   console.log('\n== Zoom y movimiento reducido')
   const extra = await extras(navegador)
   const foto = ETAPA === 'identidad' ? await medirContrasteSobreFoto(navegador, BASE) : null
-  const subfaseA = ETAPA === 'experiencia' || ETAPA === 'pulido' ? await medirSubfaseA(navegador, extra.sesiones.carla) : null
-  const texto = informe(analizarContraste(), extra, foto, subfaseA)
+  const subfaseA = ETAPA === 'experiencia' || ETAPA === 'pulido' || ETAPA === 'taste' ? await medirSubfaseA(navegador, extra.sesiones.carla) : null
+  const taste = ETAPA === 'taste' ? await medirTaste(navegador, extra.sesiones.carla) : null
+  const texto = informe(analizarContraste(), extra, foto, subfaseA, taste)
   writeFileSync(INFORME, texto + '\n', 'utf8')
   console.log(`\nInforme escrito en ${INFORME}`)
   console.log(texto.split('\n').filter((l) => l.startsWith('TOTAL')).join('\n'))
