@@ -1,26 +1,53 @@
 import estilos from './EstadoVacio.module.css'
 
 /**
- * Estado vacío del sistema: una ilustración sencilla, qué pasa y, si hay una salida, el botón que la ofrece («Limpiar
- * filtros», «Reservar un ambiente»). Un vacío sin siguiente paso deja al usuario sin saber qué hacer (Nielsen 9).
+ * Estado vacío institucional: ilustración SVG sobria y ligera con la silueta de un edificio institucional
+ * ilustrativo y el emblema de la UPLA, mensaje semántico y siguiente paso claro.
+ * Accesible: la ilustración tiene aria-hidden="true" y focusable="false".
  */
 export default function EstadoVacio({ mensaje = null, children = null }) {
   return (
-    <div className={estilos.vacio}>
+    <div className={estilos.vacio} data-testid="estado-vacio">
       <svg
         className={estilos.ilustracion}
-        viewBox="0 0 120 96"
-        width="120"
-        height="96"
+        viewBox="0 0 140 100"
+        width="140"
+        height="100"
         aria-hidden="true"
         focusable="false"
       >
-        <rect x="14" y="16" width="92" height="68" rx="6" className={estilos.hoja} />
-        <rect x="14" y="16" width="92" height="18" rx="6" className={estilos.cabecera} />
-        <path d="M34 8v14M86 8v14" className={estilos.anillas} />
-        <path d="M30 48h24M30 60h40M30 72h18" className={estilos.lineas} />
-        <circle cx="90" cy="68" r="12" className={estilos.lupa} />
-        <path d="m99 77 8 8" className={estilos.lupa} />
+        {/* Aura de fondo */}
+        <ellipse cx="70" cy="52" rx="54" ry="34" className={estilos.aura} />
+
+        {/* Línea de tierra */}
+        <path d="M16 88 h108" className={estilos.lineaBase} />
+
+        {/* Guías arquitectónicas flotantes */}
+        <path d="M12 28 h10 M118 28 h10 M18 54 h6 M116 54 h6" className={estilos.guiaFlotante} />
+
+        {/* Escalinata y podio */}
+        <rect x="24" y="82" width="92" height="6" rx="2" className={estilos.escalon} />
+        <rect x="30" y="78" width="80" height="4" rx="1" className={estilos.escalon} />
+
+        {/* Columnata académica */}
+        <rect x="36" y="44" width="8" height="34" rx="1" className={estilos.columna} />
+        <rect x="52" y="44" width="8" height="34" rx="1" className={estilos.columna} />
+        <rect x="80" y="44" width="8" height="34" rx="1" className={estilos.columna} />
+        <rect x="96" y="44" width="8" height="34" rx="1" className={estilos.columna} />
+
+        {/* Portal de arco central */}
+        <path d="M62 78 v-20 a8 8 0 0 1 16 0 v20" className={estilos.arco} />
+        <path d="M70 60 v18" className={estilos.trazoFino} />
+
+        {/* Cornisa y frontón triangular */}
+        <rect x="30" y="38" width="80" height="6" rx="1" className={estilos.cornisa} />
+        <path d="M32 41 h76" className={estilos.fileteDorado} />
+        <path d="M26 38 L70 14 L114 38 Z" className={estilos.fronton} />
+        <path d="M36 36 L70 19 L104 36" className={estilos.trazoFino} />
+
+        {/* Isotipo hexagonal institucional UPLA */}
+        <path d="M70 21 L76 24.5 V31.5 L70 35 L64 31.5 V24.5 Z" className={estilos.isocresta} />
+        <circle cx="70" cy="28" r="2" className={estilos.puntoDorado} />
       </svg>
       {mensaje && <p className={estilos.mensaje}>{mensaje}</p>}
       {children}

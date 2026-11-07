@@ -81,9 +81,12 @@ describe('EstadoVacio', () => {
     expect(screen.getByRole('button', { name: 'Reservar' })).toBeInTheDocument()
   })
 
-  it('sin siguiente paso solo trae el mensaje', () => {
-    render(<EstadoVacio mensaje="Nada por aquí." />)
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  it('la ilustración SVG es puramente decorativa: aria-hidden="true", focusable="false" y sin controles interactivos', () => {
+    const { container } = render(<EstadoVacio mensaje="Sin datos disponibles." />)
+    const svg = container.querySelector('svg')
+    expect(svg).toHaveAttribute('aria-hidden', 'true')
+    expect(svg).toHaveAttribute('focusable', 'false')
+    expect(svg.querySelectorAll('button, a, input, [tabindex]')).toHaveLength(0)
   })
 })
 

@@ -8,18 +8,21 @@ import estilos from './GrupoDeIndicadores.module.css'
 export default function GrupoDeIndicadores({ indicadores }) {
   return (
     <section className={estilos.grupo} aria-label="Indicadores">
-      {indicadores.map(({ clave, valor, descripcion, detalle, href, icono, tono, ancha }) => (
-        <CardIndicador
-          key={clave}
-          valor={valor}
-          descripcion={descripcion}
-          detalle={detalle}
-          href={href}
-          icono={icono}
-          tono={tono}
-          ancha={ancha}
-        />
-      ))}
+      {indicadores.map(
+        ({ clave, valor, descripcion, detalle, href, icono, tono, ancha, chips }) => (
+          <CardIndicador
+            key={clave}
+            valor={valor}
+            descripcion={descripcion}
+            detalle={detalle}
+            href={href}
+            icono={icono}
+            tono={tono}
+            ancha={ancha}
+            chips={chips}
+          />
+        ),
+      )}
     </section>
   )
 }

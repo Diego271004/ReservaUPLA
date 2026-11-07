@@ -92,7 +92,7 @@ describe('Dashboard: indicadores', () => {
     expect(tarjetas[2]).toHaveTextContent('31Reservas aprobadas')
     expect(tarjetas[3]).toHaveTextContent('10Reservas rechazadas')
     expect(tarjetas[4]).toHaveTextContent(
-      'Laboratorio de Cómputo 2Ambiente más utilizado14 reservas aprobadas',
+      'Ambiente más utilizadoLaboratorio de Cómputo 214 reservas aprobadas',
     )
   })
 
@@ -117,8 +117,11 @@ describe('Dashboard: indicadores', () => {
     )
     mostrar()
     expect(
-      await screen.findByText('Auditorio Principal y Laboratorio de Cómputo 2'),
+      await screen.findByText('Empate: 2 ambientes con 3 reservas aprobadas'),
     ).toBeInTheDocument()
+    const regionEmpate = screen.getByLabelText('Ambientes en empate')
+    expect(within(regionEmpate).getByText('Auditorio Principal')).toBeInTheDocument()
+    expect(within(regionEmpate).getByText('Laboratorio de Cómputo 2')).toBeInTheDocument()
     expect(screen.getByText('3 reservas aprobadas cada uno')).toBeInTheDocument()
   })
 

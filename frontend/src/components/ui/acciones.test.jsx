@@ -299,6 +299,32 @@ describe('CardIndicador', () => {
     expect(screen.getByText('Laboratorio de Cómputo 2')).toBeInTheDocument()
     expect(screen.getByText('14 reservas')).toBeInTheDocument()
   })
+
+  it('tarjeta ancha con empate: orden visual y de lectura (etiqueta -> dato -> chips -> detalle)', () => {
+    render(
+      <CardIndicador
+        ancha
+        descripcion="Ambiente más utilizado"
+        valor="Empate: 2 ambientes con 3 reservas aprobadas"
+        chips={['Auditorio Principal', 'Laboratorio de Cómputo 1']}
+        detalle="Total: 6 reservas"
+      />,
+    )
+    const elEtiqueta = screen.getByText('Ambiente más utilizado')
+    const elValor = screen.getByText('Empate: 2 ambientes con 3 reservas aprobadas')
+    const elChips = screen.getByLabelText('Ambientes en empate')
+    const elDetalle = screen.getByText('Total: 6 reservas')
+
+    expect(
+      Boolean(elEtiqueta.compareDocumentPosition(elValor) & Node.DOCUMENT_POSITION_FOLLOWING),
+    ).toBe(true)
+    expect(
+      Boolean(elValor.compareDocumentPosition(elChips) & Node.DOCUMENT_POSITION_FOLLOWING),
+    ).toBe(true)
+    expect(
+      Boolean(elChips.compareDocumentPosition(elDetalle) & Node.DOCUMENT_POSITION_FOLLOWING),
+    ).toBe(true)
+  })
 })
 
 describe('InterruptorActivo', () => {

@@ -224,6 +224,13 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
   gap: var(--espacio-2);
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .resumenEstados {
+    grid-template-columns: repeat(4, minmax(min(180px, 100%), 1fr));
+  }
 }
 
 .resumenCard {
@@ -299,9 +306,9 @@
 .numeroResumen {
   display: block;
   font-family: var(--fuente-titulo);
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
+  font-size: 2.5rem;
+  font-weight: 600;
+  line-height: 1.1;
   color: var(--color-marino);
 }
 

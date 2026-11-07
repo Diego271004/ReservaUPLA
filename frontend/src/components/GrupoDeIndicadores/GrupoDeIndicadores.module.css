@@ -3,4 +3,11 @@
   grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
   gap: var(--espacio-2);
   margin-bottom: var(--espacio-3);
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .grupo {
+    grid-template-columns: repeat(4, minmax(min(180px, 100%), 1fr));
+  }
 }

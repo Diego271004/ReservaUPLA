@@ -1,43 +1,95 @@
 .vacio {
   display: flex;
   flex-direction: column;
-  gap: var(--espacio-2);
+  gap: var(--espacio-3);
   align-items: center;
-  padding: var(--espacio-4) var(--espacio-2);
+  justify-content: center;
+  padding: var(--espacio-6) var(--espacio-3);
   text-align: center;
+  min-height: 220px;
 }
 
 .mensaje {
   margin: 0;
   color: var(--color-texto-suave);
+  font-size: var(--tipo-cuerpo);
+  max-width: 44ch;
+  line-height: var(--altura-linea);
 }
 
 .ilustracion {
   stroke-linecap: round;
   stroke-linejoin: round;
+  overflow: visible;
 }
 
-.hoja {
+.aura {
+  fill: var(--fondo-seleccion);
+  stroke: none;
+}
+
+.lineaBase {
+  stroke: var(--color-borde-control);
+  stroke-width: 2;
+  fill: none;
+}
+
+.guiaFlotante {
+  stroke: var(--color-borde);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 3;
+  fill: none;
+}
+
+.escalon {
+  fill: var(--color-superficie);
+  stroke: var(--color-borde-control);
+  stroke-width: 1.75;
+}
+
+.columna {
+  fill: var(--color-superficie);
+  stroke: var(--color-borde-control);
+  stroke-width: 1.75;
+}
+
+.arco {
+  fill: var(--fondo-seleccion);
+  stroke: var(--color-primario);
+  stroke-width: 2;
+}
+
+.cornisa {
+  fill: var(--color-superficie);
+  stroke: var(--color-borde-control);
+  stroke-width: 1.75;
+}
+
+.fronton {
   fill: var(--color-superficie);
   stroke: var(--color-borde-control);
   stroke-width: 2;
 }
 
-.cabecera {
-  fill: var(--fondo-encabezado-tabla);
+.trazoFino {
   stroke: var(--color-borde-control);
-  stroke-width: 2;
-}
-
-.anillas,
-.lineas {
+  stroke-width: 1.25;
   fill: none;
-  stroke: var(--color-borde-control);
-  stroke-width: 3;
 }
 
-.lupa {
-  fill: var(--fondo-info);
+.fileteDorado {
+  stroke: var(--color-acento);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.isocresta {
+  fill: var(--fondo-seleccion);
   stroke: var(--color-primario);
-  stroke-width: 3;
+  stroke-width: 1.5;
+}
+
+.puntoDorado {
+  fill: var(--color-acento);
+  stroke: none;
 }

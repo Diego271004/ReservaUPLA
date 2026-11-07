@@ -122,6 +122,8 @@ describe('tarjeta de ambiente más utilizado', () => {
     ).toEqual({
       valor: 'Laboratorio de Cómputo 2',
       detalle: '14 reservas aprobadas',
+      esEmpate: false,
+      empatados: ['Laboratorio de Cómputo 2'],
     })
   })
 
@@ -132,15 +134,17 @@ describe('tarjeta de ambiente más utilizado', () => {
     ).toBe('1 reserva aprobada')
   })
 
-  it('en empate se muestran todos los empatados', () => {
+  it('en empate muestra texto «Empate: N ambientes con M reservas aprobadas» y lista de empatados', () => {
     expect(
       ambienteMasUtilizado([
         { ambienteId: 1, nombre: 'Auditorio Principal', reservasAprobadas: 3 },
         { ambienteId: 2, nombre: 'Laboratorio de Cómputo 2', reservasAprobadas: 3 },
       ]),
     ).toEqual({
-      valor: 'Auditorio Principal y Laboratorio de Cómputo 2',
+      valor: 'Empate: 2 ambientes con 3 reservas aprobadas',
       detalle: '3 reservas aprobadas cada uno',
+      esEmpate: true,
+      empatados: ['Auditorio Principal', 'Laboratorio de Cómputo 2'],
     })
   })
 
@@ -148,6 +152,8 @@ describe('tarjeta de ambiente más utilizado', () => {
     expect(ambienteMasUtilizado([])).toEqual({
       valor: '—',
       detalle: 'Todavía no hay reservas aprobadas',
+      esEmpate: false,
+      empatados: [],
     })
   })
 })

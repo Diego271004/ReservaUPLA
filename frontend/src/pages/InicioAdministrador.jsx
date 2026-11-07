@@ -75,6 +75,7 @@ export default function InicioAdministrador({ ahora = new Date() }) {
                 valor: masUtilizado.valor,
                 descripcion: TEXTOS.indicadorMasUtilizado,
                 detalle: masUtilizado.detalle,
+                chips: masUtilizado.esEmpate ? masUtilizado.empatados : null,
                 href: '/reservas?estado=Aprobada',
                 icono: 'ambientes',
                 tono: 'info',

@@ -191,6 +191,8 @@
   left: var(--espacio-1);
   bottom: 8px;
   font-size: 0.875rem;
+  background: var(--color-fondo);
+  z-index: 2;
 }
 .bloqueAprobado {
   position: absolute;
@@ -205,6 +207,7 @@
   font-size: 0.75rem;
   text-overflow: ellipsis;
   white-space: nowrap;
+  z-index: 2;
 }
 .mantenimiento {
   position: absolute;
@@ -216,6 +219,7 @@
   border: 2px dashed var(--color-borde);
   color: var(--color-texto);
   font-weight: 700;
+  z-index: 2;
 }
 .horaActual {
   position: absolute;
@@ -223,6 +227,8 @@
   bottom: 0;
   width: 2px;
   background: var(--color-error);
+  z-index: 1;
+  pointer-events: none;
 }
 .horaActual > span {
   position: absolute;

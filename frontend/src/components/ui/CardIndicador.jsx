@@ -16,6 +16,7 @@ export default function CardIndicador({
   icono,
   tono = 'info',
   ancha = false,
+  chips = null,
 }) {
   const contenido = (
     <>
@@ -31,10 +32,21 @@ export default function CardIndicador({
           </span>
         )}
       </div>
+      {ancha && <p className={estilos.descripcion}>{descripcion}</p>}
       <p className={`${estilos.valor} ${typeof valor === 'number' ? '' : estilos.valorTexto}`}>
         {valor}
       </p>
-      <p className={estilos.descripcion}>{descripcion}</p>
+      {chips && chips.length > 0 && (
+        <div className={estilos.chips} aria-label="Ambientes en empate">
+          {chips.map((nombre) => (
+            <span key={nombre} className={estilos.chip}>
+              <Icono nombre="ambientes" tamano={14} />
+              <span>{nombre}</span>
+            </span>
+          ))}
+        </div>
+      )}
+      {!ancha && <p className={estilos.descripcion}>{descripcion}</p>}
       {detalle && <p className={estilos.detalle}>{detalle}</p>}
     </>
   )

@@ -1,4 +1,4 @@
-import { MENSAJES } from '../constants/messages.js'
+import { MENSAJES, TEXTOS } from '../constants/messages.js'
 import { fechaAIso, isoAFecha, parsearFecha } from './fechas.js'
 
 /** Los filtros de la lista de Reservas. Las fechas se escriben dd/mm/aaaa; en la dirección y en la API van aaaa-mm-dd. */
@@ -45,14 +45,32 @@ export function validarFiltros({ desde, hasta }) {
   return errores
 }
 
-/** Lo que muestra la tarjeta «Ambiente más utilizado»: el nombre (o los nombres, si empatan) y cuántas reservas aprobadas. */
+/** Lo que muestra la tarjeta «Ambiente más utilizado»: el nombre (o los nombres en chips, si empatan) y cuántas reservas aprobadas. */
 export function ambienteMasUtilizado(ambientes) {
-  if (ambientes.length === 0) return { valor: '—', detalle: 'Todavía no hay reservas aprobadas' }
+  if (!ambientes || ambientes.length === 0) {
+    return {
+      valor: '—',
+      detalle: 'Todavía no hay reservas aprobadas',
+      esEmpate: false,
+      empatados: [],
+    }
+  }
   const cantidad = ambientes[0].reservasAprobadas
+  const esEmpate = ambientes.length > 1
+  if (esEmpate) {
+    return {
+      valor: TEXTOS.empateAmbientes(ambientes.length, cantidad),
+      detalle: `${cantidad} ${cantidad === 1 ? 'reserva aprobada' : 'reservas aprobadas'} cada uno`,
+      esEmpate: true,
+      empatados: ambientes.map((ambiente) => ambiente.nombre),
+    }
+  }
   const unidad = cantidad === 1 ? 'reserva aprobada' : 'reservas aprobadas'
   return {
-    valor: ambientes.map((ambiente) => ambiente.nombre).join(' y '),
-    detalle: `${cantidad} ${unidad}${ambientes.length > 1 ? ' cada uno' : ''}`,
+    valor: ambientes[0].nombre,
+    detalle: `${cantidad} ${unidad}`,
+    esEmpate: false,
+    empatados: [ambientes[0].nombre],
   }
 }
 

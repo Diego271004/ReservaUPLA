@@ -6,6 +6,7 @@ import AvisoDeError from '../components/AvisoDeError/AvisoDeError.jsx'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
 import PageHeader from '../components/ui/PageHeader.jsx'
 import Button from '../components/ui/Button.jsx'
+import EstadoVacio from '../components/ui/EstadoVacio.jsx'
 import SelectInput from '../components/ui/SelectInput.jsx'
 import TableList from '../components/ui/TableList.jsx'
 import { TEXTOS } from '../constants/messages.js'
@@ -102,13 +103,19 @@ export default function MiAmbientePage() {
           </section>
           <GrupoDeIndicadores indicadores={indicadoresDeEstado(indicadores)} />
           <div className={estilos.uso}>
-            <TableList
-              titulo={TEXTOS.usoDelAmbiente}
-              columnas={columnas}
-              filas={reservas.elementos}
-              textoVacio={TEXTOS.sinReservas}
-            />
-            <PieDeLista pagina={{ ...reservas, alCambiar: irAPagina }} />
+            {reservas.elementos.length === 0 ? (
+              <EstadoVacio mensaje={TEXTOS.sinReservas} />
+            ) : (
+              <>
+                <TableList
+                  titulo={TEXTOS.usoDelAmbiente}
+                  columnas={columnas}
+                  filas={reservas.elementos}
+                  textoVacio={TEXTOS.sinReservas}
+                />
+                <PieDeLista pagina={{ ...reservas, alCambiar: irAPagina }} />
+              </>
+            )}
           </div>
         </>
       )}
