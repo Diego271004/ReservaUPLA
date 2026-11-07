@@ -84,21 +84,21 @@ Todas las cifras fueron tomadas mediante comandos ejecutados en la terminal con 
 
 | Métrica | Valor Base | Valor Pulido | Tipo | Comando de Medición | Fecha / Hora |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Pruebas frontend (Vitest)** | 1.272 (53 arch.) | **1.297 pasadas (55 arch.)** | Medida | `cd frontend; npx vitest run` | 2026-11-07 00:02:44 |
-| **ESLint Frontend** | 0 advertencias | **0 errores, 0 advertencias** | Medida | `cd frontend; npm run lint` | 2026-11-07 00:03:02 |
-| **Prettier Format** | Limpio | **100% verificado (All matched files use Prettier)** | Medida | `cd frontend; npm run format:check` | 2026-11-07 00:03:12 |
-| **Peso JS producción** | 403,97 kB (gzip: 125,97) | **408,51 kB (gzip: 127,16 kB)** | Medida | `cd frontend; npm run build` | 2026-11-07 00:03:20 |
-| **Peso CSS producción** | 74,53 kB (gzip: 12,67) | **80,59 kB (gzip: 13,71 kB)** | Medida | `cd frontend; npm run build` | 2026-11-07 00:03:20 |
-| **Pruebas backend con BD viva** | 230 pasadas | **230 pasadas (0 omitidas)** | Medida | `dotnet test backend/ReservaUPLA.sln` | 2026-11-07 00:04:39 |
-| **Pruebas suite usabilidad** | 18 pasadas | **18 pasadas (0 fallos)** | Medida | `node --test tools/usabilidad/pruebas/*.test.mjs` | 2026-11-07 00:04:45 |
-| **Suite E2E (`npm run todo`)** | 9 fases aprobadas | **9 de 9 fases OK (300 s)** | Medida | `cd tools/e2e; npm run todo` | 2026-11-07 00:09:54 |
-| **Violaciones axe** | 0 | **0 en 87 estados** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 00:14:09 |
-| **Contraste < umbral AA** | 0 | **0 pares fallidos** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 00:14:09 |
-| **Objetivos < 44 px** | 0 | **0 en 44 estados móviles** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 00:14:09 |
-| **Paradas de foco ausentes** | 0 | **0 paradas sin foco** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 00:14:09 |
-| **Scroll horizontal a 188 px** | 0 en 30 | **0 en 30 combinaciones** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 00:14:09 |
-| **Animaciones en reduced motion** | 0 | **0 animaciones infinitas** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 00:14:09 |
-| **Comprobaciones sub-fase A** | 0 fallos | **0 fallos** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 00:14:09 |
+| **Pruebas frontend (Vitest)** | 1.272 (53 arch.) | **1.304 pasadas (57 arch.)** | Medida | `cd frontend; npx vitest run` | 2026-11-07 11:34:27 |
+| **ESLint Frontend** | 0 advertencias | **0 errores, 0 advertencias** | Medida | `cd frontend; npm run lint` | 2026-11-07 11:26:45 |
+| **Prettier Format** | Limpio | **100% verificado (All matched files use Prettier)** | Medida | `cd frontend; npm run format:check` | 2026-11-07 11:26:50 |
+| **Peso JS producción** | 403,97 kB (gzip: 125,97) | **408,81 kB (gzip: 127,23 kB)** | Medida | `cd frontend; npm run build` | 2026-11-07 11:35:39 |
+| **Peso CSS producción** | 74,53 kB (gzip: 12,67) | **80,60 kB (gzip: 13,71 kB)** | Medida | `cd frontend; npm run build` | 2026-11-07 11:35:39 |
+| **Pruebas backend con BD viva** | 230 pasadas | **230 pasadas (0 omitidas)** | Medida | `dotnet test backend/ReservaUPLA.sln` | 2026-11-07 11:35:31 |
+| **Pruebas suite usabilidad** | 18 pasadas | **18 pasadas (0 fallos)** | Medida | `node --test tools/usabilidad/pruebas/*.test.mjs` | 2026-11-07 11:35:53 |
+| **Suite E2E (`npm run todo`)** | 9 fases aprobadas | **9 de 9 fases OK (211 s)** | Medida | `cd tools/e2e; npm run todo` | 2026-11-07 11:42:40 |
+| **Violaciones axe** | 0 | **0 en 87 estados** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
+| **Contraste < umbral AA** | 0 | **0 pares fallidos** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
+| **Objetivos < 44 px** | 0 | **0 en 44 estados móviles** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
+| **Paradas de foco ausentes** | 0 | **0 paradas sin foco** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
+| **Scroll horizontal a 188 px** | 0 en 30 | **0 en 30 combinaciones** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
+| **Animaciones en reduced motion** | 0 | **0 animaciones infinitas** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
+| **Comprobaciones sub-fase A** | 0 fallos | **0 fallos** | Medida | `cd tools/usabilidad; $env:ETAPA="pulido"; node accesibilidad.mjs` | 2026-11-07 11:38:54 |
 
 ---
 
@@ -106,24 +106,29 @@ Todas las cifras fueron tomadas mediante comandos ejecutados en la terminal con 
 
 Todas las capturas se generaron a través del guion automatizado `tools/e2e/capturar-pulido-final.mjs` autenticando usuarios reales contra la base de datos viva PostgreSQL (`05_datos_prueba.sql`), con validación de tamaño $\ge 10$ KB y comprobación de `mtimeMs >= maxMtimeSrc`.
 
-### Juego Final (`docs/evidencias/pulido/final/` - 34 capturas)
+### Juego Final (`docs/evidencias/pulido/final/` - 36 capturas)
 1. `01-login-1280.png` (644 KB) y `01-login-375.png` (30 KB)
-2. `02-inicio-admin-1280.png` (260 KB) y `02-inicio-admin-375.png` (222 KB)
-3. `03-inicio-solicitante-1280.png` (110 KB) y `03-inicio-solicitante-375.png` (96 KB)
-4. `04-inicio-responsable-1280.png` (98 KB) y `04-inicio-responsable-375.png` (86 KB)
-5. `05-nueva-reserva-1280.png` (113 KB) y `05-nueva-reserva-375.png` (107 KB)
-6. `06-nueva-reserva-cierre-1280.png` (144 KB) y `06-nueva-reserva-cierre-375.png` (126 KB)
+2. `02-inicio-admin-1280.png` (255 KB) y `02-inicio-admin-375.png` (224 KB)
+3. `03-inicio-solicitante-1280.png` (90 KB) y `03-inicio-solicitante-375.png` (87 KB)
+4. `04-inicio-responsable-1280.png` (87 KB) y `04-inicio-responsable-375.png` (82 KB)
+5. `05-nueva-reserva-1280.png` (113 KB) y `05-nueva-reserva-375.png` (106 KB)
+6. `06-nueva-reserva-cierre-1280.png` (137 KB) y `06-nueva-reserva-cierre-375.png` (126 KB)
 7. `07-detalle-reserva-1280.png` (88 KB) y `07-detalle-reserva-375.png` (57 KB)
 8. `08-detalle-conflicto-1280.png` (84 KB) y `08-detalle-conflicto-375.png` (53 KB)
-9. `09-reservas-admin-1280.png` (114 KB) y `09-reservas-admin-375.png` (156 KB)
-10. `10-ambientes-1280.png` (92 KB) y `10-ambientes-375.png` (85 KB)
+9. `09-reservas-admin-1280.png` (109 KB) y `09-reservas-admin-375.png` (156 KB)
+10. `10-ambientes-1280.png` (90 KB) y `10-ambientes-375.png` (83 KB)
 11. `11-ambiente-nuevo-1280.png` (50 KB) y `11-ambiente-nuevo-375.png` (36 KB)
-12. `12-usuarios-1280.png` (76 KB) y `12-usuarios-375.png` (61 KB)
+12. `12-usuarios-1280.png` (74 KB) y `12-usuarios-375.png` (59 KB)
 13. `13-usuario-nuevo-1280.png` (72 KB) y `13-usuario-nuevo-375.png` (39 KB)
 14. `14-403-sin-permiso-1280.png` (40 KB) y `14-403-sin-permiso-375.png` (16 KB)
-15. `15-404-no-encontrada-1280.png` (52 KB) y `15-404-no-encontrada-375.png` (21 KB)
-16. `16-disponibilidad-1280.png` (81 KB) y `16-disponibilidad-375.png` (54 KB) [Fecha real con reservas: `05/11/2026`]
-17. `17-disponibilidad-dia-libre-1280.png` (80 KB) y `17-disponibilidad-dia-libre-375.png` (48 KB) [Fecha día libre: `20/11/2026`]
+15. `15-404-no-encontrada-1280.png` (51 KB) y `15-404-no-encontrada-375.png` (21 KB)
+16. `16-disponibilidad-1280.png` (77 KB) y `16-disponibilidad-375.png` (54 KB) [Fecha futura `24/11/2026`: reservas reales vía API, tramo libre interactivo con «+», aprobada `10–12 h` en verde, pendiente `14–16 h` en ámbar y mantenimiento en gris]
+17. `17-disponibilidad-dia-libre-1280.png` (78 KB) y `17-disponibilidad-dia-libre-375.png` (49 KB) [Fecha futura día libre `25/11/2026`: todos los tramos libres con aviso de día libre y navegación fluida]
+18. `18-disponibilidad-dia-pasado-1280.png` (79 KB) y `18-disponibilidad-dia-pasado-375.png` (54 KB) [Fecha pasada `05/11/2026`: franja de horas pasadas sombreada y tramos deshabilitados en modo solo lectura conforme a RN-07]
+
+### Limitación Técnica Identificada (Horas Pasadas del Día de Hoy)
+- **Comportamiento verificado**: El sistema permite crear una reserva para la fecha de hoy cuya `horaInicio` ya haya pasado en el reloj de la jornada actual (por ejemplo, a las 15:00 reservar de 08:00 a 10:00 para la fecha presente).
+- **Causa raíz**: RN-07 y su disparador `trg_reservas_validar_fecha` validan exclusivamente que `NEW.fecha >= (now() AT TIME ZONE 'America/Lima')::date`, sin evaluar `(NEW.fecha + NEW.hora_inicio) < now()`. Se preserva el comportamiento para mantener la integridad de RN-01 a RN-07 sin alteraciones no autorizadas en backend/base de datos.
 
 ### Capturas Intermedias Regeneradas (`docs/evidencias/pulido/` - 23 capturas)
 - `P1-resumen-vivo-vacio-1280.png` (125 KB) y `375.png` (106 KB)
@@ -145,20 +150,25 @@ Todas las capturas se generaron a través del guion automatizado `tools/e2e/capt
 
 ---
 
-## 5. Plan de Commits Atómicos (7 Commits)
+## 5. Historial Completo de Commits Atómicos (12 Commits)
 
 Conforme a las reglas del proyecto: formato «tipo: descripción» en español con tildes, sin ámbito entre paréntesis, sin `Co-Authored-By`, rutas de archivo explícitas (nunca `git add .` ni `git add -A`), y aislamiento absoluto respecto a las 147 capturas de `docs/evidencias/experiencia/`.
 
 | # | Mensaje del Commit | Archivos Incluidos | Justificación Técnica |
 | :--- | :--- | :--- | :--- |
-| **1** | `refactor: escala tipográfica formal de 4 niveles y tokens visuales` | `frontend/src/styles/tokens.css`<br>`frontend/src/styles/accesibilidad.test.js` | Introduce la escala tipográfica de 4 niveles (`--tipo-h1`, `--tipo-h2`, `--tipo-seccion`, `--tipo-etiqueta`, `--tipo-cuerpo`, `--tipo-sm`) y tokens de interacción (`--fondo-seleccion`, `--fondo-libre`, `--fondo-fila-alterna`, `--transicion-corta`, `--fondo-franja-pasada`). |
+| **1** | `refactor: escala tipográfica formal de 4 niveles y tokens visuales` | `frontend/src/styles/tokens.css`<br>`frontend/src/styles/accesibilidad.test.js` | Escala formal de 4 niveles (`--tipo-h1`, `--tipo-h2`, `--tipo-seccion`, `--tipo-etiqueta`, `--tipo-cuerpo`, `--tipo-sm`) y tokens de interacción (`--fondo-seleccion`, `--fondo-libre`, `--fondo-fila-alterna`, `--transicion-corta`, `--fondo-franja-pasada`). |
 | **2** | `feat: selector de ambientes táctil, atajos de duración y resumen vivo` | `frontend/src/components/AtajosDeDuracion/AtajosDeDuracion.jsx`<br>`frontend/src/components/AtajosDeDuracion/AtajosDeDuracion.module.css`<br>`frontend/src/components/AtajosDeDuracion/AtajosDeDuracion.test.jsx`<br>`frontend/src/components/ResumenDeSolicitud/ResumenDeSolicitud.jsx`<br>`frontend/src/components/ResumenDeSolicitud/ResumenDeSolicitud.module.css`<br>`frontend/src/components/ResumenDeSolicitud/ResumenDeSolicitud.test.jsx`<br>`frontend/src/components/ui/SelectorDeAmbientes.jsx`<br>`frontend/src/components/ui/SelectorDeAmbientes.module.css`<br>`frontend/src/components/ui/SelectorDeAmbientes.test.jsx`<br>`frontend/src/components/ui/campos.test.jsx`<br>`frontend/src/constants/messages.js` | Radio aumentado a 24 px con icono de verificación en la esquina, atajos táctiles de 1h/2h/3h y panel vivo con estados tenue/resaltado y `aria-live="polite"`. |
 | **3** | `feat: línea de tiempo de disponibilidad con tramos libres y leyenda` | `frontend/src/components/Disponibilidad/BloquesDisponibilidad.jsx`<br>`frontend/src/components/Disponibilidad/EjeTiempo.jsx`<br>`frontend/src/components/Disponibilidad/EjeTiempo.module.css`<br>`frontend/src/components/Disponibilidad/EjeTiempo.test.jsx`<br>`frontend/src/components/ui/Icono.jsx`<br>`frontend/src/pages/DisponibilidadPage.jsx`<br>`frontend/src/pages/DisponibilidadPage.module.css`<br>`frontend/src/pages/DisponibilidadPage.test.jsx` | Tramo libre en blanco con borde punteado e icono «+», fila superior dedicada para «Ahora HH:MM» con `clamp()`, línea «Ahora» en z-index 1 detrás de bloques y franja de mantenimiento en z-index 2. |
-| **4** | `feat: indicadores de inicio con soporte de empate y estado vacío ilustrado` | `frontend/src/components/GrupoDeIndicadores/GrupoDeIndicadores.jsx`<br>`frontend/src/components/GrupoDeIndicadores/GrupoDeIndicadores.module.css`<br>`frontend/src/components/GrupoDeIndicadores/GrupoDeIndicadores.test.jsx`<br>`frontend/src/components/ui/CardIndicador.jsx`<br>`frontend/src/components/ui/CardIndicador.module.css`<br>`frontend/src/components/ui/EstadoVacio.jsx`<br>`frontend/src/components/ui/EstadoVacio.module.css`<br>`frontend/src/components/ui/acciones.test.jsx`<br>`frontend/src/components/ui/presentacion.test.jsx`<br>`frontend/src/pages/DashboardPage.module.css`<br>`frontend/src/pages/DashboardPage.test.jsx`<br>`frontend/src/pages/InicioAdministrador.jsx`<br>`frontend/src/pages/InicioSolicitante.module.css`<br>`frontend/src/pages/MiAmbientePage.jsx`<br>`frontend/src/utils/filtrosDeReservas.js`<br>`frontend/src/utils/filtrosDeReservas.test.js` | Métricas destacadas en 32 px. `filtrosDeReservas.js` contiene `ambienteMasUtilizado(ambientes)` que formatea el indicador, detecta empates, extrae nombres y genera texto de reservas aprobadas para `CardIndicador` e `InicioAdministrador`. Ilustración SVG del edificio UPLA en `EstadoVacio`. Línea «Ahora» de `AgendaDeHoy` configurada en z-index 1. |
-| **5** | `feat: barra superior contextual, menú lateral y microinteracciones accesibles` | `frontend/src/components/Layout/Layout.jsx`<br>`frontend/src/components/Layout/Layout.module.css`<br>`frontend/src/components/Layout/Layout.test.jsx`<br>`frontend/src/components/Layout/MenuLateral.jsx`<br>`frontend/src/components/Layout/Topbar.jsx`<br>`frontend/src/components/Layout/Topbar.module.css`<br>`frontend/src/components/LayoutYDetalle.test.jsx`<br>`frontend/src/components/ui/TableList.module.css`<br>`frontend/src/pages/AmbientesPage.jsx`<br>`frontend/src/pages/AmbientesPage.module.css`<br>`frontend/src/pages/DetalleReservaPage.test.jsx`<br>`frontend/src/pages/ErrorRutaPage.jsx`<br>`frontend/src/pages/UsuariosPage.jsx`<br>`frontend/src/pages/UsuariosPage.module.css`<br>`frontend/src/pages/listados.test.jsx`<br>`frontend/src/utils/migas.js`<br>`frontend/src/utils/migas.test.js` | En todas las rutas raíz (`/dashboard`, `/disponibilidad`, `/reservas`, `/ambientes`, `/usuarios`, `/mi-ambiente`) barra superior sin título a la izquierda; en móvil hamburguesa accesible; contenedor lateral continuo `min-height: 100%` con fondo marino continuo `#1F365C` en fullPage; elevación 2 px hover en tarjetas. |
+| **4** | `feat: indicadores de inicio con soporte de empate y estado vacío ilustrado` | `frontend/src/components/GrupoDeIndicadores/GrupoDeIndicadores.jsx`<br>`frontend/src/components/GrupoDeIndicadores/GrupoDeIndicadores.module.css`<br>`frontend/src/components/GrupoDeIndicadores/GrupoDeIndicadores.test.jsx`<br>`frontend/src/components/ui/CardIndicador.jsx`<br>`frontend/src/components/ui/CardIndicador.module.css`<br>`frontend/src/components/ui/EstadoVacio.jsx`<br>`frontend/src/components/ui/EstadoVacio.module.css`<br>`frontend/src/components/ui/acciones.test.jsx`<br>`frontend/src/components/ui/presentacion.test.jsx`<br>`frontend/src/pages/DashboardPage.module.css`<br>`frontend/src/pages/DashboardPage.test.jsx`<br>`frontend/src/pages/InicioAdministrador.jsx`<br>`frontend/src/pages/InicioSolicitante.module.css`<br>`frontend/src/pages/MiAmbientePage.jsx`<br>`frontend/src/utils/filtrosDeReservas.js`<br>`frontend/src/utils/filtrosDeReservas.test.js` | Métricas destacadas en 32 px. `filtrosDeReservas.js` contiene `ambienteMasUtilizado(ambientes)` con soporte de empates. Ilustración SVG del edificio UPLA en `EstadoVacio`. Línea «Ahora» de `AgendaDeHoy` en z-index 1. |
+| **5** | `feat: barra superior contextual, menú lateral y microinteracciones accesibles` | `frontend/src/components/Layout/Layout.jsx`<br>`frontend/src/components/Layout/Layout.module.css`<br>`frontend/src/components/Layout/Layout.test.jsx`<br>`frontend/src/components/Layout/MenuLateral.jsx`<br>`frontend/src/components/Layout/Topbar.jsx`<br>`frontend/src/components/Layout/Topbar.module.css`<br>`frontend/src/components/LayoutYDetalle.test.jsx`<br>`frontend/src/components/ui/TableList.module.css`<br>`frontend/src/pages/AmbientesPage.jsx`<br>`frontend/src/pages/AmbientesPage.module.css`<br>`frontend/src/pages/DetalleReservaPage.test.jsx`<br>`frontend/src/pages/ErrorRutaPage.jsx`<br>`frontend/src/pages/UsuariosPage.jsx`<br>`frontend/src/pages/UsuariosPage.module.css`<br>`frontend/src/pages/listados.test.jsx`<br>`frontend/src/utils/migas.js`<br>`frontend/src/utils/migas.test.js` | Barra superior limpia en rutas raíz, hamburguesa accesible en móvil, contenedor lateral continuo `min-height: 100%` con fondo marino continuo `#1F365C` en fullPage; elevación 2 px hover en tarjetas. |
 | **6** | `chore: guiones de captura e2e y suite de accesibilidad por etapas` | `tools/e2e/capturar-paso1-pulido.mjs`<br>`tools/e2e/capturar-paso2-pulido.mjs`<br>`tools/e2e/capturar-paso3-pulido.mjs`<br>`tools/e2e/capturar-paso4-pulido.mjs`<br>`tools/e2e/capturar-paso5-pulido.mjs`<br>`tools/e2e/capturar-pulido-final.mjs`<br>`tools/usabilidad/accesibilidad.mjs`<br>`tools/usabilidad/pruebas/accesibilidad-etapas.test.mjs` | Guiones Playwright e2e para capturas con sistema real, soporte de `ETAPA=pulido` y pruebas unitarias de accesibilidad por etapas. |
 | **7** | `docs: actualización de especificaciones, comparativa visual y evidencias` | `docs/avance-pulido.md`<br>`docs/diseno/DESIGN.md`<br>`docs/diseno/componentes.md`<br>`docs/diseno/experiencia.md`<br>`docs/diseno/pulido-antes-despues.md`<br>`docs/evidencias/pulido-accesibilidad.txt`<br>`docs/evidencias/pulido/` | Especificaciones de diseño formalizadas, bitácora de mediciones reales, informe `pulido-accesibilidad.txt`, comparativa visual y carpetas `final/`, `medicion/` y capturas intermedias. |
+| **8** | `chore: validación de fecha y de antigüedad en el guion de capturas final` | `tools/e2e/capturar-pulido-final.mjs` | Comprobación de antigüedad (`mtimeMs >= maxMtimeSrc`) y validación estricta del valor del campo fecha. |
+| **9** | `chore: retirar del control de versiones las capturas descartadas` | `.gitignore`<br>`docs/avance-pulido.md`<br>`docs/evidencias/pulido/descartadas/` | Desindexación de las 28 capturas intermedias obsoletas conservadas en disco y actualización del `.gitignore`. |
+| **10** | `feat: formato sin recorte en bloques cortos de disponibilidad y nuevas capturas` | `frontend/src/utils/disponibilidad.js`<br>`frontend/src/utils/disponibilidad.test.js`<br>`frontend/src/components/Disponibilidad/BloquesDisponibilidad.jsx`<br>`frontend/src/components/Disponibilidad/BloquesDisponibilidad.test.jsx`<br>`frontend/src/pages/DisponibilidadPage.module.css`<br>`frontend/src/pages/formulariosRegistro.test.jsx`<br>`tools/e2e/capturar-pulido-final.mjs`<br>`docs/evidencias/pulido/` | Formato abreviado conciso (`10–12 h`, `Libre 7–10 h`) sin elipsis, pruebas unitarias dedicadas y generación de capturas 16 (futura 24/11 con reservas), 17 (día libre 25/11) y 18 (día pasado 05/11). |
+| **11** | `feat: script de datos de demostración con fechas relativas` | `database/07_datos_demo.sql`<br>`README.md` | Script SQL opcional e idempotente con fechas relativas (`CURRENT_DATE + 1`, `+ 2`) que puebla reservas aprobadas, pendientes y conflicto 409 respetando RN-01 a RN-07. |
+| **12** | `docs: actualización de avance y comparativa visual con capturas finales` | `docs/avance-pulido.md`<br>`docs/diseno/pulido-antes-despues.md` | Actualización de bitácora con mediciones reales actualizadas, documentación de limitación técnica en horas pasadas de hoy y comparativa visual con las 18 pantallas. |
 
 ---
 
-**ESTADO ACTUAL**: Tarea completada al 100%. 0 defectos detectados. Todas las pruebas (unitarias, E2E y accesibilidad) verificadas exitosamente. Commits autorizados en Paso 13 por el usuario listos para ejecución local secuencial.
+**ESTADO ACTUAL**: Tarea completada al 100%. 0 defectos detectados. Todas las pruebas (unitarias 1.304 vitest, 230 backend, 18 usabilidad, E2E 9/9 y accesibilidad 0 violaciones) verificadas exitosamente. Árbol de trabajo limpio y aislado.
