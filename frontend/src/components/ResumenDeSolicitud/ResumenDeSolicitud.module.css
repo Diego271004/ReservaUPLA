@@ -33,13 +33,25 @@
 .fila dd {
   margin: 4px 0 0 calc(1.25rem + var(--espacio-1));
   overflow-wrap: anywhere;
+  transition:
+    font-weight var(--transicion-corta),
+    color var(--transicion-corta);
+}
+
+.fila dd.elegido {
   font-weight: 600;
   color: var(--color-marino);
 }
 
-.pendiente {
+.fila dd.pendiente {
   font-weight: 400;
   color: var(--color-texto-suave);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fila dd {
+    transition: none;
+  }
 }
 
 .detalle {

@@ -165,6 +165,7 @@ export const TEXTOS = Object.freeze({
   etiquetaHoraInicio: 'Hora de inicio',
   etiquetaHoraFin: 'Hora de fin',
   ayudaHorario: 'Horario permitido: 07:00 a 22:00',
+  atajosAyudaHoraInicio: 'Elige primero la hora de inicio.',
   etiquetaMotivo: 'Motivo',
   registrarSolicitud: 'Registrar solicitud',
   ambienteEnMantenimiento: 'En mantenimiento (no disponible)',
@@ -231,6 +232,8 @@ export const TEXTOS = Object.freeze({
   indicadorAprobadas: 'Reservas aprobadas',
   indicadorRechazadas: 'Reservas rechazadas',
   indicadorMasUtilizado: 'Ambiente más utilizado',
+  empateAmbientes: (n, m) =>
+    `Empate: ${n} ambientes con ${m} ${m === 1 ? 'reserva aprobada' : 'reservas aprobadas'}`,
   requierenDecision: 'Requieren tu decisión',
   hoyEnAmbientes: 'Hoy en los ambientes',
   usoPorAmbiente: 'Uso por ambiente',

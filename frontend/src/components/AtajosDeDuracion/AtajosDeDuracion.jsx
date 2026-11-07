@@ -1,3 +1,4 @@
+import { TEXTOS } from '../../constants/messages.js'
 import { horaFinDeDuracion } from '../../utils/resumenDeSolicitud.js'
 import Button from '../ui/Button.jsx'
 import estilos from './AtajosDeDuracion.module.css'
@@ -9,20 +10,28 @@ const DURACIONES = [1, 2, 3]
  * columnas iguales de 44 px de alto), también a 375 y 188 px.
  */
 export default function AtajosDeDuracion({ horaInicio, horaFin, alElegir }) {
+  const sinInicio = !horaInicio
+  const idAyuda = 'ayuda-atajos-inicio'
+
   return (
-    <div className={estilos.contenedor} role="group" aria-label="Duración de la reserva">
+    <div
+      className={estilos.contenedor}
+      role="group"
+      aria-label="Duración de la reserva"
+      aria-describedby={sinInicio ? idAyuda : undefined}
+    >
       <span className={estilos.titulo}>Duración</span>
       <div className={estilos.cuadricula}>
         {DURACIONES.map((horas) => {
           const fin = horaFinDeDuracion(horaInicio, horas)
           const elegida = Boolean(horaInicio) && fin !== null && fin === horaFin
-          const sinInicio = !horaInicio
           return (
             <Button
               key={horas}
               variante="secundario"
               aria-pressed={elegida}
               deshabilitado={sinInicio || fin === null}
+              aria-describedby={sinInicio ? idAyuda : undefined}
               title={
                 sinInicio
                   ? 'Elige primero la hora de inicio'
@@ -38,6 +47,11 @@ export default function AtajosDeDuracion({ horaInicio, horaFin, alElegir }) {
           )
         })}
       </div>
+      {sinInicio && (
+        <p id={idAyuda} className={estilos.ayuda}>
+          {TEXTOS.atajosAyudaHoraInicio}
+        </p>
+      )}
     </div>
   )
 }

@@ -17,16 +17,55 @@
   gap: var(--espacio-1);
 }
 
-.boton {
-  min-height: var(--control-alto-minimo, 44px);
-  height: 44px;
+.cuadricula .boton {
+  min-height: var(--alto-control);
+  height: var(--alto-control);
   width: 100%;
   padding: 0 var(--espacio-1);
   justify-content: center;
+  color: var(--color-primario);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-primario);
+  transition:
+    background-color var(--duracion-transicion),
+    border-color var(--duracion-transicion),
+    color var(--duracion-transicion);
 }
 
-.boton.elegida {
+.cuadricula .boton:hover:not(:disabled) {
+  background: var(--fondo-info);
+  border-color: var(--color-marino);
+  color: var(--color-marino);
+}
+
+.cuadricula .boton.elegida {
   color: var(--color-sobre-oscuro);
   background: var(--color-primario);
-  border-color: transparent; /* el relleno azul ya es el límite del control (6:1 sobre la tarjeta) */
+  border-color: transparent;
+}
+
+.cuadricula .boton.elegida:hover:not(:disabled) {
+  background: var(--color-marino);
+  border-color: transparent;
+  color: var(--color-sobre-oscuro);
+}
+
+.cuadricula .boton:disabled {
+  color: var(--color-deshabilitado);
+  border-color: transparent;
+  background: var(--fondo-deshabilitado);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ayuda {
+  margin: var(--espacio-1) 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-texto-suave);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cuadricula .boton {
+    transition: none;
+  }
 }

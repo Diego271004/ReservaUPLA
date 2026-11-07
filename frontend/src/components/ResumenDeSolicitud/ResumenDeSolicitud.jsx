@@ -47,7 +47,7 @@ export default function ResumenDeSolicitud({ ambiente, fecha, horaInicio, horaFi
               <Icono nombre={fila.icono} className={estilos.icono} />
               {fila.titulo}
             </dt>
-            <dd className={fila.valor ? undefined : estilos.pendiente}>
+            <dd className={fila.valor ? estilos.elegido : estilos.pendiente}>
               {fila.valor ?? SIN_ELEGIR}
               {fila.valor && fila.detalle && (
                 <span className={estilos.detalle}>{fila.detalle}</span>

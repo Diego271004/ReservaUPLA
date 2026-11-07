@@ -99,9 +99,9 @@ describe('PasswordInput', () => {
     render(<PasswordInput {...props} mostrando onAlternar={() => {}} onChange={() => {}} />)
     expect(screen.getByLabelText('Contraseña')).toHaveAttribute('type', 'text')
     expect(screen.getByRole('button', { name: 'Ocultar contraseña' })).toHaveTextContent('Ocultar')
-    expect(
-      screen.getByRole('button', { name: 'Ocultar contraseña' }),
-    ).not.toHaveAttribute('aria-pressed')
+    expect(screen.getByRole('button', { name: 'Ocultar contraseña' })).not.toHaveAttribute(
+      'aria-pressed',
+    )
   })
 
   it('el botón alterna con clic y con el teclado (Enter)', async () => {

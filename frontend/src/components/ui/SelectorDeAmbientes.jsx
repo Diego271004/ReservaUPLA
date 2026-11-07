@@ -143,35 +143,36 @@ export default function SelectorDeAmbientes({
               onKeyDown={(e) => manejarTeclado(e, ambiente.id)}
             >
               <div className={estilos.cabeceraTarjeta}>
-                <span className={estilos.iconoTipo}>
-                  <Icono nombre={iconoDeTipoAmbiente(ambiente.tipo)} tamano={22} />
+                <div className={estilos.tipoYEstado}>
+                  <span className={estilos.iconoTipo}>
+                    <Icono nombre={iconoDeTipoAmbiente(ambiente.tipo)} tamano={22} />
+                  </span>
+                  {enMantenimiento ? (
+                    <span className={estilos.badgeMantenimiento}>
+                      <Icono nombre="aviso" tamano={14} />
+                      <span>En mantenimiento (no disponible)</span>
+                    </span>
+                  ) : (
+                    <span className={estilos.badgeDisponible}>
+                      <Icono nombre="exito" tamano={14} />
+                      <span>Disponible</span>
+                    </span>
+                  )}
+                </div>
+                <span
+                  className={`${estilos.indicadorRadio} ${seleccionado ? estilos.indicadorRadioSeleccionado : ''}`}
+                  aria-hidden="true"
+                >
+                  {seleccionado && (
+                    <Icono nombre="marca" tamano={14} className={estilos.iconoMarca} />
+                  )}
                 </span>
-                {enMantenimiento ? (
-                  <span className={estilos.badgeMantenimiento}>
-                    <Icono nombre="aviso" tamano={14} />
-                    <span>En mantenimiento (no disponible)</span>
-                  </span>
-                ) : (
-                  <span className={estilos.badgeDisponible}>
-                    <Icono nombre="exito" tamano={14} />
-                    <span>Disponible</span>
-                  </span>
-                )}
               </div>
 
               <div className={estilos.cuerpoTarjeta}>
                 <span className={estilos.nombre}>{ambiente.nombre}</span>
                 <span className={estilos.detalles}>
                   {ambiente.capacidad} {TEXTOS.personas} · {ambiente.ubicacion}
-                </span>
-              </div>
-
-              <div className={estilos.pieTarjeta}>
-                <span
-                  className={`${estilos.indicadorRadio} ${seleccionado ? estilos.indicadorRadioSeleccionado : ''}`}
-                  aria-hidden="true"
-                >
-                  {seleccionado && <span className={estilos.puntoActivo} />}
                 </span>
               </div>
             </div>

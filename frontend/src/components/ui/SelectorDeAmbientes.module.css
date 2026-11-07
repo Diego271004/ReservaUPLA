@@ -56,7 +56,7 @@
 
 .seleccionada {
   border: 2px solid var(--color-primario);
-  background: var(--fondo-info);
+  background: var(--fondo-seleccion);
 }
 
 .conError:not(.seleccionada) {
@@ -71,11 +71,18 @@
 
 .cabeceraTarjeta {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--espacio-1);
   margin-bottom: var(--espacio-1);
+}
+
+.tipoYEstado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-1);
+  min-width: 0;
 }
 
 .iconoTipo {
@@ -107,11 +114,54 @@
   background: var(--fondo-aviso);
 }
 
+.indicadorRadio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radio-completo);
+  border: 2px solid var(--color-borde-control);
+  background: var(--color-superficie);
+  flex-shrink: 0;
+  transition:
+    border-color var(--duracion-transicion),
+    background-color var(--duracion-transicion);
+}
+
+.indicadorRadioSeleccionado {
+  border-color: transparent;
+  background: var(--color-primario);
+  color: var(--color-sobre-oscuro);
+}
+
+@keyframes animacionMarca {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.iconoMarca {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  animation: animacionMarca var(--transicion-corta) ease-out;
+}
+
 .cuerpoTarjeta {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-bottom: var(--espacio-1);
+  margin-top: auto;
 }
 
 .nombre {
@@ -128,38 +178,6 @@
   color: var(--color-texto-suave);
   line-height: 1.35;
   overflow-wrap: anywhere;
-}
-
-.pieTarjeta {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-top: auto;
-}
-
-.indicadorRadio {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: var(--radio-completo);
-  border: 2px solid var(--color-borde-control);
-  background: var(--color-superficie);
-  transition:
-    border-color var(--duracion-transicion),
-    background-color var(--duracion-transicion);
-}
-
-.indicadorRadioSeleccionado {
-  border-color: var(--color-primario);
-}
-
-.puntoActivo {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radio-completo);
-  background: var(--color-primario);
 }
 
 .ayuda {
@@ -184,7 +202,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tarjeta,
-  .indicadorRadio {
-    transition: none;
+  .indicadorRadio,
+  .iconoMarca {
+    animation: none !important;
+    transition: none !important;
   }
 }
