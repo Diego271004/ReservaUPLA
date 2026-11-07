@@ -40,12 +40,18 @@
   transition:
     border-color var(--duracion-transicion),
     background-color var(--duracion-transicion),
-    box-shadow var(--duracion-transicion);
+    box-shadow var(--duracion-transicion),
+    transform var(--duracion-transicion) ease-out;
 }
 
 .tarjeta:hover:not(.deshabilitada) {
   border-color: var(--color-primario);
   box-shadow: var(--elevacion-flotante);
+  transform: translateY(-2px);
+}
+
+.tarjeta:active:not(.deshabilitada) {
+  transform: translateY(0);
 }
 
 .tarjeta:focus,
@@ -206,5 +212,6 @@
   .iconoMarca {
     animation: none !important;
     transition: none !important;
+    transform: none !important;
   }
 }

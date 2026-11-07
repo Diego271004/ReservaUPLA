@@ -68,6 +68,10 @@
   transform: translateY(-2px);
 }
 
+.enlace .tarjeta:active {
+  transform: translateY(0);
+}
+
 .enlace:focus-visible {
   outline: var(--grosor-foco) solid var(--color-foco);
   outline-offset: 2px;
@@ -176,7 +180,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .tarjeta {
+    transition: none;
+  }
+
   .enlace .tarjeta:hover,
+  .enlace .tarjeta:active,
   .enlace .tarjeta:hover .flecha {
     transform: none;
   }

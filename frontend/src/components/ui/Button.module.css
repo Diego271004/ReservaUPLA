@@ -18,7 +18,13 @@
   white-space: normal;
   transition:
     background-color var(--duracion-transicion),
-    border-color var(--duracion-transicion);
+    border-color var(--duracion-transicion),
+    transform var(--duracion-transicion) ease-out,
+    box-shadow var(--duracion-transicion) ease-out;
+}
+
+.boton:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 @media (max-width: 767px) {
@@ -164,5 +170,15 @@
 @keyframes girar {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton {
+    transition: none;
+  }
+
+  .boton:active:not(:disabled) {
+    transform: none;
   }
 }

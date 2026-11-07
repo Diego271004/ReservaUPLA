@@ -29,13 +29,18 @@
   transition:
     background-color var(--duracion-transicion),
     border-color var(--duracion-transicion),
-    color var(--duracion-transicion);
+    color var(--duracion-transicion),
+    transform var(--duracion-transicion) ease-out;
 }
 
 .cuadricula .boton:hover:not(:disabled) {
   background: var(--fondo-info);
   border-color: var(--color-marino);
   color: var(--color-marino);
+}
+
+.cuadricula .boton:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .cuadricula .boton.elegida {
@@ -67,5 +72,10 @@
 @media (prefers-reduced-motion: reduce) {
   .cuadricula .boton {
     transition: none;
+    transform: none;
+  }
+
+  .cuadricula .boton:active:not(:disabled) {
+    transform: none;
   }
 }

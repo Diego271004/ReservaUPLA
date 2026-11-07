@@ -144,11 +144,15 @@
   background: var(--color-superficie);
   transition:
     background-color var(--duracion-transicion),
-    border-color var(--duracion-transicion);
+    border-color var(--duracion-transicion),
+    transform var(--duracion-transicion) ease-out;
 }
 .libre:hover:not(:disabled) {
   background: var(--fondo-libre-hover);
   border-color: var(--color-primario);
+}
+.libre:active:not(:disabled) {
+  transform: translateY(1px);
 }
 .aprobada {
   color: var(--color-exito);
@@ -241,6 +245,11 @@
   .esqueletoBloque2 {
     animation: none;
     opacity: 0.8;
+  }
+  .libre,
+  .libre:active:not(:disabled) {
+    transition: none;
+    transform: none;
   }
 }
 .vacio {
