@@ -26,3 +26,7 @@ appsettings.Development.json
 
 # Logo original de la UPLA (1724x2000): no se redistribuye; la app solo carga las versiones derivadas
 frontend/src/assets/logo-upla.webp
+
+# Evidencias intermedias obsoletas
+docs/evidencias/pulido/descartadas/
+
