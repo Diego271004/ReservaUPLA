@@ -2,9 +2,6 @@ import { readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-// Contrato de los estilos: Vitest corre con `css: false`, así que estas pruebas leen los archivos .css. Cada una cubre un
-// defecto medido en el sistema real (docs/evidencias/fase8-accesibilidad-antes.txt); el navegador real lo comprueba
-// tools/usabilidad/accesibilidad.mjs.
 const SRC = resolve(__dirname, '..')
 const css = (ruta) => readFileSync(join(SRC, ruta), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
 const escapar = (texto) => texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -95,7 +92,6 @@ describe('prefers-reduced-motion', () => {
   })
 })
 
-// ---------------------------------------------------------------- Reflujo (WCAG 1.4.10): sin scroll horizontal a 320 px
 describe('reflujo en pantallas angostas', () => {
   it('la columna del login no crece más que la pantalla', () => {
     expect(
@@ -141,7 +137,6 @@ describe('objetivos táctiles de 44 px', () => {
   })
 })
 
-// ---------------------------------------------------------------- Separación de los botones del cierre de una reserva
 describe('cierre de Nueva reserva', () => {
   it('los botones no quedan pegados', () => {
     expect(regla(css('pages/NuevaReservaPage.module.css'), '.acciones')).toContain(
@@ -150,7 +145,6 @@ describe('cierre de Nueva reserva', () => {
   })
 })
 
-// ---------------------------------------------------------------- Listados en móvil
 describe('listados en móvil', () => {
   it('cada registro se separa del siguiente con una banda visible, no con una línea de 1 px', () => {
     expect(css('components/ui/TableList.module.css')).toMatch(
@@ -169,7 +163,6 @@ describe('listados en móvil', () => {
   })
 })
 
-// ---------------------------------------------------------------- Pantallas de la Fase 9 (defectos vistos en las capturas reales)
 describe('Dashboard, Reservas y Mi ambiente', () => {
   it('un valor de texto de una tarjeta (el nombre de un ambiente) es más chico que un número y parte las palabras largas', () => {
     const regla1 = regla(css('components/ui/CardIndicador.module.css'), '.valorTexto')

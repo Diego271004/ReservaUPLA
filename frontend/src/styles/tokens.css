@@ -12,6 +12,7 @@
 
   --color-texto: #1f365c;
   --color-texto-suave: #4f4f4f;
+  --color-texto-secundario: #4f4f4f;
   --color-fondo: #f4f6fa;
   --color-superficie: #ffffff;
   --color-borde: #d1d5db;
@@ -28,6 +29,10 @@
   --fuente-base: 'Montserrat', system-ui, sans-serif;
   --fuente-titulo: 'Poppins', 'Montserrat', system-ui, sans-serif;
   --tamano-texto: 1rem;
+  --tipo-titulo-pagina: 1.5rem;
+  --tipo-seccion: 1.125rem;
+  --tipo-etiqueta: 0.875rem;
+  --tipo-cuerpo: 1rem;
 
   --alto-control: 44px;
   /* Formas sobrias: esquinas de 4 a 6 px; 999px solo para el interruptor y el indicador de carga, que son círculos. */
@@ -39,6 +44,7 @@
   --ancho-menu-colapsado: 80px;
   --alto-barra-superior: 64px;
   --duracion-transicion: 180ms; /* hover, foco, paneles, modales y avisos: 150 a 200 ms, sin movimiento con prefers-reduced-motion */
+  --transicion-corta: 150ms;
   --alto-logo-menu: 40px;
   --alto-logo-login: 80px;
   --alto-logo-login-movil: 40px;
@@ -60,7 +66,12 @@
   --fondo-exito: #effaf3;
   --fondo-aviso: #fef8e7;
   --fondo-info: #eef4fd;
+  --fondo-seleccion: #edf5fc;
+  --fondo-libre: #ffffff;
+  --fondo-libre-hover: #eef4fd;
+  --fondo-fila-alterna: #f9fafc;
   --fondo-neutro: #eceef1;
+  --fondo-franja-pasada: rgba(148, 163, 184, 0.22);
   --fondo-encabezado-tabla: #e6ecf5;
   /* Capas planas (sin degradado): la del login deja el texto blanco a 4,5:1 o más sobre la parte más clara de la foto. */
   --fondo-login: #f4f6fa;
@@ -90,6 +101,7 @@
   --elevacion-flotante: 0 1px 2px rgb(31 54 92 / 24%);
   --separador-sobre-oscuro: rgb(255 255 255 / 20%);
   --color-neutro: #4f4f4f;
+  --color-etiqueta-menu: #a0aec0;
   --color-deshabilitado: #6b7280;
   --fondo-deshabilitado: #eceef1;
 }
