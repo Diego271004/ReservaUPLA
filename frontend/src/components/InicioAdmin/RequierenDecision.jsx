@@ -15,12 +15,7 @@ export default function RequierenDecision({ solicitudes, totalPendientes, alDeci
   return (
     <section className={estilos.seccion} aria-labelledby="decisiones-titulo">
       <div className={estilos.encabezadoSeccion}>
-        <div>
-          <p className={estilos.etiqueta}>
-            {solicitudes.length ? `${solicitudes.length} por atender` : 'Al día'}
-          </p>
-          <h2 id="decisiones-titulo">{TEXTOS.requierenDecision}</h2>
-        </div>
+        <h2 id="decisiones-titulo">{TEXTOS.requierenDecision}</h2>
         {totalPendientes > 0 && (
           <Link className={estilos.verTodas} to="/reservas?estado=Pendiente">
             {TEXTOS.verTodas}
@@ -95,7 +90,7 @@ export default function RequierenDecision({ solicitudes, totalPendientes, alDeci
           })}
         </div>
       )}
-      {totalPendientes > 0 && (
+      {totalPendientes > solicitudes.length && (
         <p className={estilos.piePagina} role="status">
           {textoMostrando(solicitudes.length, totalPendientes)}
         </p>

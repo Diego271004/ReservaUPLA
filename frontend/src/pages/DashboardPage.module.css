@@ -200,22 +200,26 @@
 .sinReservasHoy {
   position: absolute;
   left: var(--espacio-1);
-  bottom: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 0.875rem;
   background: var(--color-fondo);
   z-index: 2;
 }
 .bloqueAprobado {
   position: absolute;
-  top: 20px;
-  height: 32px;
+  top: 8px;
+  display: flex;
+  align-items: center;
+  height: 48px;
   min-width: 2px;
   overflow: hidden;
-  padding: 6px 4px;
+  padding: 0 8px;
   background: var(--color-exito);
   color: var(--color-superficie);
   border-radius: var(--radio-pequeno);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
   z-index: 2;
@@ -300,7 +304,8 @@
 }
 .apilada {
   display: flex;
-  min-height: 44px;
+  gap: 2px;
+  min-height: 16px;
   margin-top: var(--espacio-2);
   overflow: hidden;
   border-radius: var(--radio-pequeno);
@@ -309,7 +314,7 @@
   display: flex;
   align-items: center;
   min-width: 0;
-  padding: 4px 8px;
+  padding: 0;
 }
 .leyendaEstados {
   display: flex;
@@ -425,5 +430,42 @@
   .filaBarra .trazo {
     grid-column: 1 / -1;
     grid-row: 2;
+  }
+}
+
+/* Esqueleto del Inicio del Administrador: la forma de lo que va a llegar, para que no haya saltos al cargar. */
+.esqueletoInicio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+.cajaEsqueleto {
+  height: 120px;
+  background: var(--fondo-neutro);
+  border-radius: var(--radio-tarjeta);
+  animation: pulsoEsqueleto 1.5s ease-in-out infinite;
+}
+.cajaEsqueletoAlta {
+  height: 220px;
+}
+@keyframes pulsoEsqueleto {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cajaEsqueleto {
+    animation: none;
+  }
+}
+
+/* En pantallas angostas el carril es corto: el bloque queda como barra de color y el horario lo dice el lector (aria-label) y el title, sin texto recortado. */
+@media (max-width: 767px) {
+  .bloqueAprobado > span[aria-hidden='true'] {
+    display: none;
   }
 }

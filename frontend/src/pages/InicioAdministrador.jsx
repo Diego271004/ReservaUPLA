@@ -64,7 +64,18 @@ export default function InicioAdministrador({ ahora = new Date() }) {
         <AlertMessage tipo={decision.alerta.tipo}>{decision.alerta.mensaje}</AlertMessage>
       )}
       {error && <AvisoDeError mensaje={error} alReintentar={recargar} />}
-      {cargando && <p role="status">{TEXTOS.cargando}</p>}
+      {cargando && (
+        <>
+          <p role="status" className="solo-lector">
+            {TEXTOS.cargando}
+          </p>
+          <div className={estilos.esqueletoInicio} aria-hidden="true">
+            <div className={estilos.cajaEsqueleto} />
+            <div className={`${estilos.cajaEsqueleto} ${estilos.cajaEsqueletoAlta}`} />
+            <div className={estilos.cajaEsqueleto} />
+          </div>
+        </>
+      )}
       {!error && !cargando && (
         <div className={estilos.contenedorInicio}>
           <Portada pendientes={pendientesMasAntiguas.total} ahora={ahora} />
