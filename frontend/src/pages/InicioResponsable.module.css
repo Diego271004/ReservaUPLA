@@ -204,6 +204,11 @@
   justify-self: end;
 }
 
+/* «Próximas reservas» lleva seis datos por fila (fecha, hora, ambiente, solicitante, estado y botón): seis columnas, para que el botón quede en la misma fila. */
+.listaResponsable li {
+  grid-template-columns: 130px 110px 1fr 1fr auto auto;
+}
+
 @media (max-width: 768px) {
   .agendaResponsable li,
   .listaResponsable li {

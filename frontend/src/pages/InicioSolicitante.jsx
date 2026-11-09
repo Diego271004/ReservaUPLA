@@ -25,7 +25,7 @@ const iconoPorEstado = (estado) =>
   ({
     Pendiente: 'reloj',
     Aprobada: 'exito',
-    Rechazada: 'error',
+    Rechazada: 'equis',
     Cancelada: 'calendario',
   })[estado] ?? 'calendario'
 
@@ -92,13 +92,6 @@ export default function InicioSolicitante({ ahora = new Date() }) {
                 : 'No tienes reservas próximas. Elige un ambiente para comenzar.'}
             </p>
           </div>
-          <Button
-            variante="secundario"
-            className={estilos.accionPortada}
-            onClick={() => navigate('/reservas/nueva')}
-          >
-            Reservar un ambiente
-          </Button>
         </section>
 
         {proxima ? (
