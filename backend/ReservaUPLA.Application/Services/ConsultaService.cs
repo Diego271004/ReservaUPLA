@@ -50,6 +50,10 @@ public sealed class ConsultaService : IConsultaService
         return ResultadoOperacion<PaginaDeReservasDto>.Exitoso(await _reservas.ListarAsync(filtro, cancellationToken));
     }
 
+    /// <summary>Las reservas que siguen vigentes (aprobadas o pendientes); una cancelada o rechazada ya no ocupa el ambiente.</summary>
+    private static List<ReservaDto> Vigentes(IEnumerable<ReservaDto> reservas) =>
+        reservas.Where(r => r.Estado is "Aprobada" or "Pendiente").ToList();
+
     public async Task<DashboardDto> ObtenerDashboardAsync(ActorDto actor, CancellationToken cancellationToken)
     {
         var hoy = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(-5));
@@ -67,7 +71,10 @@ public sealed class ConsultaService : IConsultaService
                     cancellationToken);
                 resumen.Add(new IndicadorEstadoDto(estado.ToString(), pagina.Total));
             }
-            var proxima = solicitudes.Elementos.FirstOrDefault();
+            // La «próxima reserva» es la más cercana que sigue vigente: primero la aprobada, y si no hay, la pendiente.
+            // Una cancelada o rechazada no es una reserva próxima.
+            var proxima = solicitudes.Elementos.FirstOrDefault(r => r.Estado == "Aprobada")
+                ?? solicitudes.Elementos.FirstOrDefault(r => r.Estado == "Pendiente");
             var inicioSolicitante = new InicioSolicitanteDto(proxima, solicitudes.Elementos.ToList(), resumen);
             return new DashboardDto(
                 new IndicadoresDto(solicitudes.Total, resumen.FirstOrDefault(x => x.Estado == "Pendiente")?.Total ?? 0,
@@ -86,7 +93,9 @@ public sealed class ConsultaService : IConsultaService
                 new FiltroReservas(ResponsableId: actor.UsuarioId, Desde: hoy.AddDays(1), Pagina: 1, Tamano: 1000),
                 cancellationToken);
             var resumenes = propios.Select(ADto).ToList();
-            var inicioResponsable = new InicioResponsableDto(resumenes, hoyReservas.Elementos.ToList(), proximas.Elementos.ToList());
+            // Las listas de «Hoy» y «Próximas» son lo que el Responsable tiene por delante: solo reservas vigentes (aprobadas o pendientes).
+            // Las canceladas y rechazadas no ocupan el ambiente; los indicadores de abajo siguen contando todos los estados.
+            var inicioResponsable = new InicioResponsableDto(resumenes, Vigentes(hoyReservas.Elementos), Vigentes(proximas.Elementos));
             return new DashboardDto(new IndicadoresDto(hoyReservas.Total + proximas.Total, hoyReservas.Elementos.Count(r => r.Estado == "Pendiente"), hoyReservas.Elementos.Count(r => r.Estado == "Aprobada") + proximas.Elementos.Count(r => r.Estado == "Aprobada"), hoyReservas.Elementos.Count(r => r.Estado == "Rechazada") + proximas.Elementos.Count(r => r.Estado == "Rechazada")), [], new PaginaDeReservasDto([], 0, 1, 5), [], [], [], null, inicioResponsable);
         }
 

@@ -153,6 +153,37 @@ public class ConsultaServiceTests
     }
 
     [Fact]
+    public async Task Dashboard_solicitante_la_proxima_reserva_ignora_las_canceladas_y_rechazadas()
+    {
+        ReservaDto De(int id, string fecha, string estado) =>
+            new(id, ReservaFixture.Laboratorio, "Laboratorio de Cómputo 2", 42, "Ana Torres", fecha, "10:00", "12:00", "Práctica", estado);
+        _escenario.Reservas.PaginaARetornar = new PaginaDeReservasDto(
+            new List<ReservaDto> { De(1, "2030-02-10", "Cancelada"), De(2, "2030-02-11", "Rechazada"), De(3, "2030-02-12", "Pendiente"), De(4, "2030-02-13", "Aprobada") },
+            4, 1, 1000);
+
+        var dashboard = await _escenario.CrearServicioDeConsulta().ObtenerDashboardAsync(new ActorDto(42, RolUsuario.Solicitante), CancellationToken.None);
+
+        // La aprobada manda aunque sea posterior a la pendiente.
+        Assert.Equal(4, dashboard.InicioSolicitante!.ProximaReserva!.Id);
+    }
+
+    [Fact]
+    public async Task Dashboard_solicitante_sin_aprobadas_la_proxima_es_la_pendiente_y_sin_ninguna_vigente_no_hay_proxima()
+    {
+        ReservaDto De(int id, string estado) =>
+            new(id, ReservaFixture.Laboratorio, "Laboratorio de Cómputo 2", 42, "Ana Torres", "2030-02-10", "10:00", "12:00", "Práctica", estado);
+        var servicio = _escenario.CrearServicioDeConsulta();
+
+        _escenario.Reservas.PaginaARetornar = new PaginaDeReservasDto(new List<ReservaDto> { De(1, "Cancelada"), De(2, "Pendiente") }, 2, 1, 1000);
+        var conPendiente = await servicio.ObtenerDashboardAsync(new ActorDto(42, RolUsuario.Solicitante), CancellationToken.None);
+        Assert.Equal(2, conPendiente.InicioSolicitante!.ProximaReserva!.Id);
+
+        _escenario.Reservas.PaginaARetornar = new PaginaDeReservasDto(new List<ReservaDto> { De(1, "Cancelada"), De(3, "Rechazada") }, 2, 1, 1000);
+        var sinVigentes = await servicio.ObtenerDashboardAsync(new ActorDto(42, RolUsuario.Solicitante), CancellationToken.None);
+        Assert.Null(sinVigentes.InicioSolicitante!.ProximaReserva);
+    }
+
+    [Fact]
     public async Task Dashboard_responsable_no_consulta_ambientes_ajenos()
     {
         var dashboard = await _escenario.CrearServicioDeConsulta().ObtenerDashboardAsync(new ActorDto(77, RolUsuario.Responsable), CancellationToken.None);
@@ -160,6 +191,20 @@ public class ConsultaServiceTests
         Assert.NotNull(dashboard.InicioResponsable);
         Assert.All(_escenario.Reservas.Filtros, filtro => Assert.Equal(77, filtro.ResponsableId));
         Assert.All(_escenario.Reservas.Filtros, filtro => Assert.Null(filtro.UsuarioId));
+    }
+
+    [Fact]
+    public async Task Dashboard_responsable_hoy_y_proximas_solo_muestran_reservas_vigentes()
+    {
+        ReservaDto De(int id, string estado) =>
+            new(id, ReservaFixture.Laboratorio, "Laboratorio de Cómputo 2", 42, "Ana Torres", "2030-02-10", "10:00", "12:00", "Práctica", estado);
+        _escenario.Reservas.PaginaARetornar = new PaginaDeReservasDto(
+            new List<ReservaDto> { De(1, "Cancelada"), De(2, "Rechazada"), De(3, "Pendiente"), De(4, "Aprobada") }, 4, 1, 1000);
+
+        var dashboard = await _escenario.CrearServicioDeConsulta().ObtenerDashboardAsync(new ActorDto(77, RolUsuario.Responsable), CancellationToken.None);
+
+        Assert.Equal([3, 4], dashboard.InicioResponsable!.Hoy.Select(r => r.Id));
+        Assert.Equal([3, 4], dashboard.InicioResponsable.Proximas.Select(r => r.Id));
     }
 
     // ---------------------------------------------------------------- Mi ambiente
