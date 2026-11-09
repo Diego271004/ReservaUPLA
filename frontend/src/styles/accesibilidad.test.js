@@ -295,3 +295,18 @@ describe('reflujo a 188 px: rejillas con mínimo de columna', () => {
     )
   })
 })
+
+describe('barra superior: el enlace de regreso es solo de móvil', () => {
+  const topbar = css('components/Layout/Topbar.module.css')
+
+  it('en escritorio el enlace «‹ Padre» está oculto y la regla gana a «.migas a» (defecto visto en Detalle y Nueva reserva a 1280 px: salían el enlace y la miga a la vez)', () => {
+    expect(regla(topbar, '.migas .enlaceRegresoMovil')).toContain('display: none')
+    expect(topbar.slice(0, topbar.indexOf('@media'))).not.toMatch(/(^|\n)\.enlaceRegresoMovil\s*\{/)
+  })
+
+  it('en móvil (≤ 480 px) se muestra con una regla de igual o mayor especificidad que «.migas a»', () => {
+    expect(regla(topbar, '.migas .enlaceRegresoMovil', '@media (max-width: 480px)')).toContain(
+      'display: inline-flex',
+    )
+  })
+})
