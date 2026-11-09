@@ -104,7 +104,7 @@ describe('tablas: encabezado marino claro y filas con separadores finos', () => 
 })
 
 describe('acento dorado: solo detalle', () => {
-  it('el dorado se usa únicamente en bordes (franja del login, línea bajo el nombre en el menú de usuario, filete del resumen y marca del ítem activo del menú), nunca como color de texto ni de fondo', () => {
+  it('el dorado se usa únicamente en bordes (franja del login, línea bajo el nombre en el menú de usuario, filete del resumen, filete bajo el título de cada pantalla y marca del ítem activo del menú), nunca como color de texto ni de fondo', () => {
     const usos = TODOS_LOS_CSS.flatMap((ruta) =>
       [...leer(ruta).matchAll(/([\w-]+)\s*:\s*[^;]*var\(--color-dorado\)[^;]*;/g)].map((m) => [
         ruta,
@@ -117,6 +117,7 @@ describe('acento dorado: solo detalle', () => {
       'components/Layout/Layout.module.css',
       'components/Layout/MenuDeUsuario.module.css',
       'components/ResumenDeSolicitud/ResumenDeSolicitud.module.css',
+      'components/ui/PageHeader.module.css',
       'pages/LoginPage.module.css',
     ])
   })
