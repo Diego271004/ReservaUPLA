@@ -41,7 +41,7 @@ Experiencia de selección y confirmación:
 - **Principios:** Flexibilidad y eficiencia de uso (Nielsen 7), prevención y recuperación de errores (Nielsen 5 y 9).
 
 ## Login y Páginas de Error (`/login`, 403 y 404)
-- **Login a pantalla partida:** Fotografía institucional del campus con degradado lateral marino oscuro que garantiza contraste > 4.5:1; tarjeta blanca con logo oficial de la UPLA y controles de 48 px. Alternancia de contraseña accesible con `aria-pressed`, detector de Bloq Mayús no invasivo y estado de carga «Verificando credenciales…».
+- **Login a pantalla partida:** fotografía institucional del campus con velo marino que garantiza contraste > 4.5:1; el panel termina en **punta de hexágono** (eco del logo) y no lleva franja dorada. Movimiento decorativo, finito y apagado con `prefers-reduced-motion`: la foto se asienta al cargar (6 s) y se desplaza hasta 12 px con el puntero, tres hexágonos de la marca flotan a distinta profundidad y los textos y campos entran escalonados (600 ms). Chips con los tipos de espacio (Laboratorios, Auditorios, Salas). Tarjeta blanca con logo oficial y controles de 48 px, alternancia de contraseña accesible, detector de Bloq Mayús y estado «Verificando credenciales…». En móvil queda la franja con el nombre y la tarjeta, sin foto ni adornos.
 ## 403 y 404
 - Ilustración institucional sobria en `EstadoVacio`, redacción en lenguaje humano comprensible y enlace de retorno «Volver al inicio» con objetivo táctil >= 44 px y foco visible de 3 px.
 
