@@ -1,5 +1,6 @@
-/* Login a pantalla partida (referencia: la intranet de la UPLA): la foto del campus con un degradado lateral oscuro a la
-   izquierda y, a la derecha, una tarjeta blanca con el logo y el formulario sobre un fondo gris azulado. */
+/* Login a pantalla partida: a la izquierda el campus con un velo marino y hexágonos de la marca; el panel termina en punta de
+   hexágono (como el logo) y a la derecha va la tarjeta blanca con el formulario. El movimiento es decorativo (entrada escalonada,
+   la foto que se asienta y capas que siguen al puntero) y se apaga con prefers-reduced-motion. */
 .pagina {
   display: grid;
   grid-template-columns: minmax(0, 58fr) minmax(400px, 42fr);
@@ -7,7 +8,7 @@
   background: var(--fondo-login);
 }
 
-/* Panel marino con la foto de fondo. La franja dorada (detalle, sin texto) lo separa del formulario. */
+/* Panel marino. Las capas decorativas solo existen en pantallas anchas (más abajo). */
 .panel {
   position: relative;
   display: flex;
@@ -17,16 +18,24 @@
   overflow: hidden;
   color: var(--color-sobre-oscuro);
   background: var(--color-marino);
-  border-right: var(--ancho-franja-dorada) solid var(--color-dorado);
 }
 
-.panel > * {
+.foto,
+.velo,
+.hexagonos {
+  display: none;
+}
+
+.texto {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
 }
 
 .universidad {
-  margin: 0 0 var(--espacio-2);
+  margin: 0;
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -45,6 +54,28 @@
   max-width: 24ch;
   margin: var(--espacio-2) 0 0;
   font-size: 1.25rem;
+}
+
+/* Los tipos de espacio que se pueden reservar, como etiquetas: oscurecen el fondo (no lo aclaran) para mantener el contraste. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-1);
+  padding: 0;
+  margin: var(--espacio-1) 0 0;
+  list-style: none;
+}
+
+.chips li {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 14px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--fondo-chip-login);
+  border: 1px solid var(--borde-chip-login);
+  border-radius: var(--radio-completo);
 }
 
 .contenido {
@@ -75,6 +106,91 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/* Los textos y los campos del formulario entran uno tras otro. */
+@keyframes subir {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* La foto empieza un poco más cerca y se asienta. */
+@keyframes asentar {
+  from {
+    scale: 1.2;
+  }
+
+  to {
+    scale: 1.06;
+  }
+}
+
+.universidad,
+.marca,
+.lema,
+.chips {
+  animation: subir var(--duracion-entrada) ease-out both;
+}
+
+.universidad {
+  animation-delay: 80ms;
+}
+
+.marca {
+  animation-delay: 170ms;
+}
+
+.lema {
+  animation-delay: 260ms;
+}
+
+.chips {
+  animation-delay: 360ms;
+}
+
+.formulario > * {
+  animation: subir var(--duracion-entrada) ease-out both;
+}
+
+.formulario > :nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.formulario > :nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.formulario > :nth-child(4) {
+  animation-delay: 180ms;
+}
+
+.formulario > :nth-child(5) {
+  animation-delay: 240ms;
+}
+
+.formulario > :nth-child(6) {
+  animation-delay: 300ms;
+}
+
+.formulario > :nth-child(n + 7) {
+  animation-delay: 360ms;
 }
 
 /* Logo en la cabecera de la tarjeta (sobre blanco). */
@@ -121,34 +237,86 @@
   margin-top: var(--espacio-1);
 }
 
-/* Foto del campus (decorativa) anclada abajo, sin estirarla más de 1,5 veces (--alto-foto-maximo); lo que sobra arriba queda marino
-   y el difuminado superior lo funde con la foto (sin escalón). Los degradados viven en los tokens: oscurecen la parte del texto
-   (marino a 72 % o más, que da 4,5:1 o más al texto blanco sobre lo más claro de la foto) y dejan ver la foto hacia la derecha.
-   Móvil no la descarga. */
+/* Pantallas anchas: la foto del campus (decorativa) anclada abajo, sin estirarla más de 1,5 veces (--alto-foto-maximo); lo que
+   sobra arriba queda marino y el difuminado superior lo funde con la foto. El velo oscurece la zona del texto (marino a 72 % o más,
+   que da 4,5:1 o más al texto blanco sobre lo más claro de la foto) y deja ver la foto hacia la derecha. La foto se mueve hasta
+   12 px y los hexágonos hasta 14 px según el puntero (--mx y --my). Móvil no descarga la foto. */
 @media (min-width: 768px) {
-  .panel::before,
-  .panel::after {
+  .panel {
+    padding-right: calc(5vw + var(--punta-hexagono));
+    clip-path: polygon(
+      0 0,
+      calc(100% - var(--punta-hexagono)) 0,
+      100% 50%,
+      calc(100% - var(--punta-hexagono)) 100%,
+      0 100%
+    );
+  }
+
+  .foto,
+  .velo {
     position: absolute;
     right: 0;
     bottom: 0;
     left: 0;
+    display: block;
     height: min(100%, var(--alto-foto-maximo));
-    content: '';
   }
 
-  .panel::before {
+  /* El marco recorta la imagen: así el zoom y el movimiento nunca asoman fuera de la foto. */
+  .foto {
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .fotoImagen {
+    position: absolute;
+    inset: 0;
     background-image: url('../assets/campus-upla.webp');
     background-repeat: no-repeat;
     background-position: 52% bottom;
     background-size: cover;
+    scale: 1.06;
+    transform: translate3d(calc(var(--mx, 0) * -12px), calc(var(--my, 0) * -8px), 0);
+    animation: asentar var(--duracion-asentamiento) ease-out both;
+    will-change: transform;
   }
 
-  .panel::after {
+  .velo {
+    z-index: 1;
     background: var(--degradado-superior-foto), var(--degradado-lateral-foto);
+  }
+
+  .hexagonos {
+    position: absolute;
+    top: 4%;
+    right: calc(var(--punta-hexagono) + 2vw);
+    z-index: 1;
+    display: block;
+    width: min(22vw, 260px);
+    height: auto;
+    overflow: visible;
+    fill: none;
+    stroke: var(--trazo-marca);
+    stroke-linejoin: round;
+    stroke-width: 2;
+    animation: surgir 1.2s ease-out 400ms both;
+  }
+
+  .hexLejano {
+    transform: translate(calc(var(--mx, 0) * 6px), calc(var(--my, 0) * 4px));
+  }
+
+  .hexMedio {
+    transform: translate(calc(var(--mx, 0) * 10px), calc(var(--my, 0) * 7px));
+  }
+
+  .hexCercano {
+    transform: translate(calc(var(--mx, 0) * 14px), calc(var(--my, 0) * 10px));
   }
 }
 
-/* Móvil: una sola columna, una franja superior con el nombre (sin foto); el logo queda en la tarjeta. */
+/* Móvil: una sola columna, una franja superior con el nombre (sin foto ni adornos); el logo queda en la tarjeta. */
 @media (max-width: 767px) {
   .pagina {
     grid-template-columns: minmax(0, 1fr);
@@ -157,12 +325,12 @@
 
   .panel {
     padding: var(--espacio-2);
-    border-right: 0;
-    border-bottom: var(--ancho-franja-dorada) solid var(--color-dorado);
+    border-radius: 0;
   }
 
   .universidad,
-  .lema {
+  .lema,
+  .chips {
     display: none;
   }
 
@@ -197,7 +365,21 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tarjeta {
+  .tarjeta,
+  .universidad,
+  .marca,
+  .lema,
+  .chips,
+  .hexagonos,
+  .fotoImagen,
+  .formulario > * {
     animation: none !important;
+  }
+
+  .fotoImagen,
+  .hexLejano,
+  .hexMedio,
+  .hexCercano {
+    transform: none !important;
   }
 }

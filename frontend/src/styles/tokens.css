@@ -51,7 +51,6 @@
   --relleno-logo: 4px;
   /* Foto del login: 1024 x 512 px; con 768 px de alto no se estira más de 1,5 veces. */
   --alto-foto-maximo: 768px;
-  --ancho-franja-dorada: 4px;
   --grosor-linea-dorada: 2px;
 
   --espacio-1: 0.5rem;
@@ -82,6 +81,13 @@
   --degradado-portada: linear-gradient(120deg, #1f365c 0%, #164a7e 55%, #0063a8 100%);
   --trazo-marca: rgb(255 255 255 / 22%);
   --alto-control-login: 48px;
+  /* Movimiento del login: entrada escalonada de 600 ms, la foto se asienta en 6 s y las capas se mueven hasta 14 px con el puntero.
+     Todo se apaga con prefers-reduced-motion. */
+  --duracion-entrada: 600ms;
+  --duracion-asentamiento: 6s;
+  --fondo-chip-login: rgb(31 54 92 / 55%);
+  --borde-chip-login: rgb(255 255 255 / 28%);
+  --punta-hexagono: 44px;
   /* Foto del login: el marino cubre la zona del texto con 72 % o más (texto blanco a 4,5:1 o más sobre lo más claro de la foto) y se
      aclara hacia la derecha para que la foto se vea. El difuminado superior funde el marino plano con la foto (sin escalón). */
   --degradado-lateral-foto: linear-gradient(

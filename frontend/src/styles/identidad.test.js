@@ -104,7 +104,7 @@ describe('tablas: encabezado marino claro y filas con separadores finos', () => 
 })
 
 describe('acento dorado: solo detalle', () => {
-  it('el dorado se usa únicamente en bordes (franja del login, línea bajo el nombre en el menú de usuario, filete del resumen, filete bajo el título de cada pantalla y marca del ítem activo del menú), nunca como color de texto ni de fondo', () => {
+  it('el dorado se usa únicamente en bordes (línea bajo el nombre en el menú de usuario, filete del resumen, filete bajo el título de cada pantalla y marca del ítem activo del menú), nunca como color de texto ni de fondo', () => {
     const usos = TODOS_LOS_CSS.flatMap((ruta) =>
       [...leer(ruta).matchAll(/([\w-]+)\s*:\s*[^;]*var\(--color-dorado\)[^;]*;/g)].map((m) => [
         ruta,
@@ -118,7 +118,6 @@ describe('acento dorado: solo detalle', () => {
       'components/Layout/MenuDeUsuario.module.css',
       'components/ResumenDeSolicitud/ResumenDeSolicitud.module.css',
       'components/ui/PageHeader.module.css',
-      'pages/LoginPage.module.css',
     ])
   })
 })
@@ -235,10 +234,34 @@ describe('login: la foto es decorativa y solo se pide en pantallas anchas', () =
     expect(login).toMatch(/background:\s*var\(--fondo-login\)/)
   })
 
-  it('la franja dorada va entre el panel y el formulario', () => {
-    expect(login).toMatch(
-      /\.panel\s*\{[^}]*border-right:\s*var\(--ancho-franja-dorada\) solid var\(--color-dorado\)/,
-    )
+  it('el login ya no lleva franja dorada: el panel termina en punta de hexágono (como el logo) y sin color dorado', () => {
+    expect(login).not.toMatch(/color-dorado|franja-dorada/)
+    expect(login).toMatch(/clip-path:\s*polygon\(/)
+    expect(pixeles(token('--punta-hexagono'))).toBeGreaterThanOrEqual(32)
+    expect(pixeles(token('--punta-hexagono'))).toBeLessThanOrEqual(64)
+  })
+
+  it('el movimiento del login es decorativo, finito y se apaga con prefers-reduced-motion', () => {
+    expect(login).not.toMatch(/infinite/)
+    const reducido = login.slice(login.indexOf('@media (prefers-reduced-motion: reduce)'))
+    for (const clase of [
+      '.tarjeta',
+      '.universidad',
+      '.marca',
+      '.lema',
+      '.chips',
+      '.hexagonos',
+      '.foto',
+    ])
+      expect(reducido, clase).toContain(clase)
+    expect(reducido).toMatch(/animation:\s*none !important/)
+    expect(reducido).toMatch(/transform:\s*none !important/)
+    expect(pixeles(token('--duracion-entrada'))).toBeLessThanOrEqual(600)
+  })
+
+  it('los chips del panel oscurecen el fondo: marino a 50 % o más, para que el texto blanco no pierda contraste', () => {
+    const opacidad = Number(token('--fondo-chip-login').match(/rgb\(31 54 92 \/ (\d+)%\)/)[1])
+    expect(opacidad).toBeGreaterThanOrEqual(50)
   })
 })
 
