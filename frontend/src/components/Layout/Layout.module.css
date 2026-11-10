@@ -49,6 +49,34 @@
   outline-color: var(--color-foco-sobre-oscuro);
 }
 
+/* Barra de desplazamiento del menú: fina y translúcida sobre el marino (no la blanca con flechas del sistema). Con el menú contraído se
+   oculta del todo; el menú sigue desplazándose con la rueda y con el teclado. */
+.menu {
+  scrollbar-color: var(--trazo-marca) transparent;
+  scrollbar-width: thin;
+}
+
+.menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.menu::-webkit-scrollbar-thumb {
+  background: var(--trazo-marca);
+  border-radius: var(--radio-completo);
+}
+
+.menu[data-colapsado='true'] {
+  scrollbar-width: none;
+}
+
+.menu[data-colapsado='true']::-webkit-scrollbar {
+  display: none;
+}
+
 .cabecera {
   display: flex;
   flex-wrap: wrap;
@@ -205,11 +233,12 @@
 
 /* Menú contraído (solo escritorio): iconos con el texto oculto a la vista pero disponible para el lector de pantalla. */
 @media (min-width: 768px) {
+  /* Sin «flex»: el menú está dentro de una columna (.lateral) y un flex-basis de 72 px se aplicaría al ALTO, dejándolo de 80 px con los
+     iconos recortados y una barra de desplazamiento. El ancho lo dan width, min-width y max-width. */
   .menu[data-colapsado='true'] {
     width: var(--ancho-menu-colapsado);
     min-width: var(--ancho-menu-colapsado);
     max-width: var(--ancho-menu-colapsado);
-    flex: 0 0 var(--ancho-menu-colapsado);
     padding: var(--espacio-2) var(--espacio-1);
   }
 

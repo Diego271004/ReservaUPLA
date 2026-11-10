@@ -310,3 +310,20 @@ describe('barra superior: el enlace de regreso es solo de móvil', () => {
     )
   })
 })
+
+describe('menú lateral contraído: ocupa todo el alto y no muestra la barra del sistema', () => {
+  const layout = css('components/Layout/Layout.module.css')
+
+  it('el menú contraído no declara «flex»: dentro de una columna lo aplicaría al alto y lo dejaría de 80 px con los iconos recortados', () => {
+    const regla1 = regla(layout, ".menu[data-colapsado='true']", '@media (min-width: 768px)')
+    expect(regla1).not.toMatch(/(^|;)\s*flex\s*:/)
+    expect(regla1).toContain('width: var(--ancho-menu-colapsado)')
+  })
+
+  it('el menú ocupa el alto de la ventana y su barra de desplazamiento es fina y translúcida (oculta si está contraído)', () => {
+    expect(layout).toMatch(/\.menu \{[^}]*scrollbar-width: thin/)
+    expect(layout).toMatch(/\.menu \{[^}]*scrollbar-color: var\(--trazo-marca\) transparent/)
+    expect(layout).toMatch(/\.menu\[data-colapsado='true'\] \{\s*scrollbar-width: none/)
+    expect(layout).toMatch(/\.menu\[data-colapsado='true'\]::-webkit-scrollbar \{\s*display: none/)
+  })
+})
