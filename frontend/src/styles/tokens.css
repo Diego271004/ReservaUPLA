@@ -49,8 +49,8 @@
   --alto-logo-login: 80px;
   --alto-logo-login-movil: 40px;
   --relleno-logo: 4px;
-  /* Foto del login: 1024 x 512 px; con 768 px de alto no se estira más de 1,5 veces. */
-  --alto-foto-maximo: 768px;
+  /* Foto del login: 1024 x 512 px; con 520 px de alto se muestra a 1,1 veces su tamaño (antes a 1,5 y salía borrosa). */
+  --alto-foto-maximo: 520px; /* la foto mide 1024 x 512: a 520 px de alto se muestra casi a su tamaño (1,1 veces) y no borrosa */
   --grosor-linea-dorada: 2px;
 
   --espacio-1: 0.5rem;

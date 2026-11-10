@@ -134,11 +134,11 @@
 /* La foto empieza un poco más cerca y se asienta. */
 @keyframes asentar {
   from {
-    scale: 1.2;
+    scale: 1.1;
   }
 
   to {
-    scale: 1.06;
+    scale: 1;
   }
 }
 
@@ -271,12 +271,12 @@
 
   .fotoImagen {
     position: absolute;
-    inset: 0;
+    inset: -14px;
     background-image: url('../assets/campus-upla.webp');
     background-repeat: no-repeat;
     background-position: 52% bottom;
     background-size: cover;
-    scale: 1.06;
+    filter: contrast(1.06) saturate(1.1);
     transform: translate3d(calc(var(--mx, 0) * -12px), calc(var(--my, 0) * -8px), 0);
     animation: asentar var(--duracion-asentamiento) ease-out both;
     will-change: transform;

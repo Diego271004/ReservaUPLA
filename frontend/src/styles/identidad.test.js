@@ -165,8 +165,8 @@ describe('login: la foto es decorativa y solo se pide en pantallas anchas', () =
     expect(fuera).not.toMatch(/url\(/)
   })
 
-  it('la foto no se estira más de 1,5 veces (alto máximo de 768 px = 1,5 × 512) y se ancla abajo; sus capas vienen de los tokens', () => {
-    expect(pixeles(token('--alto-foto-maximo'))).toBeLessThanOrEqual(768)
+  it('la foto no se estira más de 1,1 veces (alto máximo de 520 px sobre una foto de 512) y se ancla abajo; sus capas vienen de los tokens', () => {
+    expect(pixeles(token('--alto-foto-maximo'))).toBeLessThanOrEqual(560)
     expect(login).toMatch(/height:\s*min\(100%,\s*var\(--alto-foto-maximo\)\)/)
     expect(login).toMatch(/background-size:\s*cover/)
     expect(login).toMatch(
