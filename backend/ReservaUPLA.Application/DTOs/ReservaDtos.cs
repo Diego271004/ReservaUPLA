@@ -124,6 +124,21 @@ public sealed record InicioResponsableDto(
     IReadOnlyList<ReservaDto> Hoy,
     IReadOnlyList<ReservaDto> Proximas);
 
+/// <summary>
+/// Un cambio de estado reciente de cualquier reserva (trazabilidad para el Administrador): quién lo hizo, sobre qué reserva y cuándo.
+/// </summary>
+public sealed record ActividadRecienteDto(
+    int ReservaId,
+    string AmbienteNombre,
+    string SolicitanteNombre,
+    string FechaReserva,
+    string HoraInicio,
+    string HoraFin,
+    string? EstadoAnterior,
+    string EstadoNuevo,
+    string UsuarioNombre,
+    DateTimeOffset Fecha);
+
 public sealed record DashboardDto(
     IndicadoresDto Indicadores,
     IReadOnlyList<AmbienteUsoDto> AmbientesMasUtilizados,
@@ -132,7 +147,8 @@ public sealed record DashboardDto(
     IReadOnlyList<AgendaAmbienteDto> HoyEnLosAmbientes,
     IReadOnlyList<AmbienteUsoDto> UsoPorAmbiente,
     InicioSolicitanteDto? InicioSolicitante,
-    InicioResponsableDto? InicioResponsable);
+    InicioResponsableDto? InicioResponsable,
+    IReadOnlyList<ActividadRecienteDto>? ActividadReciente = null);
 
 public sealed record AmbienteResumenDto(int Id, string Nombre, string Ubicacion, int Capacidad, string Estado);
 

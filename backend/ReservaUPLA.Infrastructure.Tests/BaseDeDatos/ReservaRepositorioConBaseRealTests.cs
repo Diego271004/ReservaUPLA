@@ -114,4 +114,36 @@ public class ReservaRepositorioConBaseRealTests
         Assert.Null(contigua);
         Assert.Equal(EstadoReserva.Aprobada, solapa!.Estado);
     }
+
+    [FactConBaseDeDatos]
+    public async Task La_actividad_reciente_trae_primero_el_cambio_mas_nuevo_con_quien_lo_hizo_y_respeta_el_limite()
+    {
+        await using var datos = new DatosDePrueba();
+        await datos.InicializarAsync();
+        var ambiente = await datos.CrearAmbienteAsync();
+        var id = await datos.CrearReservaPendienteAsync(ambiente, "2030-01-19", "10:00", "12:00");
+        await using var contextoA = NuevoContexto();
+        var repositorioA = new ReservaRepository(contextoA);
+        var reserva = (await repositorioA.ObtenerConHistorialAsync(id, default))!;
+        reserva.Aprobar(datos.AdministradorId, DateTimeOffset.UtcNow.AddMinutes(5));
+        await repositorioA.GuardarAsync(reserva, default);
+
+        await using var consulta = NuevoContexto();
+        var repo = new ReservaRepository(consulta);
+
+        var ultimo = await repo.ActividadRecienteAsync(1, default);
+        var dos = await repo.ActividadRecienteAsync(2, default);
+
+        var evento = Assert.Single(ultimo);
+        Assert.Equal(id, evento.ReservaId);
+        Assert.Equal("Pendiente", evento.EstadoAnterior);
+        Assert.Equal("Aprobada", evento.EstadoNuevo);
+        Assert.Equal("Carla Rojas", evento.UsuarioNombre);
+        Assert.Equal("Ana Torres", evento.SolicitanteNombre);
+        Assert.Equal("2030-01-19", evento.FechaReserva);
+        Assert.Equal("10:00", evento.HoraInicio);
+        // Lo más nuevo primero: la aprobación va antes que la solicitud original.
+        Assert.Equal(["Aprobada", "Pendiente"], dos.Take(2).Select(e => e.EstadoNuevo));
+        Assert.True(dos.Count <= 2);
+    }
 }

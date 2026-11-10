@@ -15,6 +15,8 @@ public sealed class ConsultaService : IConsultaService
 {
     public const int TamanoDePagina = 10;
     public const int PendientesDelDashboard = 5;
+    /// <summary>Cuántos cambios de estado recientes muestra el dashboard del Administrador.</summary>
+    public const int ActividadRecienteDelDashboard = 6;
 
     private readonly IValidator<ConsultaReservasDto> _validador;
     private readonly IReservaRepository _reservas;
@@ -102,6 +104,7 @@ public sealed class ConsultaService : IConsultaService
         var indicadores = await _reservas.ContarAsync(null, cancellationToken);
         var masUtilizados = await _reservas.AmbientesMasUtilizadosAsync(cancellationToken);
         var usoPorAmbiente = await _reservas.UsoPorAmbienteAsync(cancellationToken);
+        var actividad = await _reservas.ActividadRecienteAsync(ActividadRecienteDelDashboard, cancellationToken);
         var pendientes = await _reservas.ListarAsync(
             new FiltroReservas(Estado: EstadoReserva.Pendiente, Pagina: 1, Tamano: PendientesDelDashboard, Orden: OrdenReservas.PorAntiguedad),
             cancellationToken);
@@ -131,7 +134,7 @@ public sealed class ConsultaService : IConsultaService
             .Select(ambiente => new AgendaAmbienteDto(ambiente.Id, ambiente.Nombre, TextosDominio.ATexto(ambiente.Estado), aprobadasHoy.Elementos.Where(reserva => reserva.AmbienteId == ambiente.Id).ToList()))
             .ToList();
 
-        return new DashboardDto(indicadores, masUtilizados, pendientes, decisiones, agenda, usoPorAmbiente, null, null);
+        return new DashboardDto(indicadores, masUtilizados, pendientes, decisiones, agenda, usoPorAmbiente, null, null, actividad);
     }
 
     public async Task<ResultadoOperacion<MiAmbienteDto>> ObtenerMiAmbienteAsync(

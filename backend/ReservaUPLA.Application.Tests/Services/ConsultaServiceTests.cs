@@ -143,6 +143,37 @@ public class ConsultaServiceTests
     }
 
     [Fact]
+    public async Task Dashboard_del_administrador_trae_la_actividad_reciente_y_pide_solo_las_ultimas_seis()
+    {
+        for (var i = 1; i <= 8; i++)
+        {
+            _escenario.Reservas.ActividadARetornar.Add(new ActividadRecienteDto(
+                i, "Auditorio Principal", "Ana Torres", "2030-02-10", "10:00", "12:00", "Pendiente", "Aprobada", "Carla Rojas",
+                new DateTimeOffset(2030, 2, 1, 9, 0, 0, TimeSpan.Zero).AddMinutes(-i)));
+        }
+
+        var dashboard = await _escenario.CrearServicioDeConsulta().ObtenerDashboardAsync(new ActorDto(1, RolUsuario.Administrador), CancellationToken.None);
+
+        Assert.Equal([ReservaUPLA.Application.Services.ConsultaService.ActividadRecienteDelDashboard], _escenario.Reservas.ActividadPedida);
+        Assert.Equal(6, dashboard.ActividadReciente!.Count);
+        Assert.Equal("Carla Rojas", dashboard.ActividadReciente[0].UsuarioNombre);
+    }
+
+    [Fact]
+    public async Task Dashboard_del_solicitante_y_del_responsable_no_traen_actividad_de_otros()
+    {
+        _escenario.Reservas.ActividadARetornar.Add(new ActividadRecienteDto(
+            1, "Auditorio Principal", "Otra persona", "2030-02-10", "10:00", "12:00", null, "Pendiente", "Otra persona", DateTimeOffset.UtcNow));
+
+        var solicitante = await _escenario.CrearServicioDeConsulta().ObtenerDashboardAsync(new ActorDto(42, RolUsuario.Solicitante), CancellationToken.None);
+        var responsable = await _escenario.CrearServicioDeConsulta().ObtenerDashboardAsync(new ActorDto(77, RolUsuario.Responsable), CancellationToken.None);
+
+        Assert.Null(solicitante.ActividadReciente);
+        Assert.Null(responsable.ActividadReciente);
+        Assert.Empty(_escenario.Reservas.ActividadPedida);
+    }
+
+    [Fact]
     public async Task Dashboard_solicitante_no_consulta_reservas_ajenas()
     {
         var dashboard = await _escenario.CrearServicioDeConsulta().ObtenerDashboardAsync(new ActorDto(42, RolUsuario.Solicitante), CancellationToken.None);

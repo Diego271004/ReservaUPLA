@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using ReservaUPLA.Application.Common;
@@ -98,6 +99,34 @@ public sealed class ReservaRepository : IReservaRepository
             Pendientes: De(EstadoReserva.Pendiente),
             Aprobadas: De(EstadoReserva.Aprobada),
             Rechazadas: De(EstadoReserva.Rechazada));
+    }
+
+    public async Task<IReadOnlyList<ActividadRecienteDto>> ActividadRecienteAsync(int cantidad, CancellationToken cancellationToken)
+    {
+        var filas = await (
+            from evento in _contexto.HistorialReservas.AsNoTracking()
+            join reserva in _contexto.Reservas.AsNoTracking() on evento.ReservaId equals reserva.Id
+            join ambiente in _contexto.Ambientes.AsNoTracking() on reserva.AmbienteId equals ambiente.Id
+            join solicitante in _contexto.Usuarios.AsNoTracking() on reserva.UsuarioId equals solicitante.Id
+            join autor in _contexto.Usuarios.AsNoTracking() on evento.UsuarioId equals autor.Id
+            orderby evento.Fecha descending, evento.Id descending
+            select new { evento, reserva, ambiente, solicitante, autor })
+            .Take(cantidad)
+            .ToListAsync(cancellationToken);
+
+        return filas
+            .Select(fila => new ActividadRecienteDto(
+                fila.reserva.Id,
+                fila.ambiente.Nombre,
+                fila.solicitante.NombreCompleto,
+                fila.reserva.Fecha.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                fila.reserva.HoraInicio.ToString("HH:mm", CultureInfo.InvariantCulture),
+                fila.reserva.HoraFin.ToString("HH:mm", CultureInfo.InvariantCulture),
+                fila.evento.EstadoAnterior?.ToString(),
+                fila.evento.EstadoNuevo.ToString(),
+                fila.autor.NombreCompleto,
+                fila.evento.Fecha))
+            .ToList();
     }
 
     public async Task<IReadOnlyList<AmbienteUsoDto>> UsoPorAmbienteAsync(CancellationToken cancellationToken)
