@@ -5,6 +5,7 @@ import PestanasDeEstado from '../components/ui/PestanasDeEstado.jsx'
 import PieDeLista from '../components/PieDeLista/PieDeLista.jsx'
 import AvisoDeError from '../components/AvisoDeError/AvisoDeError.jsx'
 import Button from '../components/ui/Button.jsx'
+import EsqueletoDeLista from '../components/ui/EsqueletoDeLista.jsx'
 import EstadoVacio from '../components/ui/EstadoVacio.jsx'
 import PageHeader from '../components/ui/PageHeader.jsx'
 import TableList from '../components/ui/TableList.jsx'
@@ -116,7 +117,7 @@ export default function ReservasPage() {
       />
       <div id={idPanel} role="tabpanel">
         {error && <AvisoDeError mensaje={error} alReintentar={recargar} />}
-        {cargando && <p role="status">{TEXTOS.cargandoReservas}</p>}
+        {cargando && <EsqueletoDeLista texto={TEXTOS.cargandoReservas} />}
         {!cargando && !error && (
           <div className={estilos.resultado}>
             <TableList

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
 import Button from '../components/ui/Button.jsx'
+import EsqueletoDeLista from '../components/ui/EsqueletoDeLista.jsx'
 import PageHeader from '../components/ui/PageHeader.jsx'
 import TableList from '../components/ui/TableList.jsx'
 import { TEXTOS } from '../constants/messages.js'
@@ -53,7 +54,7 @@ export default function ListadoPage({
         </AlertMessage>
       )}
       {cargando ? (
-        <p role="status">{TEXTOS.cargando}</p>
+        <EsqueletoDeLista texto={TEXTOS.cargando} />
       ) : (
         !error &&
         (renderContenido ? (
