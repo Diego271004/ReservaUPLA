@@ -49,7 +49,7 @@
 }
 
 .interruptor:checked::before {
-  background: var(--color-primario);
+  background: var(--relleno-primario);
 }
 
 .interruptor:checked::after {

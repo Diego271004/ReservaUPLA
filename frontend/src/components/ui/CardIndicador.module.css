@@ -131,7 +131,7 @@
   font-size: 2.5rem;
   font-weight: 600;
   line-height: 1.1;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   font-variant-numeric: tabular-nums;
 }
 
@@ -159,7 +159,7 @@
   border-radius: var(--radio-pequeno);
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   white-space: normal;
   overflow-wrap: anywhere;
 }

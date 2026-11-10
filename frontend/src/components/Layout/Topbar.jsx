@@ -3,6 +3,7 @@ import { TEXTOS } from '../../constants/messages.js'
 import { fechaAIso, hoyEnLima } from '../../utils/fechas.js'
 import { seccionActualDe } from '../../utils/migas.js'
 import Button from '../ui/Button.jsx'
+import InterruptorDeTema from '../ui/InterruptorDeTema.jsx'
 import { Icono } from '../ui/Icono.jsx'
 import MenuDeUsuario from './MenuDeUsuario.jsx'
 import estilos from './Topbar.module.css'
@@ -76,6 +77,7 @@ export default function Topbar({
         <span className="solo-lector">{TEXTOS.hoyEs}: </span>
         <time dateTime={fechaAIso(hoy)}>{hoy}</time>
       </p>
+      <InterruptorDeTema />
       <MenuDeUsuario sesion={sesion} alCerrarSesion={alCerrarSesion} />
     </header>
   )

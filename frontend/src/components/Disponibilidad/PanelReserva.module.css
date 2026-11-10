@@ -35,7 +35,7 @@
   margin: 0;
   font-size: var(--texto-base);
   font-weight: 700;
-  color: var(--color-marino);
+  color: var(--texto-marino);
 }
 
 .botonCerrar {
@@ -62,7 +62,7 @@
 
 .etiqueta {
   font-weight: 600;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   min-width: 90px;
 }
 

@@ -13,7 +13,7 @@
     "imagenes": "node optimizar-imagenes.mjs",
     "peso-login": "node peso-login.mjs",
     "verificar-tabla": "node verificar-tabla-pruebas.mjs",
-    "pruebas": "node --test pruebas/analizar.test.mjs pruebas/mapa.test.mjs pruebas/mermaid.test.mjs pruebas/contraste-foto.test.mjs && node verificar-tabla-pruebas.mjs"
+    "pruebas": "node --test pruebas/analizar.test.mjs pruebas/mapa.test.mjs pruebas/mermaid.test.mjs pruebas/contraste-foto.test.mjs pruebas/contraste-temas.test.mjs && node verificar-tabla-pruebas.mjs"
   },
   "dependencies": {
     "axe-core": "4.10.2",

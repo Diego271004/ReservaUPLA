@@ -27,13 +27,13 @@
 }
 
 .pestana:hover {
-  color: var(--color-marino);
+  color: var(--texto-marino);
   border-bottom-color: var(--color-borde-control);
 }
 
 .activa,
 .activa:hover {
-  color: var(--color-marino);
+  color: var(--texto-marino);
   border-bottom-color: var(--color-primario);
 }
 
@@ -42,7 +42,7 @@
   padding: 0 var(--espacio-1);
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   text-align: center;
   background: var(--fondo-encabezado-tabla);
   border-radius: var(--radio-completo);

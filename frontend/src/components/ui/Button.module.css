@@ -44,11 +44,11 @@
 
 .primario {
   color: var(--color-sobre-oscuro);
-  background: var(--color-primario);
+  background: var(--relleno-primario);
 }
 
 .secundario {
-  color: var(--color-marino);
+  color: var(--texto-marino);
   background: var(--color-superficie);
   border-color: var(--color-borde-control);
 }
@@ -71,7 +71,7 @@
 
 .confirmarRechazo {
   color: var(--color-sobre-oscuro);
-  background: var(--color-error);
+  background: var(--relleno-error);
 }
 
 .enlace {
@@ -102,7 +102,7 @@
 .icono {
   min-width: var(--alto-control);
   padding: 0;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   background: transparent;
 }
 
@@ -114,7 +114,7 @@
 .usuario {
   gap: var(--espacio-1);
   padding: 0 var(--espacio-1);
-  color: var(--color-marino);
+  color: var(--texto-marino);
   background: transparent;
   border-color: transparent;
 }
@@ -127,7 +127,7 @@
 .filaDeMenu {
   justify-content: flex-start;
   width: 100%;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   background: transparent;
 }
 

@@ -33,7 +33,7 @@
 .seccion h2,
 .seccion h3 {
   margin: 0;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   font-family: var(--fuente-titulo);
 }
 .etiqueta {
@@ -73,7 +73,7 @@
   margin: 0 0 var(--espacio-1);
   font-family: var(--fuente-titulo);
   font-weight: 700;
-  color: var(--color-marino);
+  color: var(--texto-marino);
 }
 .datos {
   display: flex;
@@ -215,8 +215,8 @@
   min-width: 2px;
   overflow: hidden;
   padding: 0 8px;
-  background: var(--color-exito);
-  color: var(--color-superficie);
+  background: var(--relleno-exito);
+  color: var(--color-sobre-oscuro);
   border-radius: var(--radio-pequeno);
   font-size: 0.8125rem;
   font-weight: 600;
@@ -241,7 +241,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: var(--color-error);
+  background: var(--relleno-error);
   z-index: 1;
   pointer-events: none;
 }
@@ -275,7 +275,7 @@
   display: block;
   height: 100%;
   min-width: 2px;
-  background: var(--color-primario);
+  background: var(--relleno-primario);
 }
 .tablaAlternativa {
   margin-top: var(--espacio-2);
@@ -340,22 +340,22 @@
   border-radius: var(--radio-completo);
 }
 .puntoPendiente {
-  background: var(--color-aviso);
+  background: var(--relleno-aviso);
 }
 .puntoAprobada {
-  background: var(--color-exito);
+  background: var(--relleno-exito);
 }
 .puntoRechazada {
-  background: var(--color-error);
+  background: var(--relleno-error);
 }
 .pendiente {
-  background: var(--color-aviso);
+  background: var(--relleno-aviso);
 }
 .aprobada {
-  background: var(--color-exito);
+  background: var(--relleno-exito);
 }
 .rechazada {
-  background: var(--color-error);
+  background: var(--relleno-error);
 }
 .seccion h3 {
   margin-top: var(--espacio-3);

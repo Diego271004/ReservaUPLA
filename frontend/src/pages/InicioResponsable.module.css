@@ -130,7 +130,7 @@
 .cabeceraSeccion h2 {
   margin: 0;
   font-size: 1.25rem;
-  color: var(--color-marino);
+  color: var(--texto-marino);
 }
 
 .contadorSeccion {
@@ -181,7 +181,7 @@
   align-items: center;
   gap: var(--espacio-1);
   font-size: 0.9375rem;
-  color: var(--color-marino);
+  color: var(--texto-marino);
 }
 
 .horaProxima {

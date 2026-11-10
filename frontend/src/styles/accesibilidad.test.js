@@ -17,11 +17,17 @@ function regla(texto, selector, desde = '') {
 }
 
 // ---------------------------------------------------------------- Contraste (WCAG 1.4.3 y 1.4.11)
-const tokens = Object.fromEntries(
-  [...css('styles/tokens.css').matchAll(/(--[\w-]+)\s*:\s*(#[0-9a-fA-F]{6})\s*;/g)].map(
-    ([, nombre, hex]) => [nombre, hex],
-  ),
-)
+// El archivo de tokens trae el tema claro y, al final, el oscuro (:root[data-tema='oscuro']): se leen por separado.
+const [TOKENS_CLAROS, TOKENS_OSCUROS] = css('styles/tokens.css').split(":root[data-tema='oscuro']")
+const leerTokens = (texto) =>
+  Object.fromEntries(
+    [...texto.matchAll(/(--[\w-]+)\s*:\s*(#[0-9a-fA-F]{6})\s*;/g)].map(([, nombre, hex]) => [
+      nombre,
+      hex,
+    ]),
+  )
+const tokens = leerTokens(TOKENS_CLAROS)
+const oscuros = { ...tokens, ...leerTokens(TOKENS_OSCUROS) }
 const luminancia = (hex) => {
   const [r, g, b] = [1, 3, 5].map((i) => {
     const v = parseInt(hex.slice(i, i + 2), 16) / 255
@@ -325,5 +331,81 @@ describe('menú lateral contraído: ocupa todo el alto y no muestra la barra del
     expect(layout).toMatch(/\.menu \{[^}]*scrollbar-color: var\(--trazo-marca\) transparent/)
     expect(layout).toMatch(/\.menu\[data-colapsado='true'\] \{\s*scrollbar-width: none/)
     expect(layout).toMatch(/\.menu\[data-colapsado='true'\]::-webkit-scrollbar \{\s*display: none/)
+  })
+})
+
+describe('modo oscuro: contraste AA de cada par texto/fondo y de los componentes', () => {
+  const razonOscura = (a, b) => razon(oscuros[a], oscuros[b])
+  const SUPERFICIES = [
+    '--color-superficie',
+    '--color-fondo',
+    '--fondo-neutro',
+    '--fondo-encabezado-tabla',
+  ]
+
+  it.each(SUPERFICIES)(
+    'el texto, el texto suave y el título llegan a 4,5:1 sobre %s',
+    (superficie) => {
+      for (const texto of ['--color-texto', '--color-texto-suave', '--texto-marino'])
+        expect(
+          razonOscura(texto, superficie),
+          `${texto} sobre ${superficie}`,
+        ).toBeGreaterThanOrEqual(4.5)
+    },
+  )
+
+  it.each(['--color-superficie', '--color-fondo', '--fondo-seleccion', '--fondo-info'])(
+    'el azul de enlaces y bordes (--color-primario) llega a 4,5:1 sobre %s',
+    (superficie) => {
+      expect(razonOscura('--color-primario', superficie)).toBeGreaterThanOrEqual(4.5)
+    },
+  )
+
+  it.each(['exito', 'error', 'aviso', 'info'])(
+    'el texto de estado %s llega a 4,5:1 sobre su fondo y sobre la superficie',
+    (estado) => {
+      expect(razonOscura(`--color-${estado}`, `--fondo-${estado}`)).toBeGreaterThanOrEqual(4.5)
+      expect(razonOscura(`--color-${estado}`, '--color-superficie')).toBeGreaterThanOrEqual(4.5)
+    },
+  )
+
+  it.each(['primario', 'exito', 'error', 'aviso'])(
+    'el relleno %s lleva texto blanco a 4,5:1 y se distingue de la superficie a 3:1',
+    (nombre) => {
+      expect(razon('#ffffff', oscuros[`--relleno-${nombre}`])).toBeGreaterThanOrEqual(4.5)
+      expect(razonOscura(`--relleno-${nombre}`, '--color-superficie')).toBeGreaterThanOrEqual(3)
+      expect(razonOscura(`--relleno-${nombre}`, '--color-fondo')).toBeGreaterThanOrEqual(3)
+    },
+  )
+
+  it('el límite de un campo y el anillo de foco llegan a 3:1 sobre la superficie y sobre el fondo', () => {
+    for (const fondo of ['--color-superficie', '--color-fondo']) {
+      expect(razonOscura('--color-borde-control', fondo)).toBeGreaterThanOrEqual(3)
+      expect(razonOscura('--color-foco', fondo)).toBeGreaterThanOrEqual(3)
+    }
+  })
+
+  it('el tema oscuro redefine todos los colores de texto, superficie, borde y estado del claro (salvo los de la marca, que no cambian)', () => {
+    const MARCA = [
+      '--color-marino',
+      '--color-titulo',
+      '--color-celeste',
+      '--color-dorado',
+      '--color-sobre-oscuro',
+      '--color-foco-sobre-oscuro',
+      '--color-etiqueta-menu',
+    ]
+    const claros = Object.keys(tokens).filter(
+      (nombre) =>
+        /^--(color|fondo|texto|relleno)-/.test(nombre) &&
+        !MARCA.includes(nombre) &&
+        nombre !== '--fondo-chip-login',
+    )
+    const definidos = new Set(Object.keys(leerTokens(TOKENS_OSCUROS)))
+    expect(claros.filter((nombre) => !definidos.has(nombre))).toEqual([])
+  })
+
+  it('declara color-scheme: dark para que los campos de fecha, la barra de desplazamiento y los controles nativos se oscurezcan', () => {
+    expect(TOKENS_OSCUROS).toContain('color-scheme: dark')
   })
 })

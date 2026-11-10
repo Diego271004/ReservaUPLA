@@ -185,7 +185,7 @@
   top: -8px;
   bottom: -8px;
   width: 2px;
-  background: var(--color-marino);
+  background: var(--texto-marino);
   pointer-events: none;
 }
 .esqueleto {

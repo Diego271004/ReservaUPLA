@@ -26,7 +26,7 @@
 
 .alternadorVista .botonAlternar {
   padding: 0 var(--espacio-2);
-  color: var(--color-marino);
+  color: var(--texto-marino);
   background: transparent;
   border-color: transparent;
   border-radius: var(--radio-pequeno);
@@ -94,7 +94,7 @@
 .nombreAmbiente {
   margin: 0;
   font-size: 1.125rem;
-  color: var(--color-marino);
+  color: var(--texto-marino);
 }
 
 .tipoAmbiente {

@@ -19,6 +19,12 @@
   /* Límite de un campo o control: 3:1 sobre blanco y sobre el fondo de la página (WCAG 1.4.11). --color-borde queda para divisores. */
   --color-borde-control: #7b818c;
   --color-sobre-oscuro: #ffffff;
+  /* Texto y relleno de un mismo color se separan: en el modo oscuro el texto se aclara y el relleno conserva el contraste con el texto blanco. */
+  --texto-marino: #1f365c;
+  --relleno-primario: #0063a8;
+  --relleno-exito: #166534;
+  --relleno-error: #b91c1c;
+  --relleno-aviso: #92400e;
 
   --color-error: #b91c1c;
   --color-exito: #166534;
@@ -110,4 +116,46 @@
   --color-etiqueta-menu: #a0aec0;
   --color-deshabilitado: #6b7280;
   --fondo-deshabilitado: #eceef1;
+}
+
+/* Modo oscuro (se activa con data-tema="oscuro" en <html>). Solo cambian las superficies, los textos y los estados; la marca (menú marino,
+   portada, login, botones azules) se mantiene. Cada par texto/fondo está comprobado a 4,5:1 o más en accesibilidad.test.js. */
+:root[data-tema='oscuro'] {
+  color-scheme: dark;
+  --color-primario: #5aa9ec;
+  --texto-marino: #e8edf6;
+  --relleno-primario: #0a6fba;
+  --relleno-exito: #188044;
+  --relleno-error: #c43a3a;
+  --relleno-aviso: #ad5f0e;
+  --color-foco: #7bbcf2;
+  --color-texto: #e8edf6;
+  --color-texto-suave: #aab6cb;
+  --color-texto-secundario: #aab6cb;
+  --color-fondo: #0f1726;
+  --color-superficie: #172236;
+  --color-borde: #2f4160;
+  --color-borde-control: #7f93b3;
+  --color-error: #ff9b9b;
+  --color-exito: #7ee2a8;
+  --color-aviso: #f5c26b;
+  --color-info: #9cc4ff;
+  --color-neutro: #aab6cb;
+  --color-deshabilitado: #8696b0;
+  --fondo-deshabilitado: #1e2c45;
+  --fondo-error: #3a1a1f;
+  --fondo-exito: #12301f;
+  --fondo-aviso: #35280f;
+  --fondo-info: #14284a;
+  --fondo-seleccion: #1c3556;
+  --fondo-libre: #172236;
+  --fondo-libre-hover: #1c3556;
+  --fondo-fila-alterna: #1a263c;
+  --fondo-neutro: #1e2c45;
+  --fondo-franja-pasada: rgba(148, 163, 184, 0.14);
+  --fondo-encabezado-tabla: #1b2a44;
+  --fondo-login: #0f1726;
+  --elevacion-tarjeta: 0 1px 2px rgb(0 0 0 / 40%), 0 4px 12px rgb(0 0 0 / 22%);
+  --elevacion-flotante: 0 1px 2px rgb(0 0 0 / 50%);
+  --capa-modal: rgb(5 10 20 / 70%);
 }

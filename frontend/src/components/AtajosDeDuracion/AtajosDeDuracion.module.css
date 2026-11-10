@@ -7,7 +7,7 @@
 
 .titulo {
   font-weight: 600;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   font-size: 0.875rem;
 }
 
@@ -35,8 +35,8 @@
 
 .cuadricula .boton:hover:not(:disabled) {
   background: var(--fondo-info);
-  border-color: var(--color-marino);
-  color: var(--color-marino);
+  border-color: var(--texto-marino);
+  color: var(--texto-marino);
 }
 
 .cuadricula .boton:active:not(:disabled) {
@@ -45,7 +45,7 @@
 
 .cuadricula .boton.elegida {
   color: var(--color-sobre-oscuro);
-  background: var(--color-primario);
+  background: var(--relleno-primario);
   border-color: transparent;
 }
 

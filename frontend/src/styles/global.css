@@ -17,7 +17,7 @@ h2,
 h3 {
   font-family: var(--fuente-titulo);
   font-weight: 600;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   overflow-wrap: anywhere; /* un título con una palabra larga no empuja la página fuera de la pantalla (reflujo a 320 px) */
 }
 

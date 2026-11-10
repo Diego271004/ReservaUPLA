@@ -2,6 +2,7 @@ import { Navigate } from 'react-router-dom'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
 import Button from '../components/ui/Button.jsx'
 import { Icono } from '../components/ui/Icono.jsx'
+import InterruptorDeTema from '../components/ui/InterruptorDeTema.jsx'
 import PasswordInput from '../components/ui/PasswordInput.jsx'
 import TextInput from '../components/ui/TextInput.jsx'
 import { MENSAJES, TEXTOS } from '../constants/messages.js'
@@ -133,6 +134,8 @@ export default function LoginPage() {
             )}
           </form>
         </div>
+        {/* Al final del documento para no cambiar el orden de Tab (correo, contraseña…); se ve arriba a la derecha. */}
+        <InterruptorDeTema className={estilos.interruptor} />
       </main>
     </div>
   )

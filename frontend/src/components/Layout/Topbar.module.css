@@ -28,7 +28,7 @@
   font-family: var(--fuente-titulo);
   font-size: var(--tipo-seccion);
   font-weight: 600;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -78,7 +78,7 @@
 
 .migas [aria-current='page'] {
   font-weight: 600;
-  color: var(--color-marino);
+  color: var(--texto-marino);
 }
 
 .fecha {

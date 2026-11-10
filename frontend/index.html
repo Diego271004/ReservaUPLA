@@ -5,6 +5,16 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ReservaUPLA</title>
+    <!-- El tema guardado se aplica antes de pintar para que no haya un parpadeo claro/oscuro. Sin elección guardada, claro. -->
+    <script>
+      try {
+        if (localStorage.getItem('reservaupla.tema') === 'oscuro') {
+          document.documentElement.dataset.tema = 'oscuro'
+        }
+      } catch (e) {
+        /* sin almacenamiento: tema claro */
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

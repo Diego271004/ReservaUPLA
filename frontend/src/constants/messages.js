@@ -243,6 +243,8 @@ export const TEXTOS = Object.freeze({
   ocupacionSinAmbientes: 'No hay ambientes disponibles hoy',
   indicadoresDeGestion: 'Indicadores de gestión',
   accesosRapidos: 'Accesos rápidos',
+  cambiarAModoOscuro: 'Cambiar a modo oscuro',
+  cambiarAModoClaro: 'Cambiar a modo claro',
   accesoVerDisponibilidad: 'Ver disponibilidad',
   actividadReciente: 'Actividad reciente',
   sinActividad: 'Todavía no hay actividad reciente.',

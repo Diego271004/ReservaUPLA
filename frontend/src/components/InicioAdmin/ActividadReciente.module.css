@@ -8,7 +8,7 @@
 
 .seccion h2 {
   margin: 0 0 var(--espacio-2);
-  color: var(--color-marino);
+  color: var(--texto-marino);
   font-family: var(--fuente-titulo);
 }
 
@@ -79,7 +79,7 @@
 
 .frase {
   font-weight: 600;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   overflow-wrap: anywhere;
 }
 

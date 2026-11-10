@@ -79,10 +79,17 @@
 }
 
 .contenido {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--espacio-4);
+}
+
+.interruptor {
+  position: absolute;
+  top: var(--espacio-2);
+  right: var(--espacio-2);
 }
 
 .tarjeta {

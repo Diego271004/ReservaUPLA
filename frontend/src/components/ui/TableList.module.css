@@ -26,7 +26,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   text-align: left;
   background: var(--fondo-encabezado-tabla);
   border-bottom: 1px solid var(--color-borde);
@@ -109,7 +109,7 @@
   .tabla td::before {
     content: attr(data-etiqueta);
     font-weight: 700;
-    color: var(--color-marino);
+    color: var(--texto-marino);
   }
 }
 

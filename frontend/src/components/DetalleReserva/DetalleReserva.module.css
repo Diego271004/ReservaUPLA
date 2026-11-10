@@ -32,7 +32,7 @@
 .datos dd {
   margin: 4px 0 0;
   overflow-wrap: anywhere;
-  color: var(--color-marino);
+  color: var(--texto-marino);
 }
 
 .historial {
@@ -103,7 +103,7 @@
   font-family: var(--fuente-titulo);
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   overflow-wrap: anywhere;
 }
 
@@ -153,12 +153,12 @@
 
 .historial .actual {
   font-weight: 600;
-  color: var(--color-marino);
+  color: var(--texto-marino);
 }
 
 /* El punto del estado actual va relleno de azul; su borde transparente evita repetir el mismo color (el relleno ya lo separa del fondo). */
 .historial .actual::before {
-  background: var(--color-primario);
+  background: var(--relleno-primario);
   border-color: transparent;
 }
 

@@ -30,11 +30,16 @@ export function razon(a, b) {
 }
 
 // ---------------------------------------------------------------- Tokens
-export function leerTokens() {
+/** Los tokens de un tema. tokens.css trae el claro y, al final, el oscuro (:root[data-tema='oscuro']), que solo redefine lo que cambia. */
+export function leerTokens(tema = 'claro') {
   const texto = readFileSync(join(SRC, 'styles', 'tokens.css'), 'utf8')
-  const tokens = {}
-  for (const [, nombre, valor] of texto.matchAll(/(--[\w-]+)\s*:\s*(#[0-9a-fA-F]{3,6})\s*;/g)) tokens[nombre] = valor.toLowerCase()
-  return tokens
+  const [claro, oscuro = ''] = texto.split(":root[data-tema='oscuro']")
+  const leer = (parte) => {
+    const tokens = {}
+    for (const [, nombre, valor] of parte.matchAll(/(--[\w-]+)\s*:\s*(#[0-9a-fA-F]{3,6})\s*;/g)) tokens[nombre] = valor.toLowerCase()
+    return tokens
+  }
+  return tema === 'oscuro' ? { ...leer(claro), ...leer(oscuro) } : leer(claro)
 }
 
 function resolverColor(valor, tokens) {
@@ -80,8 +85,8 @@ export function paresDeLasHojas(tokens) {
 }
 
 // ---------------------------------------------------------------- Informe
-export function analizarContraste() {
-  const tokens = leerTokens()
+function analizarTema(tema) {
+  const tokens = leerTokens(tema)
   const lineas = []
   const fallos = []
   const nombre = (hex) => `${nombreDe(hex, tokens)} ${hex}`
@@ -118,7 +123,7 @@ export function analizarContraste() {
 
   lineas.push('', 'C) MATRIZ COMPLETA: cada color de texto de tokens.css sobre cada fondo de tokens.css (4.5:1)')
   const textos = ['--color-texto', '--color-texto-suave', '--color-marino', '--color-primario', '--color-titulo', '--color-error', '--color-exito', '--color-aviso', '--color-info', '--color-neutro', '--color-deshabilitado', '--color-sobre-oscuro', '--color-dorado']
-  const fondos = ['--color-superficie', '--color-fondo', '--fondo-error', '--fondo-exito', '--fondo-aviso', '--fondo-info', '--fondo-neutro', '--fondo-deshabilitado', '--color-primario', '--color-marino', '--color-error']
+  const fondos = ['--color-superficie', '--color-fondo', '--fondo-error', '--fondo-exito', '--fondo-aviso', '--fondo-info', '--fondo-neutro', '--fondo-deshabilitado', '--relleno-primario', '--color-marino', '--relleno-error']
   const matriz = []
   for (const t of textos) {
     for (const f of fondos) {
@@ -143,14 +148,14 @@ export function analizarContraste() {
     if (!repetido) fila('texto', par.primero, par.segundo, UMBRAL_TEXTO, `  [${par.donde}]`)
     else if (razon(par.primero, par.segundo) < UMBRAL_TEXTO) lineas.push(`      (también en ${par.donde})`)
   }
-  lineas.push('', 'E) TEXTO SIN FONDO PROPIO: se mide contra la superficie blanca y el fondo de la página (el texto blanco, contra el menú marino y el azul primario)')
+  lineas.push('', 'E) TEXTO SIN FONDO PROPIO: se mide contra la superficie blanca y el fondo de la página (el texto blanco, contra el menú marino y el relleno azul primario)')
   const sinFondo = new Map()
   for (const par of reales.filter((p) => p.tipo === 'texto-sin-fondo-propio')) {
     sinFondo.set(par.primero, [...(sinFondo.get(par.primero) ?? []), par.donde])
   }
   for (const [color, donde] of sinFondo) {
     // El texto blanco sin fondo propio vive sobre el menú lateral (marino) o un botón relleno: no sobre blanco.
-    const fondosPosibles = color === '#ffffff' ? ['--color-marino', '--color-primario'] : ['--color-superficie', '--color-fondo']
+    const fondosPosibles = color === '#ffffff' ? ['--color-marino', '--relleno-primario'] : ['--color-superficie', '--color-fondo']
     for (const f of fondosPosibles) fila('texto', color, tokens[f], UMBRAL_TEXTO, `  [${donde.length} regla(s), p. ej. ${donde[0]}]`)
   }
   lineas.push('', 'F) BORDES DE CONTROLES declarados junto a su fondo — mínimo 3:1')
@@ -162,6 +167,17 @@ export function analizarContraste() {
     fila('borde', par.primero, par.segundo, UMBRAL_COMPONENTE, `  [${par.donde}]`)
   }
   return { lineas, fallos, tokens }
+}
+
+/** El informe de los dos temas (claro y oscuro): cada par se mide con los colores de su tema. */
+export function analizarContraste() {
+  const claro = analizarTema('claro')
+  const oscuro = analizarTema('oscuro')
+  return {
+    lineas: ['########## TEMA CLARO ##########', ...claro.lineas, '', '########## TEMA OSCURO ##########', ...oscuro.lineas],
+    fallos: [...claro.fallos.map((f) => `[claro] ${f}`), ...oscuro.fallos.map((f) => `[oscuro] ${f}`)],
+    tokens: claro.tokens,
+  }
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

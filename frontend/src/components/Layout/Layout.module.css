@@ -190,7 +190,7 @@
 .activa,
 .activa:hover {
   font-weight: 700;
-  background: var(--color-primario);
+  background: var(--relleno-primario);
   border-left-color: var(--color-dorado);
 }
 
@@ -213,7 +213,7 @@
   padding: 0 6px;
   font-size: 0.8125rem;
   font-weight: 700;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   background: var(--color-superficie);
   border-radius: var(--radio-completo);
 }

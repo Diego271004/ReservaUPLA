@@ -61,7 +61,7 @@
   min-height: var(--alto-control);
   padding: 0 var(--espacio-3);
   font-weight: 700;
-  color: var(--color-marino);
+  color: var(--texto-marino);
   text-decoration: none;
   background: var(--color-superficie);
   border-radius: var(--radio);
