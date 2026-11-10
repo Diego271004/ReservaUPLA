@@ -601,7 +601,7 @@ En estricto apego a la Regla 4 (Alcance MVP: RF-01 a RF-08, login por rol y vist
 - **No se añadieron notificaciones en tiempo real ni envío de correos**: Fuera de la especificación MVP.
 - **No se implementaron reservas recurrentes ni periódicas**: Cada reserva opera de forma unitaria según RN-01 a RN-07.
 - **No se agregaron herramientas de exportación** (PDF, Excel o CSV).
-- **No se implementó selector de tema oscuro** (dark mode).
+- **No se implementó selector de tema oscuro** (dark mode). *(Añadido después, ver `docs/diseno/DESIGN.md`, sección «Modo oscuro».)*
 - **No se incorporó paleta de comandos interactiva** (`Ctrl+K`).
 - **No se modificaron reglas de negocio ni textos de `messages.js`**.
 

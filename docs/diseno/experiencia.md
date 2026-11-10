@@ -69,3 +69,8 @@ Experiencia de selección y confirmación:
 3. **Ordenación Bento orientada a la toma de decisiones**: En el Inicio del Administrador, jerarquía adaptada a la urgencia operativa: primero lo que requiere decisión (solicitudes pendientes con solapamiento advertido), luego la agenda operativa en tiempo real, seguido de los indicadores clave y el desglose analítico.
 4. **Densidad de datos y alineación tabular**: Tablas institucionales con resalte interactivo sutil al pasar el cursor (`--fondo-fila-alterna`), columnas numéricas alineadas a la derecha (`data-alineacion="derecha"`) y números tabulares `tabular-nums`.
 5. **Proporción de login editorial y estados vacíos compactos**: Pantalla de acceso en proporción 58% (visual institucional) / 42% (formulario) con supresión de animaciones bajo `prefers-reduced-motion`. Ilustración de edificio UPLA escalada a proporciones compactas (100x72 px base y 64x46 px en modo compacto).
+
+## Modo oscuro (`data-tema="oscuro"`)
+Botón con luna (claro) o sol (oscuro) en la barra superior y en el login, con el nombre «Cambiar a modo oscuro/claro» (sin `aria-pressed`: el nombre ya cambia con el estado) y objetivo de 44 px. La elección se recuerda entre visitas y se aplica antes de pintar. En el login el botón va al final del documento (se ve arriba a la derecha) para no cambiar el orden de Tab (correo, contraseña…). Detalle de la paleta y de las comprobaciones en `DESIGN.md`.
+- **Principios:** flexibilidad y eficiencia de uso (Nielsen 7), control del usuario (Nielsen 3, Shneiderman 7), usabilidad universal (Shneiderman 2: menos fatiga visual con poca luz).
+

@@ -28,6 +28,14 @@ Institucional y limpio, azul marino y blanco, minimalista, coherente con la web 
 
 Insignias de la reserva, siempre con icono y texto: Pendiente (ámbar), Aprobada (verde), Rechazada (rojo), Cancelada (gris).
 
+## Modo oscuro
+Se activa con el botón luna/sol de la barra superior y del login (`data-tema="oscuro"` en `<html>`); se recuerda en `localStorage` y, sin elección guardada, la página es clara (un script de `index.html` lo aplica antes de pintar, sin parpadeo). **Decisión del estudiante: el MVP no lo exigía, se añadió después sobre la base de tokens.**
+- **Mismos nombres, otros valores.** `tokens.css` trae el tema claro y, al final, `:root[data-tema='oscuro']`, que solo redefine superficies, textos, bordes y estados. Ningún componente tiene colores propios.
+- **Texto y relleno se separaron** para poder aclarar solo el texto: `--texto-marino` (títulos), `--color-primario` (enlaces y bordes) y `--relleno-primario`, `--relleno-exito`, `--relleno-error`, `--relleno-aviso` (rellenos con texto blanco, que conservan 4,5:1).
+- **La marca no cambia:** menú marino, portada del Inicio, panel del login y botones azules.
+- **Paleta oscura:** fondo `#0F1726`, superficie `#172236`, texto `#E8EDF6` (13,6:1), texto suave `#AAB6CB` (7,8:1), azul de enlaces `#5AA9EC` (6,3:1) y límite de campos `#7F93B3` (5,1:1).
+- **Comprobado:** `frontend/src/styles/accesibilidad.test.js` (par por par, incluidos rellenos a 3:1 contra la superficie y que el tema oscuro redefine todos los colores del claro) y `tools/usabilidad/contraste.mjs`, que ahora mide los dos temas (0 pares por debajo del umbral).
+
 ## Tipografía
 Títulos en **Poppins SemiBold** y texto en **Montserrat**, como la web institucional de la UPLA. Ambas autoalojadas localmente con `@fontsource` en subset `latin` exclusivamente para los pesos usados (sin CDNs externas). Texto de campos de 16 px para evitar zoom indeseado en dispositivos iOS. Controles de al menos 44 px de alto (48 px en el Login). Foco visible con contorno `#1E73BE` de 3 px (`#FFFFFF` sobre el menú marino). Contraste AA verificado en el 100% de combinaciones.
 
