@@ -128,30 +128,26 @@ export function horaAbreviada(hora) {
   return m === 0 ? String(h) : `${h}:${String(m).padStart(2, '0')}`
 }
 
+/**
+ * El texto que cabe dentro de un tramo de la línea de tiempo (desde 07:00 hasta 22:00 en un ancho variable). Nunca se corta:
+ * lo que no cabe se quita del texto y queda en el icono (el estado) y en el aria-label/title (el detalle completo).
+ * - Libre: vacío hasta 30 min, «Libre» hasta 3 h y «Libre 10–14 h» para tramos más largos.
+ * - Reservado: vacío hasta 45 min y «10–12 h» desde ahí (el estado lo dice el icono, no una palabra que no cabe).
+ */
 export function textoVisibleBloque(tramo) {
   if (!tramo) return ''
-  const inicio = minutosDeHora(tramo.horaInicio)
-  const fin = minutosDeHora(tramo.horaFin)
-  const duracion = fin - inicio
+  const duracion = minutosDeHora(tramo.horaFin) - minutosDeHora(tramo.horaInicio)
   const hInicio = horaAbreviada(tramo.horaInicio)
   const hFin = horaAbreviada(tramo.horaFin)
 
   if (tramo.tipo === 'libre') {
     if (duracion <= 30) return ''
-    if (duracion <= 120) return 'Libre'
+    if (duracion <= 180) return 'Libre'
     return `Libre ${hInicio}–${hFin} h`
   }
 
-  if (duracion <= 45) {
-    return ''
-  }
-  if (duracion <= 120) {
-    return `${hInicio}–${hFin} h`
-  }
-  if (duracion <= 180) {
-    return `${hInicio}–${hFin} h · ${tramo.estado}`
-  }
-  return `${tramo.horaInicio}–${tramo.horaFin} · ${tramo.estado}`
+  if (duracion <= 45) return ''
+  return `${hInicio}–${hFin} h`
 }
 
 /**

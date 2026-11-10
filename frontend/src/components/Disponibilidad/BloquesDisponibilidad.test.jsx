@@ -68,11 +68,13 @@ describe('BloquesDisponibilidad: formato sin recorte en bloques cortos', () => {
     expect(bloque11.textContent).not.toContain('…')
     expect(bloque11).toHaveAttribute('title', expect.stringContaining('Práctica de redes'))
 
-    // Tramo libre de 3 h (07:00 a 10:00): texto visible "Libre 7–10 h"
+    // Tramo libre de 3 h (07:00 a 10:00): solo «Libre» (no cabe más); el horario va en el aria-label y el title
     const libreManana = screen.getByRole('button', {
       name: /Laboratorio de Cómputo 2: Libre, 07:00 a 10:00/i,
     })
-    expect(libreManana.textContent).toContain('Libre 7–10 h')
+    expect(libreManana.textContent).toContain('Libre')
+    expect(libreManana.textContent).not.toContain('7–10')
+    expect(libreManana).toHaveAttribute('title', expect.stringContaining('07:00 a 10:00'))
     expect(libreManana.textContent).not.toContain('…')
 
     // Mantenimiento de todo el día

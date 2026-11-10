@@ -18,77 +18,35 @@ describe('utilidades de disponibilidad', () => {
     expect(horaAbreviada('')).toBe('')
   })
 
-  it('formatea texto conciso sin recortar para bloques libres con umbral de 120 min (bordes 90, 120 y 121 min)', () => {
+  it('formatea texto sin recortar para bloques libres con umbral de 180 min (bordes 30, 180 y 181 min)', () => {
+    const libre = (horaInicio, horaFin) =>
+      textoVisibleBloque({ tipo: 'libre', horaInicio, horaFin })
     // <= 30 min: vacío (solo icono)
-    expect(textoVisibleBloque({ tipo: 'libre', horaInicio: '07:00', horaFin: '07:30' })).toBe('')
-
-    // <= 120 min (incluye 60, 90 y 120 min): solo "Libre"
-    expect(textoVisibleBloque({ tipo: 'libre', horaInicio: '07:00', horaFin: '08:00' })).toBe(
-      'Libre',
-    )
-    expect(textoVisibleBloque({ tipo: 'libre', horaInicio: '10:00', horaFin: '11:30' })).toBe(
-      'Libre',
-    )
-    expect(textoVisibleBloque({ tipo: 'libre', horaInicio: '12:00', horaFin: '14:00' })).toBe(
-      'Libre',
-    )
-
-    // > 120 min (borde 121 min y largos): "Libre H–H h"
-    expect(textoVisibleBloque({ tipo: 'libre', horaInicio: '10:00', horaFin: '12:01' })).toBe(
-      'Libre 10–12:01 h',
-    )
-    expect(textoVisibleBloque({ tipo: 'libre', horaInicio: '07:00', horaFin: '10:00' })).toBe(
-      'Libre 7–10 h',
-    )
-    expect(textoVisibleBloque({ tipo: 'libre', horaInicio: '13:00', horaFin: '22:00' })).toBe(
-      'Libre 13–22 h',
-    )
+    expect(libre('07:00', '07:30')).toBe('')
+    // de 31 a 180 min: solo «Libre» (un tramo de 2 h ocupa unos 100 px de línea de tiempo y «Libre 12–14 h» no cabía)
+    expect(libre('07:00', '07:31')).toBe('Libre')
+    expect(libre('07:00', '08:00')).toBe('Libre')
+    expect(libre('12:00', '14:00')).toBe('Libre')
+    expect(libre('07:00', '10:00')).toBe('Libre')
+    // > 180 min: «Libre H–H h»
+    expect(libre('10:00', '13:01')).toBe('Libre 10–13:01 h')
+    expect(libre('13:00', '22:00')).toBe('Libre 13–22 h')
   })
 
-  it('formatea texto conciso abreviado para reservas ocupadas con umbrales de borde (90, 120 y 121 min)', () => {
+  it('formatea texto sin recortar para reservas: solo el horario, el estado lo dice el icono (bordes 45, 46 y 180 min)', () => {
+    const reserva = (horaInicio, horaFin, estado = 'Aprobada') =>
+      textoVisibleBloque({ tipo: 'ocupado', horaInicio, horaFin, estado })
     // <= 45 min: vacío (solo icono)
-    expect(
-      textoVisibleBloque({
-        tipo: 'ocupado',
-        horaInicio: '10:00',
-        horaFin: '10:45',
-        estado: 'Pendiente',
-      }),
-    ).toBe('')
-
-    // <= 120 min (borde 90 y 120 min): "H–H h" sin sufijo de estado para evitar elipsis
-    const res90m = { tipo: 'ocupado', horaInicio: '10:00', horaFin: '11:30', estado: 'Aprobada' }
-    expect(textoVisibleBloque(res90m)).toBe('10–11:30 h')
-
-    const res2h = { tipo: 'ocupado', horaInicio: '10:00', horaFin: '12:00', estado: 'Pendiente' }
-    expect(textoVisibleBloque(res2h)).toBe('10–12 h')
-    expect(textoVisibleBloque(res2h)).not.toContain('…')
-    expect(textoVisibleBloque(res2h)).not.toContain('...')
-
-    const res2hAprobada = {
-      tipo: 'ocupado',
-      horaInicio: '11:00',
-      horaFin: '13:00',
-      estado: 'Aprobada',
+    expect(reserva('10:00', '10:45', 'Pendiente')).toBe('')
+    // desde 46 min: «H–H h» sin estado ni «…»; «9–12 h · Aprobada» se cortaba en un tramo de 3 h (unos 143 px)
+    expect(reserva('10:00', '10:46')).toBe('10–10:46 h')
+    expect(reserva('10:00', '11:30')).toBe('10–11:30 h')
+    expect(reserva('10:00', '12:00', 'Pendiente')).toBe('10–12 h')
+    expect(reserva('09:00', '12:00')).toBe('9–12 h')
+    expect(reserva('08:00', '14:00')).toBe('8–14 h')
+    for (const texto of [reserva('09:00', '12:00'), reserva('08:00', '14:00')]) {
+      expect(texto).not.toMatch(/…|\.\.\.|Aprobada|Pendiente/)
     }
-    expect(textoVisibleBloque(res2hAprobada)).toBe('11–13 h')
-
-    // Borde 121 min y hasta 180 min: "H–H h · Estado"
-    const res121m = {
-      tipo: 'ocupado',
-      horaInicio: '10:00',
-      horaFin: '12:01',
-      estado: 'Aprobada',
-    }
-    expect(textoVisibleBloque(res121m)).toBe('10–12:01 h · Aprobada')
-
-    // Bloques de 3 horas (180 min): "H–H h · Estado"
-    const res3h = { tipo: 'ocupado', horaInicio: '10:00', horaFin: '13:00', estado: 'Aprobada' }
-    expect(textoVisibleBloque(res3h)).toBe('10–13 h · Aprobada')
-
-    // Bloques largos (>= 4 horas): "HH:MM–HH:MM · Estado"
-    const resLarga = { tipo: 'ocupado', horaInicio: '08:00', horaFin: '14:00', estado: 'Aprobada' }
-    expect(textoVisibleBloque(resLarga)).toBe('08:00–14:00 · Aprobada')
   })
 
   it('calcula porcentaje de ocupación solo con reservas aprobadas', () => {
