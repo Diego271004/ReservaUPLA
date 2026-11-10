@@ -1,3 +1,4 @@
+import { codigoVs } from './codigo-vscode.js'
 import { ev } from '../lib/codigo.js'
 import { figs, figura, h1, h2, p, tabla, vinetas } from '../lib/word.js'
 
@@ -33,6 +34,7 @@ export function seccionFormularios() {
       [0.2, 0.34, 0.46],
     ),
     h2('5.2 Nueva reserva (el formulario principal)'),
+    ...codigoVs('hook-formulario'),
     ...figura('f-reserva-vacia', 'Formulario «Nueva reserva» recién abierto (Solicitante)', {
       tipo: 'App',
       que: 'La pantalla Nueva reserva con las tres tarjetas de ambiente y el resumen vacío.',
@@ -66,6 +68,7 @@ export function seccionFormularios() {
       seccion: '5',
     }),
     h2('5.4 Decisiones de usabilidad en los formularios'),
+    ...codigoVs('campo-formulario'),
     ...vinetas([
       'Cada campo tiene su etiqueta visible siempre (no solo un texto de ayuda dentro del campo) y un ejemplo o una nota bajo él.',
       'Se valida al salir del campo y, una vez tocado, mientras se escribe: el error desaparece apenas se corrige. Al enviar, el foco va al primer campo con error.',
@@ -81,10 +84,12 @@ export function seccionValidaciones() {
   return [
     h1('6. Validaciones en frontend y backend (semana 06)'),
     h2('6.1 Tres capas, un mismo mensaje'),
+    ...codigoVs('validador-correo', 'validador-reserva', 'mensajes'),
     p(
       'Una regla importante nunca se valida en un solo sitio. **El frontend ayuda** (avisa a tiempo y evita errores), **el backend decide** (es la única validación en la que se puede confiar, porque una llamada directa a la API se salta el formulario) y **la base de datos es la última barrera** (restricciones y disparadores). Los mensajes tienen una sola fuente en cada lado, y una prueba falla si un texto existe en un lado y no en el otro.',
     ),
     h2('6.2 Dónde se aplica cada regla'),
+    ...codigoVs('auth-servicio', 'servicio-cruce', 'entidad-reserva'),
     ...tabla(
       ['Regla', 'Frontend', 'Backend', 'Base de datos'],
       [

@@ -1,3 +1,4 @@
+import { codigoVs } from './codigo-vscode.js'
 import { ev } from '../lib/codigo.js'
 import { figura, h1, h2, p, tabla, vinetas } from '../lib/word.js'
 
@@ -24,6 +25,7 @@ export function seccionSalida() {
     }),
     p(`Implementación: \`${ev(`${FRONT}/pages/ReservasPage.jsx`, 'export default function ReservasPage')}\` (pantalla) y \`${ev(REPO, 'public async Task<PaginaDeReservasDto> ListarAsync')}\` (consulta con el alcance del rol).`),
     h2('9.2 Detalle y cambio de estado (RF-06 y RF-07)'),
+    ...codigoVs('controlador', 'modal'),
     p(
       'El detalle muestra el ambiente, el horario en letras con su duración, el estado destacado y el historial como una línea de tiempo: quién hizo cada cambio y cuándo. Las acciones dependen del rol y del estado. Aprobar y rechazar piden confirmación con el verbo exacto («Sí, aprobar»), y si aprobar causaría un choque, el botón queda deshabilitado y una tarjeta explica el choque y enlaza a la reserva que lo causa.',
     ),
@@ -49,6 +51,7 @@ export function seccionSalida() {
       seccion: '9',
     }),
     h2('9.3 Dashboard (RF-08)'),
+    ...codigoVs('actividad-reciente'),
     p('El caso pide cinco indicadores como mínimo. Los cinco están, y se calculan en el servidor con consultas a la base de datos, no con datos de ejemplo.'),
     ...tabla(
       ['Indicador del caso', 'Cómo se calcula', 'Dónde'],

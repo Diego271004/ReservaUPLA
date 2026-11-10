@@ -1,3 +1,4 @@
+import { codigoVs } from './codigo-vscode.js'
 import { ev } from '../lib/codigo.js'
 import { h1, h2, p, tabla, vinetas } from '../lib/word.js'
 import { estadisticasDeGit, tamanoDelCodigo } from '../lib/datos.js'
@@ -84,6 +85,7 @@ export function seccionEstandares() {
       [0.2, 0.42, 0.38],
     ),
     h2('3.2 Carpetas y dependencias entre capas'),
+    ...codigoVs('arquitectura-test'),
     ...vinetas([
       '`backend/` (Domain, Application, Infrastructure, API y proyectos de pruebas), `frontend/` (`components/ui`, `pages`, `hooks`, `services`, `utils`, `constants`), `database/` (scripts SQL numerados) y `docs/`.',
       '**Application depende de Domain; Infrastructure depende de Application y Domain; API depende de Application e Infrastructure. Application nunca referencia Infrastructure.** Lo comprueba una prueba de arquitectura (`ArquitecturaTests.cs`).',
@@ -109,6 +111,7 @@ export function seccionEstandares() {
       `La regla de «una sola fuente» para los colores es la que permitió agregar el **modo oscuro** al final del proyecto sin tocar los componentes: ver \`${ev('frontend/src/styles/tokens.css', "data-tema='oscuro'")}\`.`,
     ),
     h2('3.5 Seguridad y secretos'),
+    ...codigoVs('ratelimit'),
     ...vinetas([
       'Contraseñas siempre como hash BCrypt (la base de datos rechaza un valor que no tenga ese formato), nunca en texto plano ni en los registros.',
       'Cadena de conexión y clave del token JWT en `dotnet user-secrets` o variables de entorno; nunca en el repositorio. Los scripts SQL reciben las claves como variables de `psql`.',

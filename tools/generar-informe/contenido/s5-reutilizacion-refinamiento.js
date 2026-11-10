@@ -1,3 +1,4 @@
+import { codigoVs } from './codigo-vscode.js'
 import { ev } from '../lib/codigo.js'
 import { h1, h2, p, tabla, vinetas } from '../lib/word.js'
 import { DUPLICACION, usoDeComponentes } from '../lib/datos.js'
@@ -23,6 +24,7 @@ export function seccionReutilizacion() {
       'El caso pide componentes reutilizables para formularios y mensajes, y enumera nueve. Los nueve existen en `frontend/src/components/ui` y se usan en las pantallas; la columna de uso se **cuenta al generar este informe** recorriendo los `import` del código (no se escribe a mano).',
     ),
     h2('7.1 Los nueve componentes mínimos'),
+    ...codigoVs('boton'),
     ...tabla(
       ['Componente', 'Qué resuelve', 'Archivos de la aplicación que lo usan', 'Ejemplos'],
       MINIMOS.map(([nombre, descripcion], i) => [
@@ -67,6 +69,7 @@ export function seccionRefinamiento() {
       [0.2, 0.38, 0.42],
     ),
     h2('8.2 Defectos hallados al probar con datos reales'),
+    ...codigoVs('texto-bloque', 'proxima-reserva'),
     p(
       'Las pruebas unitarias pasaban, y aun así, al levantar el sistema completo con los datos de demostración aparecieron defectos que ninguna prueba cubría. Cada uno se corrigió y quedó una prueba que lo impide:',
     ),

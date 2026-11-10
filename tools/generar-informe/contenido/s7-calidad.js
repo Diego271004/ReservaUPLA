@@ -1,3 +1,4 @@
+import { codigoVs } from './codigo-vscode.js'
 import { figura, h1, h2, p, tabla, vinetas } from '../lib/word.js'
 import { ACCESIBILIDAD, BUILD, E2E, PRUEBAS } from '../lib/datos.js'
 
@@ -56,6 +57,7 @@ export function seccionCalidad() {
       '**Pendiente de la estudiante:** la prueba de usabilidad con tres a cinco compañeros (tareas, tiempos, errores y satisfacción) tiene su plantilla en `docs/usabilidad/plan-prueba-usuarios.md` y su hoja de resultados vacía en `docs/usabilidad/resultados-prueba.csv`. No se inventaron resultados: [COMPLETAR POR EL ESTUDIANTE: resultados de la prueba con compañeros].',
     ),
     h2('10.4 Modo claro y oscuro'),
+    ...codigoVs('tokens-claro', 'tokens-oscuro'),
     p(
       'Al final del proyecto se agregó un modo oscuro, y fue posible gracias a los estándares de la sección 3: como todos los colores viven en `tokens.css`, el tema oscuro es un bloque que redefine superficies, textos, bordes y estados sin tocar un solo componente. Se separó el color de texto del de relleno para poder aclarar solo los textos; cada par de colores del tema oscuro tiene una prueba de contraste (AA). El botón con luna o sol está en la barra superior y en el login, recuerda la elección y se aplica antes de pintar, sin parpadeo.',
     ),
