@@ -96,21 +96,21 @@ export default function AmbientesPage() {
     <div className={estilos.barraSuperior}>
       <div className={estilos.alternadorVista} role="group" aria-label="Modo de visualización">
         <Button
-          variante={modoVista === 'tarjetas' ? 'primario' : 'secundario'}
+          variante="secundario"
           className={estilos.botonAlternar}
           onClick={() => cambiarModo('tarjetas')}
           aria-pressed={modoVista === 'tarjetas'}
         >
-          <Icono nombre="ambientes" tamano={16} />
+          <Icono nombre="dashboard" tamano={16} />
           Tarjetas
         </Button>
         <Button
-          variante={modoVista === 'tabla' ? 'primario' : 'secundario'}
+          variante="secundario"
           className={estilos.botonAlternar}
           onClick={() => cambiarModo('tabla')}
           aria-pressed={modoVista === 'tabla'}
         >
-          <Icono nombre="calendario" tamano={16} />
+          <Icono nombre="lista" tamano={16} />
           Tabla
         </Button>
       </div>
