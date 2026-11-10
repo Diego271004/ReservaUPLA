@@ -1,6 +1,6 @@
 import { figura, p } from '../lib/word.js'
 import { porClave, rangoDe } from '../lib/codigos.js'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { RAIZ } from '../lib/codigo.js'
 
@@ -19,7 +19,7 @@ export function codigoVs(...claves) {
         tipo: 'Código',
         que: c.titulo,
         pasos: [],
-        archivo: `codigo/${clave}.png`,
+        archivo: existsSync(path.join(RAIZ, 'docs', 'evidencias', 'informe', 'codigo-vscode', `${clave}.png`)) ? `codigo-vscode/${clave}.png` : `codigo/${clave}.png`,
         seccion: '',
       }),
     ]

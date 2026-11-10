@@ -12,6 +12,7 @@ import {
   ShadingType,
   Table,
   TableCell,
+  TableLayoutType,
   TableRow,
   TextRun,
   WidthType,
@@ -133,9 +134,12 @@ export const completar = (que) => p(`[COMPLETAR POR EL ESTUDIANTE: ${que}]`)
 const borde = { style: BorderStyle.SINGLE, size: 4, color: '808080' }
 const bordes = { top: borde, bottom: borde, left: borde, right: borde, insideHorizontal: borde, insideVertical: borde }
 
+/** Las rutas largas no tienen dónde partirse: se añade un espacio de ancho cero tras cada barra y guion bajo. */
+const permitirSaltos = (texto) => String(texto).replace(/([/_])(?=\S)/g, '$1​');
+
 function celda(contenido, { encabezado = false, ancho } = {}) {
   const parrafos = (Array.isArray(contenido) ? contenido : [contenido]).map((c) =>
-    c instanceof Paragraph ? c : new Paragraph({ children: runs(c, { size: 20 }) }),
+    c instanceof Paragraph ? c : new Paragraph({ children: runs(permitirSaltos(c), { size: 20 }) }),
   )
   return new TableCell({
     children: parrafos,
@@ -166,6 +170,7 @@ export function tabla(encabezados, filas, proporciones) {
       rows: [encabezado, ...cuerpo],
       width: { size: ANCHO_UTIL, type: WidthType.DXA },
       columnWidths: anchos,
+      layout: TableLayoutType.FIXED,
       borders: bordes,
     }),
     new Paragraph({ spacing: { after: 120 } }),
