@@ -1,0 +1,15 @@
+{
+  "name": "reservaupla-generar-informe",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Genera docs/INFORME_ReservaUPLA.docx a partir del código y de los resultados reales del proyecto.",
+  "type": "module",
+  "scripts": {
+    "generar": "node generar.js",
+    "verificar": "node verificar.js"
+  },
+  "dependencies": {
+    "docx": "^9.8.1",
+    "mammoth": "^1.13.0"
+  }
+}
