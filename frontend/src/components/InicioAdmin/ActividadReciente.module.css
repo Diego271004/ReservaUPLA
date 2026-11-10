@@ -1,0 +1,106 @@
+.seccion {
+  padding: var(--espacio-2);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--elevacion-tarjeta);
+}
+
+.seccion h2 {
+  margin: 0 0 var(--espacio-2);
+  color: var(--color-marino);
+  font-family: var(--fuente-titulo);
+}
+
+.lista {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--espacio-2);
+  align-items: center;
+  min-height: 56px;
+  padding: var(--espacio-1);
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radio);
+  transition: background-color var(--duracion-transicion);
+}
+
+.fila:hover {
+  background: var(--fondo-seleccion);
+}
+
+.fila:focus-visible {
+  outline: 3px solid var(--color-foco);
+  outline-offset: 1px;
+}
+
+.icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radio-completo);
+}
+
+.pendiente {
+  color: var(--color-aviso);
+  background: var(--fondo-aviso);
+}
+
+.aprobada {
+  color: var(--color-exito);
+  background: var(--fondo-exito);
+}
+
+.rechazada {
+  color: var(--color-error);
+  background: var(--fondo-error);
+}
+
+.cancelada {
+  color: var(--color-texto-suave);
+  background: var(--fondo-neutro);
+}
+
+.texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.frase {
+  font-weight: 600;
+  color: var(--color-marino);
+  overflow-wrap: anywhere;
+}
+
+.detalle {
+  font-size: 0.875rem;
+  color: var(--color-texto-suave);
+  overflow-wrap: anywhere;
+}
+
+.cuando {
+  font-size: 0.8125rem;
+  color: var(--color-texto-suave);
+}
+
+.vacio {
+  margin: 0;
+  color: var(--color-texto-suave);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fila {
+    transition: none;
+  }
+}

@@ -17,3 +17,10 @@
     grid-template-columns: repeat(4, minmax(min(180px, 100%), 1fr));
   }
 }
+
+/* Una fila de dos tarjetas (indicadores de gestión): dos columnas desde 600 px; en móvil, una. */
+@media (min-width: 600px) {
+  .dos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

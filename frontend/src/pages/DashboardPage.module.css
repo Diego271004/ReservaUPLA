@@ -469,3 +469,17 @@
     display: none;
   }
 }
+
+/* Actividad reciente junto al uso por ambiente: dos columnas en escritorio, una debajo de otra en pantallas angostas. */
+.dosColumnas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--espacio-3);
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .dosColumnas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

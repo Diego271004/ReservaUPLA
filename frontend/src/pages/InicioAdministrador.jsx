@@ -1,5 +1,7 @@
 import AvisoDeError from '../components/AvisoDeError/AvisoDeError.jsx'
 import AlertMessage from '../components/ui/AlertMessage.jsx'
+import AccesosRapidos from '../components/InicioAdmin/AccesosRapidos.jsx'
+import ActividadReciente from '../components/InicioAdmin/ActividadReciente.jsx'
 import AgendaDeHoy from '../components/InicioAdmin/AgendaDeHoy.jsx'
 import GrupoDeIndicadores from '../components/GrupoDeIndicadores/GrupoDeIndicadores.jsx'
 import ModalDeReserva from '../components/ModalDeReserva/ModalDeReserva.jsx'
@@ -12,6 +14,7 @@ import { useDecisionDeReserva } from '../hooks/useDecisionDeReserva.js'
 import { obtenerDashboard } from '../services/recursosService.js'
 import { ambienteMasUtilizado } from '../utils/filtrosDeReservas.js'
 import { horaEnLima } from '../utils/fechas.js'
+import { ocupacionDeHoy, tasaDeAprobacion } from '../utils/gestion.js'
 import { indicadoresDeEstado } from '../utils/indicadores.js'
 import estilos from './DashboardPage.module.css'
 
@@ -22,6 +25,7 @@ const DASHBOARD_VACIO = Object.freeze({
   solicitudesRequierenDecision: [],
   hoyEnLosAmbientes: [],
   usoPorAmbiente: [],
+  actividadReciente: [],
 })
 
 const ESTADO_DE_INDICADOR = {
@@ -57,6 +61,8 @@ export default function InicioAdministrador({ ahora = new Date() }) {
     return { ...indicador, href: estado ? `/reservas?estado=${estado}` : '/reservas' }
   })
   const uso = datos.usoPorAmbiente?.length ? datos.usoPorAmbiente : ambientesMasUtilizados
+  const tasa = tasaDeAprobacion(indicadores)
+  const ocupacion = ocupacionDeHoy(datos.hoyEnLosAmbientes)
 
   return (
     <>
@@ -79,6 +85,7 @@ export default function InicioAdministrador({ ahora = new Date() }) {
       {!error && !cargando && (
         <div className={estilos.contenedorInicio}>
           <Portada pendientes={pendientesMasAntiguas.total} ahora={ahora} />
+          <AccesosRapidos />
           <RequierenDecision
             solicitudes={solicitudesPorAtender(datos)}
             totalPendientes={pendientesMasAntiguas.total}
@@ -101,7 +108,33 @@ export default function InicioAdministrador({ ahora = new Date() }) {
               },
             ]}
           />
-          <UsoYEstados uso={uso} indicadores={indicadores} />
+          <GrupoDeIndicadores
+            etiqueta={TEXTOS.indicadoresDeGestion}
+            columnas={2}
+            indicadores={[
+              {
+                clave: 'tasa',
+                valor: tasa.valor,
+                descripcion: TEXTOS.indicadorTasaAprobacion,
+                detalle: tasa.detalle,
+                icono: 'exito',
+                tono: 'exito',
+              },
+              {
+                clave: 'ocupacion',
+                valor: ocupacion.valor,
+                descripcion: TEXTOS.indicadorOcupacionHoy,
+                detalle: ocupacion.detalle,
+                href: '/disponibilidad',
+                icono: 'reloj',
+                tono: 'info',
+              },
+            ]}
+          />
+          <div className={estilos.dosColumnas}>
+            <ActividadReciente actividad={datos.actividadReciente ?? []} ahora={ahora} />
+            <UsoYEstados uso={uso} indicadores={indicadores} />
+          </div>
         </div>
       )}
       <ModalDeReserva

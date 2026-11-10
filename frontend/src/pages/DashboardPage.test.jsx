@@ -74,6 +74,71 @@ describe('Dashboard: saludo contextual', () => {
   })
 })
 
+describe('Dashboard del Administrador: indicadores de gestión, accesos rápidos y actividad', () => {
+  const conActividad = () =>
+    exito({
+      ...panel(),
+      hoyEnLosAmbientes: [
+        {
+          id: 1,
+          nombre: 'Laboratorio de Cómputo 2',
+          estado: 'Disponible',
+          reservas: [
+            { id: 5, horaInicio: '10:00', horaFin: '13:00', solicitanteNombre: 'Ana Torres' },
+          ],
+        },
+        { id: 2, nombre: 'Sala de Reuniones A', estado: 'En mantenimiento', reservas: [] },
+      ],
+      actividadReciente: [
+        {
+          reservaId: 7,
+          ambienteNombre: 'Laboratorio de Cómputo 2',
+          solicitanteNombre: 'Ana Torres',
+          fechaReserva: '2026-11-05',
+          horaInicio: '10:00',
+          horaFin: '12:00',
+          estadoAnterior: 'Pendiente',
+          estadoNuevo: 'Aprobada',
+          usuarioNombre: 'Carla Rojas',
+          fecha: new Date().toISOString(),
+        },
+      ],
+    })
+
+  it('la tasa de aprobación usa aprobadas sobre decididas (31 de 41 = 76 %) y la ocupación de hoy las horas aprobadas (3 h de 15 h = 20 %)', async () => {
+    obtenerDashboard.mockResolvedValue(conActividad())
+    mostrar()
+    const gestion = await screen.findByRole('region', { name: 'Indicadores de gestión' })
+    const [tasa, ocupacion] = within(gestion).getAllByRole('article')
+    expect(tasa).toHaveTextContent('76 %Tasa de aprobación31 de 41 solicitudes decididas')
+    expect(ocupacion).toHaveTextContent('20 %Ocupación de hoy3 h reservadas de 15 h disponibles')
+  })
+
+  it('la región «Indicadores» sigue teniendo sus cinco tarjetas y la de gestión va aparte', async () => {
+    obtenerDashboard.mockResolvedValue(conActividad())
+    mostrar()
+    const indicadores = await screen.findByRole('region', { name: 'Indicadores' })
+    expect(within(indicadores).getAllByRole('article')).toHaveLength(5)
+  })
+
+  it('muestra los accesos rápidos y la actividad reciente con el cambio de la API', async () => {
+    obtenerDashboard.mockResolvedValue(conActividad())
+    mostrar()
+    expect(await screen.findByRole('navigation', { name: 'Accesos rápidos' })).toBeInTheDocument()
+    const enlace = await screen.findByRole('link', {
+      name: /Carla Rojas aprobó la reserva de Ana Torres/,
+    })
+    expect(enlace).toHaveAttribute('href', '/reservas/7')
+  })
+
+  it('si la API no manda actividad (versión anterior) el Inicio no se rompe y dice que no hay', async () => {
+    mostrar()
+    expect(await screen.findByText('Todavía no hay actividad reciente.')).toBeInTheDocument()
+    const gestion = screen.getByRole('region', { name: 'Indicadores de gestión' })
+    expect(within(gestion).getAllByRole('article')[1]).toHaveTextContent('—')
+  })
+})
+
 describe('Dashboard: indicadores', () => {
   it('muestra el título y mientras carga «Cargando…»', () => {
     obtenerDashboard.mockReturnValue(new Promise(() => {}))
