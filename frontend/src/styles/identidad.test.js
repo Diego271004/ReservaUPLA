@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-// Contrato de la identidad visual (docs/diseno/identidad-visual.md). Vitest corre con `css: false`, así que se leen los .css.
+// Contrato de la identidad visual. Vitest corre con `css: false`, así que se leen los .css.
 // El aspecto real (foto, fuentes, contraste sobre la foto) lo mide tools/usabilidad/accesibilidad.mjs con ETAPA=identidad.
 const SRC = resolve(__dirname, '..')
 const sinComentarios = (texto) => texto.replace(/\/\*[\s\S]*?\*\//g, '')

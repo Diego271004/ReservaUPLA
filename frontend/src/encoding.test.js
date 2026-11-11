@@ -3,7 +3,6 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { extname, join } from 'node:path'
 
 const RAIZ = join(process.cwd(), 'src')
-const DOCS = join(process.cwd(), '..', 'docs', 'diseno')
 const SEC = /(?:â€|Ã[¡éíóúñ]|Â )/
 
 function archivos(directorio) {
@@ -22,10 +21,4 @@ describe('codificación UTF-8', () => {
     expect(fallos, `Mojibake encontrado en: ${fallos.join(', ')}`).toEqual([])
   })
 
-  it('docs/diseno no contiene secuencias de mojibake conocidas', () => {
-    const fallos = archivos(DOCS)
-      .filter((ruta) => ['.md', '.txt', '.css'].includes(extname(ruta)))
-      .filter((ruta) => SEC.test(readFileSync(ruta, 'utf8')))
-    expect(fallos, `Mojibake encontrado en: ${fallos.join(', ')}`).toEqual([])
-  })
 })

@@ -6,8 +6,7 @@ Sistema web de reservas de ambientes de la Universidad Peruana Los Andes (caso p
 backend/    ReservaUPLA.Domain · .Application · .Infrastructure · .API · .Application.Tests
 frontend/   React + Vite (JavaScript)
 database/   scripts SQL numerados, ejecutados con psql
-docs/       análisis, ciclo de vida, estándares, matriz de reglas e informe
-tools/      pruebas de extremo a extremo (e2e) y generador del informe
+tools/      pruebas de extremo a extremo (e2e)
 ```
 
 ## Requisitos
@@ -93,7 +92,7 @@ Abre `http://localhost:5180` (puerto fijo: si estuviera ocupado, Vite avisa con 
 ## Qué incluye el sistema
 - **Roles:** Administrador (gestiona ambientes y usuarios, aprueba y rechaza reservas), Solicitante (pide y cancela sus reservas) y Responsable de ambiente (solo consulta).
 - **Pantallas:** inicio de sesión, inicio con indicadores, listado de reservas con filtros, detalle con historial, disponibilidad diaria, nueva reserva, ambientes y usuarios (listado y alta), y «Mi ambiente».
-- **Reglas de negocio RN-01 a RN-07:** se validan en frontend, backend y base de datos (ver `docs/matriz-reglas.md`). Los mensajes son los mismos en `MensajesValidacion.cs` y en `frontend/src/constants/messages.js`.
+- **Reglas de negocio RN-01 a RN-07:** se validan en frontend, backend y base de datos. Los mensajes son los mismos en `MensajesValidacion.cs` y en `frontend/src/constants/messages.js`.
 - **Seguridad:** contraseñas con hash BCrypt, JWT, máximo 5 intentos de inicio de sesión por minuto y por IP (el sexto recibe 429), mismo mensaje para correo inexistente, inactivo o clave incorrecta, y rol de PostgreSQL de mínimo privilegio.
 - **Componentes reutilizables** (`frontend/src/components/ui`): TextInput, SelectInput, DateInput, TimeInput, Button, AlertMessage, ModalConfirmacion, TableList y CardIndicador.
 - **Endpoints principales:** `POST /api/auth/login`, `GET /api/auth/me`, `GET|POST /api/usuarios`, `GET|POST /api/ambientes`, `GET|POST /api/reservas`, `GET /api/reservas/{id}`, `GET /api/reservas/disponibilidad`, `POST /api/reservas/{id}/aprobar|rechazar|cancelar`, `GET /api/dashboard`, `GET /api/mi-ambiente` y `GET /api/salud`. Errores: 400 con errores por campo, 401, 403, 404, 409 y 429.
@@ -129,5 +128,3 @@ PGPASSWORD="<clave de postgres>" CLAVE_PRUEBA="<clave de los usuarios de prueba>
 ```
 `CLAVE_PRUEBA` debe ser la misma `password_prueba` con la que se creó la base. Si no encuentra Edge ni Chrome, indica el ejecutable con `E2E_NAVEGADOR`.
 
-## Documentación (`docs/`)
-`01-analisis.md`, `02-ciclo-de-vida.md`, `03-estandares.md`, `matriz-reglas.md`, `reutilizacion.md`, `diseno/` (reglas de diseño), `usabilidad/` (evaluación y plan de prueba) y el informe técnico (`INFORME_ReservaUPLA_breve.pdf`).

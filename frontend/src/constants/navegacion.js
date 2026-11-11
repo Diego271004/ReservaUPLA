@@ -26,7 +26,7 @@ export const OPCIONES_ESTADO_AMBIENTE = ['Disponible', 'En mantenimiento'].map((
   etiqueta: valor,
 }))
 
-// Menú lateral por rol (docs/diseno/DESIGN.md). "exacta" evita que /reservas quede activa en /reservas/nueva.
+// Menú lateral por rol. "exacta" evita que /reservas quede activa en /reservas/nueva.
 const INICIO = { ruta: '/dashboard', texto: 'Inicio', icono: 'dashboard', exacta: true }
 const RESERVAS = { ruta: '/reservas', texto: 'Reservas', icono: 'reservas', exacta: true }
 const NUEVA_RESERVA = {

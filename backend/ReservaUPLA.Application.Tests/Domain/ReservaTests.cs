@@ -5,7 +5,7 @@ using ReservaUPLA.Domain.Exceptions;
 
 namespace ReservaUPLA.Application.Tests.Domain;
 
-/// <summary>Transiciones de estado de la reserva (docs/01-analisis.md, sección 5) y RN-06.</summary>
+/// <summary>Transiciones de estado de la reserva y RN-06.</summary>
 public class ReservaTests
 {
     private static readonly DateTimeOffset Ahora = new(2026, 11, 3, 12, 0, 0, TimeSpan.Zero);
