@@ -14,6 +14,7 @@ import {
   iniciarSesion,
   leerSesion,
   nuevaPagina,
+  esperar,
   ok,
   paso,
   tokenDe,
@@ -28,11 +29,6 @@ const DIA_AB = fechaRelativa(11) // dos pendientes que se cruzan (A 10-12, B 11-
 const LIBRE = fechaRelativa(12) // sin reservas
 const CONFLICTO_10_12 = 'Ese ambiente ya tiene una reserva aprobada de 10:00 a 12:00. Elige otro horario u otro ambiente.'
 let falloGeneral = false
-
-const esperar = (condicion, mensaje) => {
-  if (!condicion) throw new Error(`No se cumplió: ${mensaje}`)
-  ok(mensaje)
-}
 
 async function elegirHorario(pagina, fecha, inicio, fin) {
   await pagina.getByRole('radio', { name: new RegExp(LABORATORIO) }).click()

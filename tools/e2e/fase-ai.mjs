@@ -16,9 +16,10 @@ import {
   carpeta,
   crearReservaApi,
   fechaRelativa,
-  iniciarSesion,
-  leerSesion,
   nuevaPagina,
+  esperar,
+  iniciarSesionDeLosRoles,
+  llenarReserva,
   ok,
   paso,
   tokenDe,
@@ -27,11 +28,6 @@ import {
 const destino = carpeta('docs', 'evidencias', 'fase-ai')
 const navegador = await abrirNavegador()
 let falloGeneral = false
-
-const esperar = (condicion, mensaje) => {
-  if (!condicion) throw new Error(`No se cumplió: ${mensaje}`)
-  ok(mensaje)
-}
 
 /** Las opciones del menú lateral marcadas como la sección actual (aria-current), aunque el panel esté plegado en móvil. */
 const opcionesMarcadas = (pagina) =>
@@ -43,14 +39,7 @@ const botonesDe = (pagina) => pagina.locator('main').getByRole('button').allInne
 async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   const sufijo = ancho === 'movil' ? ' (375 px)' : ' (1280 px)'
   const fecha = fechaRelativa(diasAdelante)
-  const llenar = async (pagina) => {
-    await pagina.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).click()
-    await pagina.getByLabel('Fecha').fill('')
-    await pagina.getByLabel('Fecha').pressSequentially(fecha.digitos)
-    await pagina.getByLabel('Hora de inicio').selectOption('14:00')
-    await pagina.getByLabel('Hora de fin').selectOption('16:00')
-    await pagina.getByLabel('Motivo').fill('Clase de arquitectura de información')
-  }
+  const llenar = (pagina) => llenarReserva(pagina, fecha, 'Clase de arquitectura de información')
 
   paso(`Nueva reserva: formulario y cierre${sufijo}`)
   const ana = await nuevaPagina(navegador, ancho, sesiones.ana)
@@ -139,18 +128,7 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
 
 try {
   paso('Inicio de sesión de Ana, Carla y Mario (una vez; las páginas móviles reutilizan la sesión)')
-  const sesiones = {}
-  for (const [rol, correo, destinoUrl] of [
-    ['ana', 'ana.torres@upla.edu.pe', '**/dashboard'],
-    ['carla', 'carla.rojas@upla.edu.pe', '**/dashboard'],
-    ['mario', 'mario.huaman@upla.edu.pe', '**/dashboard'],
-  ]) {
-    const pagina = await nuevaPagina(navegador, 'escritorio')
-    await iniciarSesion(pagina, correo)
-    await pagina.waitForURL(destinoUrl)
-    sesiones[rol] = await leerSesion(pagina)
-    await pagina.context().close()
-  }
+  const sesiones = await iniciarSesionDeLosRoles(navegador)
   const tokenCarla = tokenDe(sesiones.carla)
   await flujo('escritorio', 14, sesiones, tokenCarla)
   await flujo('movil', 21, sesiones, tokenCarla)

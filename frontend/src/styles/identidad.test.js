@@ -213,7 +213,7 @@ describe('login: la foto es decorativa y solo se pide en pantallas anchas', () =
     expect(leer('styles/tokens.css').match(/linear-gradient\(/g)).toHaveLength(3)
     const usan = TODOS_LOS_CSS.filter((ruta) => /var\(--degradado-/.test(leer(ruta)))
     expect(usan).toEqual([
-      'components/InicioAdmin/Portada.module.css',
+      'components/ui/PortadaDeInicio.module.css',
       'pages/LoginPage.module.css',
     ])
   })

@@ -5,21 +5,18 @@ import Button from '../components/ui/Button.jsx'
 import ModalDeReserva from '../components/ModalDeReserva/ModalDeReserva.jsx'
 import { Icono } from '../components/ui/Icono.jsx'
 import Insignia from '../components/ui/Insignia.jsx'
+import EsqueletoDeInicio from '../components/ui/EsqueletoDeInicio.jsx'
+import PortadaDeInicio from '../components/ui/PortadaDeInicio.jsx'
 import { useDecisionDeReserva } from '../hooks/useDecisionDeReserva.js'
 import { useCarga } from '../hooks/useCarga.js'
 import { obtenerDashboard } from '../services/recursosService.js'
 import { isoAFecha, hoy } from '../utils/fechas.js'
+import { TIPO_INSIGNIA_DE_ESTADO } from '../utils/reservas.js'
 import { fechaLarga } from '../utils/resumenDeSolicitud.js'
 import estilos from './InicioSolicitante.module.css'
 
 const puedeCancelar = (estado) => estado === 'Pendiente' || estado === 'Aprobada'
-const tipoInsignia = (estado) =>
-  ({
-    Pendiente: 'pendiente',
-    Aprobada: 'aprobada',
-    Rechazada: 'rechazada',
-    Cancelada: 'cancelada',
-  })[estado] ?? 'neutro'
+const tipoInsignia = (estado) => TIPO_INSIGNIA_DE_ESTADO[estado] ?? 'neutro'
 
 const iconoPorEstado = (estado) =>
   ({
@@ -45,15 +42,7 @@ export default function InicioSolicitante({ ahora = new Date() }) {
   const decision = useDecisionDeReserva(recargar)
 
   if (error) return <AvisoDeError mensaje={error} alReintentar={recargar} />
-  if (cargando)
-    return (
-      <section aria-live="polite" aria-busy="true" className={estilos.esqueleto}>
-        <p className={estilos.textoCarga}>Iniciando tu dashboard…</p>
-        <div className={estilos.cajaEsqueleto} />
-        <div className={estilos.cajaEsqueleto} />
-        <div className={estilos.cajaEsqueleto} />
-      </section>
-    )
+  if (cargando) return <EsqueletoDeInicio />
 
   const inicio = datos.inicioSolicitante
   const proxima = inicio?.proximaReserva
@@ -68,31 +57,16 @@ export default function InicioSolicitante({ ahora = new Date() }) {
       )}
 
       <div className={estilos.contenedorInicio}>
-        <section className={estilos.portada} aria-labelledby="portada-solicitante-titulo">
-          <svg
-            className={estilos.marca}
-            viewBox="0 0 220 160"
-            width="220"
-            height="160"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path d="M60 10 100 33v46L60 102 20 79V33z" />
-            <path d="M130 50 170 73v46l-40 23-40-23V73z" />
-            <path d="M150 -10 190 13v46l-40 23-40-23V13z" />
-          </svg>
-          <div className={estilos.textoPortada}>
-            <p className={estilos.fechaPortada}>{fechaHoy}</p>
-            <h2 id="portada-solicitante-titulo" className={estilos.tituloPortada}>
-              {proxima ? 'Tienes una reserva programada' : 'Todo listo para tu próxima reserva'}
-            </h2>
-            <p className={estilos.detallePortada}>
-              {proxima
-                ? `${proxima.ambienteNombre} · ${proxima.horaInicio} a ${proxima.horaFin}`
-                : 'No tienes reservas próximas. Elige un ambiente para comenzar.'}
-            </p>
-          </div>
-        </section>
+        <PortadaDeInicio
+          id="portada-solicitante-titulo"
+          fecha={fechaHoy}
+          titulo={proxima ? 'Tienes una reserva programada' : 'Todo listo para tu próxima reserva'}
+          detalle={
+            proxima
+              ? `${proxima.ambienteNombre} · ${proxima.horaInicio} a ${proxima.horaFin}`
+              : 'No tienes reservas próximas. Elige un ambiente para comenzar.'
+          }
+        />
 
         {proxima ? (
           <section className={estilos.seccion} aria-labelledby="proxima-titulo">

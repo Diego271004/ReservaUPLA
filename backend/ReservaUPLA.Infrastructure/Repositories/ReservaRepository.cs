@@ -129,13 +129,19 @@ public sealed class ReservaRepository : IReservaRepository
             .ToList();
     }
 
-    public async Task<IReadOnlyList<AmbienteUsoDto>> UsoPorAmbienteAsync(CancellationToken cancellationToken)
+    // Cuántas reservas aprobadas tiene cada ambiente (la base común de «uso por ambiente» y «más utilizados»).
+    private async Task<List<AprobadasDeAmbiente>> AprobadasPorAmbienteAsync(CancellationToken cancellationToken)
     {
-        var aprobadas = await _contexto.Reservas.AsNoTracking()
+        return await _contexto.Reservas.AsNoTracking()
             .Where(reserva => reserva.Estado == EstadoReserva.Aprobada)
             .GroupBy(reserva => reserva.AmbienteId)
-            .Select(grupo => new { AmbienteId = grupo.Key, Cantidad = grupo.Count() })
+            .Select(grupo => new AprobadasDeAmbiente(grupo.Key, grupo.Count()))
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<AmbienteUsoDto>> UsoPorAmbienteAsync(CancellationToken cancellationToken)
+    {
+        var aprobadas = await AprobadasPorAmbienteAsync(cancellationToken);
 
         var ambientes = await _contexto.Ambientes.AsNoTracking().ToListAsync(cancellationToken);
         return ambientes
@@ -149,11 +155,7 @@ public sealed class ReservaRepository : IReservaRepository
 
     public async Task<IReadOnlyList<AmbienteUsoDto>> AmbientesMasUtilizadosAsync(CancellationToken cancellationToken)
     {
-        var aprobadas = await _contexto.Reservas.AsNoTracking()
-            .Where(reserva => reserva.Estado == EstadoReserva.Aprobada)
-            .GroupBy(reserva => reserva.AmbienteId)
-            .Select(grupo => new { AmbienteId = grupo.Key, Cantidad = grupo.Count() })
-            .ToListAsync(cancellationToken);
+        var aprobadas = await AprobadasPorAmbienteAsync(cancellationToken);
 
         if (aprobadas.Count == 0)
         {
@@ -223,4 +225,6 @@ public sealed class ReservaRepository : IReservaRepository
 
         return false;
     }
+
+    private sealed record AprobadasDeAmbiente(int AmbienteId, int Cantidad);
 }

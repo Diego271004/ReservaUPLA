@@ -14,9 +14,10 @@ import {
   crearReservaApi,
   fechaRelativa,
   abrirFiltros,
-  iniciarSesion,
-  leerSesion,
   nuevaPagina,
+  esperar,
+  iniciarSesionDeLosRoles,
+  llenarReserva,
   ok,
   paso,
   tokenDe,
@@ -25,11 +26,6 @@ import {
 const destino = carpeta('docs', 'evidencias', 'fase9')
 const navegador = await abrirNavegador()
 let falloGeneral = false
-
-const esperar = (condicion, mensaje) => {
-  if (!condicion) throw new Error(`No se cumplió: ${mensaje}`)
-  ok(mensaje)
-}
 
 /** El número de una tarjeta del Dashboard o de Mi ambiente, por su descripción («Reservas pendientes»). */
 async function indicador(pagina, descripcion) {
@@ -125,18 +121,7 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
 
 try {
   paso('Inicio de sesión de Ana, Carla y Mario (una vez; las páginas móviles reutilizan la sesión)')
-  const sesiones = {}
-  for (const [rol, correo, destinoUrl] of [
-    ['ana', 'ana.torres@upla.edu.pe', '**/dashboard'],
-    ['carla', 'carla.rojas@upla.edu.pe', '**/dashboard'],
-    ['mario', 'mario.huaman@upla.edu.pe', '**/dashboard'],
-  ]) {
-    const pagina = await nuevaPagina(navegador, 'escritorio')
-    await iniciarSesion(pagina, correo)
-    await pagina.waitForURL(destinoUrl)
-    sesiones[rol] = await leerSesion(pagina)
-    await pagina.context().close()
-  }
+  const sesiones = await iniciarSesionDeLosRoles(navegador)
   ok('los tres roles aterrizan en Inicio (/dashboard)')
   const tokenCarla = tokenDe(sesiones.carla)
   const tokenAna = tokenDe(sesiones.ana)

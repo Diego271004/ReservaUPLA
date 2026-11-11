@@ -155,3 +155,36 @@ export async function abrirFiltros(pagina) {
   const boton = pagina.getByRole('button', { name: /^Filtros/ })
   if ((await boton.isVisible()) && (await boton.getAttribute('aria-expanded')) === 'false') await boton.click()
 }
+
+/** Falla con un mensaje claro si la condición no se cumple; si se cumple, lo deja anotado en la salida. */
+export const esperar = (condicion, mensaje) => {
+  if (!condicion) throw new Error(`No se cumplió: ${mensaje}`)
+  ok(mensaje)
+}
+
+/** Inicia sesión como Ana, Carla y Mario una sola vez y devuelve sus sesiones (las páginas móviles las reutilizan). */
+export async function iniciarSesionDeLosRoles(navegador) {
+  const sesiones = {}
+  for (const [rol, correo] of [
+    ['ana', 'ana.torres@upla.edu.pe'],
+    ['carla', 'carla.rojas@upla.edu.pe'],
+    ['mario', 'mario.huaman@upla.edu.pe'],
+  ]) {
+    const pagina = await nuevaPagina(navegador, 'escritorio')
+    await iniciarSesion(pagina, correo)
+    await pagina.waitForURL('**/dashboard')
+    sesiones[rol] = await leerSesion(pagina)
+    await pagina.context().close()
+  }
+  return sesiones
+}
+
+/** Llena «Nueva reserva» con el Laboratorio de Cómputo 2, de 14:00 a 16:00, en la fecha dada. */
+export async function llenarReserva(pagina, fecha, motivo) {
+  await pagina.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).click()
+  await pagina.getByLabel('Fecha').fill('')
+  await pagina.getByLabel('Fecha').pressSequentially(fecha.digitos)
+  await pagina.getByLabel('Hora de inicio').selectOption('14:00')
+  await pagina.getByLabel('Hora de fin').selectOption('16:00')
+  await pagina.getByLabel('Motivo').fill(motivo)
+}

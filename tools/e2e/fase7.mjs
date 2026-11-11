@@ -12,6 +12,7 @@ import {
   iniciarSesion,
   leerSesion,
   nuevaPagina,
+  esperar,
   ok,
   paso,
   tokenDe,
@@ -22,11 +23,6 @@ const navegador = await abrirNavegador()
 const FECHA_PASADA = 'No puedes reservar para una fecha anterior a hoy.'
 const DETALLE_LABORATORIO = '30 personas · Pabellón A, piso 2'
 let falloGeneral = false
-
-const esperar = (condicion, mensaje) => {
-  if (!condicion) throw new Error(`No se cumplió: ${mensaje}`)
-  ok(mensaje)
-}
 
 const fechaDeHoy = () => {
   const ahora = new Date()

@@ -1,0 +1,34 @@
+.esqueleto {
+  display: grid;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-3);
+}
+
+.texto {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-texto-suave);
+}
+
+.caja {
+  height: 100px;
+  background: var(--fondo-neutro);
+  border-radius: var(--radio-tarjeta);
+  animation: pulso 1.5s ease-in-out infinite;
+}
+
+@keyframes pulso {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caja {
+    animation: none;
+  }
+}

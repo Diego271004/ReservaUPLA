@@ -1,85 +1,89 @@
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Button from '../components/ui/Button.jsx'
 import CardIndicador from '../components/ui/CardIndicador.jsx'
 import AvisoDeError from '../components/AvisoDeError/AvisoDeError.jsx'
+import EsqueletoDeInicio from '../components/ui/EsqueletoDeInicio.jsx'
+import PortadaDeInicio from '../components/ui/PortadaDeInicio.jsx'
 import { Icono } from '../components/ui/Icono.jsx'
 import Insignia from '../components/ui/Insignia.jsx'
 import { isoAFecha, hoy } from '../utils/fechas.js'
+import { TIPO_INSIGNIA_DE_ESTADO } from '../utils/reservas.js'
 import { fechaLarga } from '../utils/resumenDeSolicitud.js'
 import { useCarga } from '../hooks/useCarga.js'
 import { obtenerDashboard } from '../services/recursosService.js'
+import portada from '../components/ui/PortadaDeInicio.module.css'
 import estilos from './InicioResponsable.module.css'
 
 const VACIO = Object.freeze({ inicioResponsable: null })
-const tipoInsignia = (estado) =>
-  ({
-    Pendiente: 'pendiente',
-    Aprobada: 'aprobada',
-    Rechazada: 'rechazada',
-    Cancelada: 'cancelada',
-  })[estado] ?? 'neutro'
+
+const textoHoy = (cantidad) =>
+  cantidad === 0
+    ? 'No hay reservas para hoy. Revisa las próximas o consulta la disponibilidad.'
+    : cantidad === 1
+      ? '1 reserva programada para hoy en tus ambientes.'
+      : `${cantidad} reservas programadas para hoy en tus ambientes.`
+
+/** Una fila de reserva: lo que cambia entre «Hoy» y «Próximas» es solo el primer dato (`destacado`). */
+function FilaDeReserva({ reserva, destacado, alVerDetalle }) {
+  return (
+    <li>
+      {destacado}
+      <span className={estilos.nombreAmbiente}>{reserva.ambienteNombre}</span>
+      <span className={estilos.nombreSolicitante}>{reserva.solicitanteNombre}</span>
+      <Insignia tipo={TIPO_INSIGNIA_DE_ESTADO[reserva.estado] ?? 'neutro'}>
+        {reserva.estado}
+      </Insignia>
+      <Button
+        variante="secundario"
+        className={estilos.botonDetalle}
+        onClick={() => alVerDetalle(reserva.id)}
+      >
+        Ver detalle
+      </Button>
+    </li>
+  )
+}
+
+/** Una sección con su título y el contador, y la lista (u otro contenido) de las reservas. */
+function SeccionDeReservas({ id, titulo, cantidad, children }) {
+  return (
+    <section className={estilos.seccion} aria-labelledby={id}>
+      <div className={estilos.cabeceraSeccion}>
+        <h2 id={id}>{titulo}</h2>
+        {cantidad > 0 && <span className={estilos.contadorSeccion}>{cantidad} reservas</span>}
+      </div>
+      {children}
+    </section>
+  )
+}
 
 export default function InicioResponsable({ ahora = new Date(), alVerDetalle }) {
-  const navigate = useNavigate()
   const { datos, cargando, error, recargar } = useCarga(obtenerDashboard, VACIO)
 
   if (error) return <AvisoDeError mensaje={error} alReintentar={recargar} />
-  if (cargando)
-    return (
-      <section aria-live="polite" aria-busy="true" className={estilos.esqueleto}>
-        <p className={estilos.textoCarga}>Iniciando tu dashboard…</p>
-        <div className={estilos.cajaEsqueleto} />
-        <div className={estilos.cajaEsqueleto} />
-        <div className={estilos.cajaEsqueleto} />
-      </section>
-    )
+  if (cargando) return <EsqueletoDeInicio />
 
   const inicio = datos.inicioResponsable
-  const hoyList = inicio?.hoy ?? []
-  const proximas = inicio?.proximas ?? []
-  const ambientes = inicio?.ambientes ?? []
-  const ordenadasHoy = [...hoyList].sort((a, b) => `${a.horaInicio}`.localeCompare(b.horaInicio))
-  const ordenadasProximas = [...proximas].sort((a, b) =>
+  const ordenadasHoy = [...(inicio?.hoy ?? [])].sort((a, b) =>
+    `${a.horaInicio}`.localeCompare(b.horaInicio),
+  )
+  const ordenadasProximas = [...(inicio?.proximas ?? [])].sort((a, b) =>
     `${a.fecha}${a.horaInicio}`.localeCompare(`${b.fecha}${b.horaInicio}`),
   )
-  const fechaHoy = fechaLarga(hoy(ahora))
+  const ambientes = inicio?.ambientes ?? []
 
   return (
     <div className={estilos.contenedorInicio}>
-      <section className={estilos.portada} aria-labelledby="portada-responsable-titulo">
-        <svg
-          className={estilos.marca}
-          viewBox="0 0 220 160"
-          width="220"
-          height="160"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path d="M60 10 100 33v46L60 102 20 79V33z" />
-          <path d="M130 50 170 73v46l-40 23-40-23V73z" />
-          <path d="M150 -10 190 13v46l-40 23-40-23V13z" />
-        </svg>
-        <div className={estilos.textoPortada}>
-          <p className={estilos.fechaPortada}>{fechaHoy}</p>
-          <h2 id="portada-responsable-titulo" className={estilos.tituloPortada}>
-            Gestión de tus ambientes a cargo
-          </h2>
-          <p className={estilos.detallePortada}>
-            {ordenadasHoy.length === 0
-              ? 'No hay reservas para hoy. Revisa las próximas o consulta la disponibilidad.'
-              : ordenadasHoy.length === 1
-                ? '1 reserva programada para hoy en tus ambientes.'
-                : `${ordenadasHoy.length} reservas programadas para hoy en tus ambientes.`}
-          </p>
-        </div>
-        <Button
-          variante="secundario"
-          className={estilos.accionPortada}
-          onClick={() => navigate('/disponibilidad')}
-        >
+      <PortadaDeInicio
+        id="portada-responsable-titulo"
+        fecha={fechaLarga(hoy(ahora))}
+        titulo="Gestión de tus ambientes a cargo"
+        detalle={textoHoy(ordenadasHoy.length)}
+      >
+        <Link className={portada.accion} to="/disponibilidad">
           Ver disponibilidad
-        </Button>
-      </section>
+        </Link>
+      </PortadaDeInicio>
 
       <section className={estilos.indicadores} aria-label="Indicadores">
         <CardIndicador
@@ -106,13 +110,11 @@ export default function InicioResponsable({ ahora = new Date(), alVerDetalle }) 
         />
       </section>
 
-      <section className={estilos.seccion} aria-labelledby="hoy-responsable">
-        <div className={estilos.cabeceraSeccion}>
-          <h2 id="hoy-responsable">Hoy en tu ambiente</h2>
-          {ordenadasHoy.length > 0 && (
-            <span className={estilos.contadorSeccion}>{ordenadasHoy.length} reservas</span>
-          )}
-        </div>
+      <SeccionDeReservas
+        id="hoy-responsable"
+        titulo="Hoy en tu ambiente"
+        cantidad={ordenadasHoy.length}
+      >
         {ordenadasHoy.length === 0 ? (
           <div className={estilos.vacio}>
             <Icono nombre="calendario" tamano={32} />
@@ -121,62 +123,52 @@ export default function InicioResponsable({ ahora = new Date(), alVerDetalle }) 
         ) : (
           <ol className={estilos.agendaResponsable}>
             {ordenadasHoy.map((reserva) => (
-              <li key={reserva.id}>
-                <strong className={estilos.horaDestacada}>
-                  <Icono nombre="reloj" tamano={16} />
-                  {reserva.horaInicio}–{reserva.horaFin}
-                </strong>
-                <span className={estilos.nombreAmbiente}>{reserva.ambienteNombre}</span>
-                <span className={estilos.nombreSolicitante}>{reserva.solicitanteNombre}</span>
-                <Insignia tipo={tipoInsignia(reserva.estado)}>{reserva.estado}</Insignia>
-                <Button
-                  variante="secundario"
-                  className={estilos.botonDetalle}
-                  onClick={() => alVerDetalle(reserva.id)}
-                >
-                  Ver detalle
-                </Button>
-              </li>
+              <FilaDeReserva
+                key={reserva.id}
+                reserva={reserva}
+                alVerDetalle={alVerDetalle}
+                destacado={
+                  <strong className={estilos.horaDestacada}>
+                    <Icono nombre="reloj" tamano={16} />
+                    {reserva.horaInicio}–{reserva.horaFin}
+                  </strong>
+                }
+              />
             ))}
           </ol>
         )}
-      </section>
+      </SeccionDeReservas>
 
-      <section className={estilos.seccion} aria-labelledby="proximas-responsable">
-        <div className={estilos.cabeceraSeccion}>
-          <h2 id="proximas-responsable">Próximas reservas</h2>
-          {ordenadasProximas.length > 0 && (
-            <span className={estilos.contadorSeccion}>{ordenadasProximas.length} reservas</span>
-          )}
-        </div>
+      <SeccionDeReservas
+        id="proximas-responsable"
+        titulo="Próximas reservas"
+        cantidad={ordenadasProximas.length}
+      >
         {ordenadasProximas.length === 0 ? (
           <p>No hay próximas reservas.</p>
         ) : (
           <ul className={estilos.listaResponsable}>
             {ordenadasProximas.map((reserva) => (
-              <li key={reserva.id}>
-                <strong className={estilos.fechaProxima}>
-                  <Icono nombre="calendario" tamano={16} />
-                  {isoAFecha(reserva.fecha)}
-                </strong>
-                <span className={estilos.horaProxima}>
-                  {reserva.horaInicio}–{reserva.horaFin}
-                </span>
-                <span className={estilos.nombreAmbiente}>{reserva.ambienteNombre}</span>
-                <span className={estilos.nombreSolicitante}>{reserva.solicitanteNombre}</span>
-                <Insignia tipo={tipoInsignia(reserva.estado)}>{reserva.estado}</Insignia>
-                <Button
-                  variante="secundario"
-                  className={estilos.botonDetalle}
-                  onClick={() => alVerDetalle(reserva.id)}
-                >
-                  Ver detalle
-                </Button>
-              </li>
+              <FilaDeReserva
+                key={reserva.id}
+                reserva={reserva}
+                alVerDetalle={alVerDetalle}
+                destacado={
+                  <>
+                    <strong className={estilos.fechaProxima}>
+                      <Icono nombre="calendario" tamano={16} />
+                      {isoAFecha(reserva.fecha)}
+                    </strong>
+                    <span className={estilos.horaProxima}>
+                      {reserva.horaInicio}–{reserva.horaFin}
+                    </span>
+                  </>
+                }
+              />
             ))}
           </ul>
         )}
-      </section>
+      </SeccionDeReservas>
     </div>
   )
 }

@@ -15,10 +15,22 @@ export function leftPorCentaje(hora) {
   return `${((minutosDeHora(hora) - INICIO_DIA) / (FIN_DIA - INICIO_DIA)) * 100}%`
 }
 
-export function fusionarBloques(bloques = []) {
-  const ocupados = [...bloques]
+/** Los bloques con hora de inicio y de fin, de la mañana a la noche. */
+function ordenadosPorInicio(bloques = []) {
+  return [...bloques]
     .filter((bloque) => bloque?.horaInicio && bloque?.horaFin)
     .sort((a, b) => minutosDeHora(a.horaInicio) - minutosDeHora(b.horaInicio))
+}
+
+/** Un tramo libre entre dos instantes (en minutos desde las 00:00). */
+const tramoLibre = (desde, hasta) => ({
+  tipo: 'libre',
+  horaInicio: minutosAHora(desde),
+  horaFin: minutosAHora(hasta),
+})
+
+export function fusionarBloques(bloques = []) {
+  const ocupados = ordenadosPorInicio(bloques)
 
   const fusionados = []
   for (const bloque of ocupados) {
@@ -48,21 +60,13 @@ export function tramosFusionados(bloques = []) {
     const inicio = minutosDeHora(bloque.horaInicio)
     const fin = minutosDeHora(bloque.horaFin)
     if (inicio > cursor) {
-      tramos.push({
-        tipo: 'libre',
-        horaInicio: minutosAHora(cursor),
-        horaFin: minutosAHora(inicio),
-      })
+      tramos.push(tramoLibre(cursor, inicio))
     }
     tramos.push({ tipo: 'ocupado', ...bloque })
     cursor = Math.max(cursor, fin)
   }
   if (cursor < FIN_DIA) {
-    tramos.push({
-      tipo: 'libre',
-      horaInicio: minutosAHora(cursor),
-      horaFin: minutosAHora(FIN_DIA),
-    })
+    tramos.push(tramoLibre(cursor, FIN_DIA))
   }
   return tramos
 }
@@ -72,9 +76,7 @@ export function minutosAHora(minutos) {
 }
 
 export function asignarCarrilesReservas(bloques = []) {
-  const ocupados = [...bloques]
-    .filter((bloque) => bloque?.horaInicio && bloque?.horaFin)
-    .sort((a, b) => minutosDeHora(a.horaInicio) - minutosDeHora(b.horaInicio))
+  const ocupados = ordenadosPorInicio(bloques)
   const finPorCarril = []
 
   return ocupados.map((bloque) => {
@@ -88,29 +90,19 @@ export function asignarCarrilesReservas(bloques = []) {
 }
 
 export function tramosLibresBase(bloques = []) {
-  const ocupados = [...bloques]
-    .filter((bloque) => bloque?.horaInicio && bloque?.horaFin)
-    .sort((a, b) => minutosDeHora(a.horaInicio) - minutosDeHora(b.horaInicio))
+  const ocupados = ordenadosPorInicio(bloques)
   const tramos = []
   let cursor = INICIO_DIA
 
   for (const bloque of ocupados) {
     const inicio = Math.max(cursor, minutosDeHora(bloque.horaInicio))
     if (inicio > cursor) {
-      tramos.push({
-        tipo: 'libre',
-        horaInicio: minutosAHora(cursor),
-        horaFin: minutosAHora(inicio),
-      })
+      tramos.push(tramoLibre(cursor, inicio))
     }
     cursor = Math.max(cursor, minutosDeHora(bloque.horaFin))
   }
   if (cursor < FIN_DIA) {
-    tramos.push({
-      tipo: 'libre',
-      horaInicio: minutosAHora(cursor),
-      horaFin: minutosAHora(FIN_DIA),
-    })
+    tramos.push(tramoLibre(cursor, FIN_DIA))
   }
   return tramos
 }

@@ -68,6 +68,18 @@ const columnas = (porAmbiente) =>
       : [columna],
   )
 
+/** Una fila «icono Etiqueta … valor» de la tarjeta de un ambiente. */
+function DetalleFila({ icono, etiqueta, children }) {
+  return (
+    <div className={estilos.detalleFila}>
+      <span className={estilos.detalleEtiqueta}>
+        <Icono nombre={icono} tamano={14} /> {etiqueta}
+      </span>
+      <span className={estilos.detalleValor}>{children}</span>
+    </div>
+  )
+}
+
 export default function AmbientesPage() {
   const navigate = useNavigate()
   const ocupacion = useCarga(cargarOcupacionDeHoy, SIN_OCUPACION)
@@ -149,30 +161,19 @@ export default function AmbientesPage() {
                   </Insignia>
                 </div>
                 <div className={estilos.tarjetaDetalles}>
-                  <div className={estilos.detalleFila}>
-                    <span className={estilos.detalleEtiqueta}>
-                      <Icono nombre="usuarios" tamano={14} /> Capacidad
-                    </span>
-                    <span className={estilos.detalleValor}>{ambiente.capacidad} personas</span>
-                  </div>
-                  <div className={estilos.detalleFila}>
-                    <span className={estilos.detalleEtiqueta}>
-                      <Icono nombre="ambientes" tamano={14} /> Ubicación
-                    </span>
-                    <span className={estilos.detalleValor}>{ambiente.ubicacion}</span>
-                  </div>
-                  <div className={estilos.detalleFila}>
-                    <span className={estilos.detalleEtiqueta}>
-                      <Icono nombre="personas" tamano={14} /> Responsable
-                    </span>
-                    <span className={estilos.detalleValor}>
-                      {ambiente.responsableNombre ? (
-                        <CeldaDePersona nombre={ambiente.responsableNombre} />
-                      ) : (
-                        '—'
-                      )}
-                    </span>
-                  </div>
+                  <DetalleFila icono="usuarios" etiqueta="Capacidad">
+                    {ambiente.capacidad} personas
+                  </DetalleFila>
+                  <DetalleFila icono="ambientes" etiqueta="Ubicación">
+                    {ambiente.ubicacion}
+                  </DetalleFila>
+                  <DetalleFila icono="personas" etiqueta="Responsable">
+                    {ambiente.responsableNombre ? (
+                      <CeldaDePersona nombre={ambiente.responsableNombre} />
+                    ) : (
+                      '—'
+                    )}
+                  </DetalleFila>
                 </div>
                 <div className={estilos.tarjetaOcupacion}>
                   <span className={estilos.ocupacionTitulo}>Ocupación de hoy:</span>

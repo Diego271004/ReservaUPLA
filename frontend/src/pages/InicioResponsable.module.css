@@ -9,99 +9,6 @@
   margin-bottom: 0 !important;
 }
 
-.esqueleto {
-  display: grid;
-  gap: var(--espacio-2);
-  margin-top: var(--espacio-3);
-}
-
-.textoCarga {
-  margin: 0;
-  font-weight: 600;
-  color: var(--color-texto-suave);
-}
-
-.cajaEsqueleto {
-  height: 100px;
-  background: var(--fondo-neutro);
-  border-radius: var(--radio-tarjeta);
-  animation: pulso 1.5s ease-in-out infinite;
-}
-
-@keyframes pulso {
-  0%,
-  100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.portada {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--espacio-3);
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--espacio-4);
-  margin-bottom: 0;
-  overflow: hidden;
-  color: var(--color-sobre-oscuro);
-  background: var(--color-marino);
-  border-radius: var(--radio-tarjeta);
-}
-
-.portada > * {
-  position: relative;
-  z-index: 1;
-}
-
-.marca {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 0;
-  fill: none;
-  stroke: var(--trazo-marca);
-  stroke-width: 2;
-  pointer-events: none;
-}
-
-.textoPortada {
-  max-width: 48ch;
-}
-
-.fechaPortada {
-  margin: 0 0 var(--espacio-1);
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.9;
-}
-
-.tituloPortada {
-  margin: 0;
-  font-size: 1.75rem;
-  line-height: 1.2;
-  color: var(--color-sobre-oscuro);
-}
-
-.detallePortada {
-  margin: var(--espacio-1) 0 0;
-  font-size: 1rem;
-}
-
-.accionPortada {
-  width: auto;
-}
-
-.portada :focus-visible {
-  outline-color: var(--color-foco-sobre-oscuro);
-}
-
 .indicadores {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
@@ -220,25 +127,5 @@
   .botonDetalle {
     width: 100%;
     justify-self: stretch;
-  }
-}
-
-@media (max-width: 640px) {
-  .portada {
-    padding: var(--espacio-3) var(--espacio-2);
-  }
-
-  .tituloPortada {
-    font-size: 1.375rem;
-  }
-
-  .accionPortada {
-    width: 100%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cajaEsqueleto {
-    animation: none;
   }
 }

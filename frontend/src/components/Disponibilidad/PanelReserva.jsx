@@ -3,7 +3,18 @@ import { useNavigate } from 'react-router-dom'
 import Button from '../ui/Button.jsx'
 import { Icono } from '../ui/Icono.jsx'
 import Insignia from '../ui/Insignia.jsx'
+import { TIPO_INSIGNIA_DE_ESTADO } from '../../utils/reservas.js'
 import estilos from './PanelReserva.module.css'
+
+/** Una fila «Etiqueta: valor» del panel. */
+function Dato({ etiqueta, children }) {
+  return (
+    <div className={estilos.fila}>
+      <span className={estilos.etiqueta}>{etiqueta}:</span>
+      <span className={estilos.valor}>{children}</span>
+    </div>
+  )
+}
 
 /**
  * Panel accesible con el detalle de una reserva en la vista de disponibilidad (ISO 9241-11).
@@ -56,44 +67,21 @@ export default function PanelReserva({ reserva, ambiente, rol, onCerrar }) {
         </div>
 
         <div className={estilos.cuerpo}>
-          <div className={estilos.fila}>
-            <span className={estilos.etiqueta}>Horario:</span>
-            <span className={estilos.valor}>
-              {reserva.horaInicio} – {reserva.horaFin}
-            </span>
-          </div>
-
-          <div className={estilos.fila}>
-            <span className={estilos.etiqueta}>Estado:</span>
-            <span className={estilos.valor}>
-              <Insignia
-                tipo={
-                  reserva.estado === 'Aprobada'
-                    ? 'aprobada'
-                    : reserva.estado === 'Pendiente'
-                      ? 'pendiente'
-                      : 'neutro'
-                }
-              >
-                {reserva.estado}
-              </Insignia>
-            </span>
-          </div>
+          <Dato etiqueta="Horario">
+            {reserva.horaInicio} – {reserva.horaFin}
+          </Dato>
+          <Dato etiqueta="Estado">
+            <Insignia tipo={TIPO_INSIGNIA_DE_ESTADO[reserva.estado] ?? 'neutro'}>
+              {reserva.estado}
+            </Insignia>
+          </Dato>
 
           {puedeVerDetalle ? (
             <>
               {reserva.solicitanteNombre && (
-                <div className={estilos.fila}>
-                  <span className={estilos.etiqueta}>Solicitante:</span>
-                  <span className={estilos.valor}>{reserva.solicitanteNombre}</span>
-                </div>
+                <Dato etiqueta="Solicitante">{reserva.solicitanteNombre}</Dato>
               )}
-              {reserva.motivo && (
-                <div className={estilos.fila}>
-                  <span className={estilos.etiqueta}>Motivo:</span>
-                  <span className={estilos.valor}>{reserva.motivo}</span>
-                </div>
-              )}
+              {reserva.motivo && <Dato etiqueta="Motivo">{reserva.motivo}</Dato>}
             </>
           ) : (
             <p className={estilos.privado}>
