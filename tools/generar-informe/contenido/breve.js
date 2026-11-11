@@ -36,6 +36,7 @@ function codigo(ruta, ancla, n, titulo) {
 /** Informe técnico breve (~15 páginas): cada tema con su explicación, la captura o el código que la respalda. */
 export function cuerpoBreve() {
   return [
+    p('**Repositorio del proyecto (GitHub):** [COMPLETAR POR EL ESTUDIANTE: enlace del repositorio, por ejemplo https://github.com/usuario/ReservaUPLA]. Rama de trabajo: `feature/diseno-final`. El README explica cómo crear la base de datos por terminal, configurar los secretos y ejecutar backend, frontend y pruebas.'),
     h1('1. Problema, actores y alcance'),
     p('Las reservas de laboratorios, auditorios y salas de la UPLA se hacían por mensajes, llamadas y papel: había duplicidad de reservas, solicitudes perdidas y ninguna trazabilidad. ReservaUPLA centraliza el flujo: el solicitante pide un ambiente, el sistema comprueba la disponibilidad, el administrador aprueba o rechaza y cada cambio queda registrado con quién lo hizo y cuándo.'),
     ...vinetas([
@@ -92,7 +93,8 @@ export function cuerpoBreve() {
     h2('5.3 Base de datos'),
     p('La restricción de exclusión de PostgreSQL garantiza RN-01 aunque dos personas aprueben a la vez: la segunda aprobación falla en la base de datos.'),
     ...codigo('database/03_crear_tablas.sql', '-- RN-01: dos reservas Aprobadas', 5, 'Restricción de exclusión que impide el cruce de reservas aprobadas'),
-    ...fig('b-ocupado', 'RN-01: aviso de disponibilidad con un tramo ocupado marcado «Choque»', '23-nueva-reserva-ocupado.png'),
+    ...fig('b-usuario', 'Formulario «Registrar usuario» con errores de validación junto a cada campo', '25-usuario-nuevo-errores.png'),
+    ...fig('b-ocupado','RN-01: aviso de disponibilidad con un tramo ocupado marcado «Choque»', '23-nueva-reserva-ocupado.png'),
     ...fig('b-login-error', 'Credenciales incorrectas: mensaje genérico que no revela si el correo existe', '04-login-error.png'),
 
     h1('6. Reutilización de componentes'),
