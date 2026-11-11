@@ -44,7 +44,6 @@ export const CUENTAS = [
   ['Solicitante', 'ana.torres@upla.edu.pe', 'Ana Torres'],
   ['Responsable de ambiente', 'mario.huaman@upla.edu.pe', 'Mario Huamán'],
 ]
-export const CLAVE_DE_PRUEBA = 'Prueba#2026Upla'
 
 // ------------------------------------------------------------------ Calculadas al generar
 const git = (...args) => execFileSync('git', args, { cwd: RAIZ, encoding: 'utf8' }).trim()

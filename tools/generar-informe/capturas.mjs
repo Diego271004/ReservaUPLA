@@ -12,7 +12,8 @@ mkdirSync(SALIDA, { recursive: true })
 const { chromium } = createRequire(path.join(RAIZ, 'tools', 'e2e') + path.sep)('playwright-core')
 
 const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5180'
-const CLAVE = process.env.CLAVE_PRUEBA ?? 'Prueba#2026Upla'
+const CLAVE = process.env.CLAVE_PRUEBA
+if (!CLAVE) throw new Error('Define CLAVE_PRUEBA (la password_prueba con la que se creó la base)')
 const NAVEGADORES = [
   'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
   'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',

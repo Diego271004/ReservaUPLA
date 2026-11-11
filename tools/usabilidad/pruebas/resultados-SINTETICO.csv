@@ -1,8 +1,0 @@
-origen,participante,tipo,tarea,completada,tiempo_s,clics,errores,ayuda_moderador,sus_1,sus_2,sus_3,sus_4,sus_5,sus_6,sus_7,sus_8,sus_9,sus_10,comentario
-SINTETICO,P1,tarea,T01,1,100,10,0,0,,,,,,,,,,,
-SINTETICO,P2,tarea,T01,1,150,8,1,0,,,,,,,,,,,
-SINTETICO,P3,tarea,T01,0,120,12,2,1,,,,,,,,,,,"se rindió, con coma"
-SINTETICO,P1,tarea,T06,1,170,11,0,0,,,,,,,,,,,
-SINTETICO,P1,sus,,,,,,,5,1,5,1,5,1,5,1,5,1,
-SINTETICO,P2,sus,,,,,,,3,3,3,3,3,3,3,3,3,3,
-SINTETICO,P3,sus,,,,,,,4,2,4,2,4,2,4,2,4,2,

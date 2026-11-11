@@ -33,3 +33,7 @@ docs/evidencias/pulido/descartadas/
 # Sesiones temporales de playwright-cli
 .playwright-cli/
 
+
+# Configuración local de agentes (no es parte del sistema)
+CLAUDE.md
+.claude/
