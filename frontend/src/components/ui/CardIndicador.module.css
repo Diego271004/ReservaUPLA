@@ -5,7 +5,6 @@
   text-decoration: none;
 }
 
-/* Tarjeta ancha: ocupa toda la fila de la rejilla y pone el icono a la izquierda del texto. */
 .ancha {
   grid-column: 1 / -1;
 }

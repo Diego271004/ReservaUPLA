@@ -3,11 +3,6 @@ import { MENSAJES } from '../constants/messages.js'
 import { RESULTADO } from '../services/llamarApi.js'
 import { mensajeDeError } from '../services/mensajesDeResultado.js'
 
-/**
- * Carga una lista al abrir la pantalla. Devuelve { datos, cargando, error, recargar }.
- * `cargar` debe ser una función estable (definida fuera del componente o con useCallback). `inicial` es lo que se
- * devuelve mientras carga o si falla: una lista vacía por omisión; una constante definida fuera del componente si no es una lista.
- */
 const LISTA_VACIA = Object.freeze([])
 
 export function useCarga(cargar, inicial = LISTA_VACIA) {

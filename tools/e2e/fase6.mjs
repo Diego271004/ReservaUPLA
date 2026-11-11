@@ -41,7 +41,6 @@ async function elegirHorario(pagina, fecha, inicio, fin) {
 const modal = (pagina) => pagina.getByRole('dialog')
 
 try {
-  // ============================ Sesiones (una vez por rol; luego se reutilizan) ============================
   paso('Inicio de sesión de Ana (Solicitante), Carla (Administrador) y Mario (Responsable)')
   const ana = await nuevaPagina(navegador, 'escritorio')
   await iniciarSesion(ana, 'ana.torres@upla.edu.pe')
@@ -68,7 +67,6 @@ try {
   const pendienteB = { id: await crearReservaApi(tokenAna, laboratorio.id, DIA_AB.iso, '11:00', '13:00', 'Práctica de redes') }
   ok(`datos de partida creados por la API: aprobada #${idOcupada} (${OCUPADA.texto} 10-12), A = #${pendienteA.id} (${DIA_AB.texto} 10-12, Pendiente), B = #${pendienteB.id} (${DIA_AB.texto} 11-13, Pendiente)`)
 
-  // ============================ Nueva reserva: disponibilidad (04, 04e, 04f) ============================
   paso('Escritorio · Ana: aviso de disponibilidad en Nueva reserva')
   await ana.goto(`${BASE}/reservas/nueva`)
   await ana.getByRole('radio', { name: /Laboratorio de Cómputo 2/ }).waitFor({ state: 'attached' })
@@ -115,7 +113,6 @@ try {
   esperar(await ana.getByRole('button', { name: 'Cancelar reserva' }).isDisabled(), 'RN-06: tras cancelar, la acción queda deshabilitada y con el aviso informativo')
   await capturar(ana, destino, '07-detalle-cancelada', 'escritorio')
 
-  // ============================ Administrador: aprobar, conflicto, rechazar ============================
   paso('Escritorio · Carla aprueba la reserva A (no cruza con ninguna aprobada)')
   await carla.goto(`${BASE}/reservas/${pendienteA.id}`)
   await carla.getByRole('heading', { name: 'Detalle de la reserva' }).waitFor()
@@ -157,14 +154,12 @@ try {
   )
   await capturar(carla, destino, '13-detalle-rechazada', 'escritorio')
 
-  // ============================ Responsable: solo consulta ============================
   paso('Escritorio · Mario (Responsable) solo consulta')
   await mario.goto(`${BASE}/reservas/${pendienteA.id}`)
   await mario.getByRole('heading', { name: 'Detalle de la reserva' }).waitFor()
   esperar((await mario.getByRole('button', { name: /Aprobar|Rechazar|Cancelar/ }).count()) === 0, 'RN-05: la Responsable no ve ninguna acción')
   await capturar(mario, destino, '14-detalle-responsable', 'escritorio')
 
-  // ============================ Contraseña inicial (U2, 07b) ============================
   paso('Escritorio · Carla: contraseña inicial con requisitos (U2)')
   await carla.goto(`${BASE}/usuarios/nuevo`)
   await carla.getByLabel('Nombre completo').fill('Rosa Chávez')
@@ -176,7 +171,6 @@ try {
   await capturar(carla, destino, '15-usuario-contrasena-requisitos', 'escritorio')
   ok('U2: la ayuda "Entre 8 y 72 caracteres, con al menos una letra y un número." y el error si no cumple')
 
-  // ============================ API directa: lo que la interfaz no deja hacer ============================
   paso('API directa: RN-05 y ambiente en mantenimiento')
   const aprobarComoAna = await api(`/api/reservas/${idPropia}/aprobar`, { metodo: 'POST', token: tokenAna })
   esperar(aprobarComoAna.status === 403, `la Solicitante intenta aprobar por la API → HTTP ${aprobarComoAna.status}`)
@@ -196,7 +190,6 @@ try {
   const inexistente = await api('/api/reservas/99999/aprobar', { metodo: 'POST', token: tokenCarla })
   esperar(inexistente.status === 404, `aprobar una reserva que no existe → HTTP ${inexistente.status}`)
 
-  // ============================ 375 px: las pantallas nuevas ============================
   paso('375 px · reservas de apoyo y capturas')
   const apoyoX = await api('/api/reservas', {
     metodo: 'POST',

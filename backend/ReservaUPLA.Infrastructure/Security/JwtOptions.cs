@@ -8,7 +8,6 @@ public sealed class JwtOptions
 {
     public const string Seccion = "Jwt";
 
-    /// <summary>HMAC-SHA256 exige una clave de al menos 256 bits.</summary>
     public const int BytesMinimosClave = 32;
 
     public string Issuer { get; set; } = string.Empty;
@@ -16,7 +15,6 @@ public sealed class JwtOptions
     public string Key { get; set; } = string.Empty;
     public int MinutosExpiracion { get; set; } = 60;
 
-    /// <summary>Clave de firma compartida por el generador y la validación de la API.</summary>
     public SymmetricSecurityKey ObtenerClaveFirma() => new(Encoding.UTF8.GetBytes(Key));
 
     internal bool ClaveValida() =>

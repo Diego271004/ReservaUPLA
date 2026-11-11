@@ -38,7 +38,6 @@ public static class TextosDominio
     public static bool TryTipo(string? texto, out TipoAmbiente tipo) =>
         TryEnum(texto, Tipos, out tipo);
 
-    // Solo acepta los nombres exactos (no números ni otras mayúsculas): lo que muestran las listas del frontend.
     private static bool TryEnum<T>(string? texto, IReadOnlyList<string> validos, out T valor) where T : struct, Enum
     {
         valor = default;

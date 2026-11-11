@@ -68,7 +68,6 @@ const columnas = (porAmbiente) =>
       : [columna],
   )
 
-/** Una fila «icono Etiqueta … valor» de la tarjeta de un ambiente. */
 function DetalleFila({ icono, etiqueta, children }) {
   return (
     <div className={estilos.detalleFila}>
@@ -96,7 +95,7 @@ export default function AmbientesPage() {
     try {
       localStorage.setItem('reservaupla.vistaAmbientes', nuevoModo)
     } catch {
-      // ignore
+      // Sin almacenamiento local la preferencia simplemente no se recuerda
     }
   }
 

@@ -3,11 +3,6 @@ import { useCallback, useEffect, useRef } from 'react'
 const FOCALIZABLES =
   'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
-/**
- * Foco atrapado en un panel abierto (el modal y el menú móvil): al abrir, el foco pasa al elemento `inicialRef` (o al
- * primero que se pueda enfocar); Tab y Mayús+Tab dan la vuelta dentro del panel; Escape llama a `alEscape`; al cerrar, el
- * foco regresa a donde estaba. Devuelve el manejador `onKeyDown` que se pone en el panel.
- */
 export function useTrampaDeFoco(abierto, panelRef, { alEscape, inicialRef } = {}) {
   const alEscapeRef = useRef(alEscape)
   useEffect(() => {

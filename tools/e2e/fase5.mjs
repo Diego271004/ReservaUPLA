@@ -23,11 +23,9 @@ const navegador = await abrirNavegador()
 
 const menu = (pagina) => pagina.getByRole('navigation', { name: 'Principal' }).getByRole('link').allTextContents()
 
-// Login lento y sin gastar intentos del límite: se responde un 401 después de una pausa, solo para ver el estado de carga.
 async function capturarCarga(pagina, ancho) {
   await pagina.route('**/api/auth/login', async (ruta) => {
     await new Promise((resolver) => setTimeout(resolver, 4000))
-    // Si la página ya siguió su camino, la ruta puede estar resuelta: no es un fallo de la prueba.
     await ruta.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ mensaje: 'x' }) }).catch(() => {})
   })
   await pagina.getByLabel('Correo institucional').fill('ana.torres@upla.edu.pe')
@@ -53,7 +51,6 @@ let sesionAna
 let falloGeneral = false
 
 try {
-  // ============================ ESCRITORIO: flujo funcional + capturas ============================
   paso('Escritorio · login (normal, errores, carga)')
   const anonima = await nuevaPagina(navegador, 'escritorio')
   await capturarLogin(anonima, 'escritorio')
@@ -161,7 +158,6 @@ try {
   await cerrarSesionPorMenu(ana)
   await ana.waitForURL('**/login')
 
-  // ============================ 375 px: las mismas pantallas ============================
   paso('375 px · login (normal, errores, carga)')
   await capturarLogin(await nuevaPagina(navegador, 'movil'), 'movil')
 

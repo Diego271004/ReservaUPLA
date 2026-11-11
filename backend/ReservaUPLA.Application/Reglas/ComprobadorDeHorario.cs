@@ -14,7 +14,6 @@ public sealed class ComprobadorDeHorario
         _reservas = reservas;
     }
 
-    /// <summary>El mensaje de conflicto (con la hora ocupada) si el ambiente ya tiene una reserva Aprobada que se cruza; si no, null.</summary>
     public async Task<string?> MensajeDeConflictoAsync(Reserva reserva, CancellationToken cancellationToken)
     {
         var propia = reserva.Id == 0 ? (int?)null : reserva.Id; // una reserva no choca con ella misma

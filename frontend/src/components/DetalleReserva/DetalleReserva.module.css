@@ -15,7 +15,6 @@
   box-shadow: var(--elevacion-tarjeta);
 }
 
-/* Una sola disposición de los datos (hallazgo E4): rejilla de dos columnas, una en móvil. */
 .datos {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -72,7 +71,6 @@
   }
 }
 
-/* Encabezado de la reserva: qué ambiente, cuándo y en qué estado, antes de los demás datos. */
 .hero {
   display: flex;
   flex-wrap: wrap;
@@ -107,7 +105,6 @@
   overflow-wrap: anywhere;
 }
 
-/* Línea de tiempo: un punto por evento unidos por una línea; el último (el estado actual) va resaltado. */
 .historial {
   position: relative;
   padding: 0;
@@ -156,7 +153,6 @@
   color: var(--texto-marino);
 }
 
-/* El punto del estado actual va relleno de azul; su borde transparente evita repetir el mismo color (el relleno ya lo separa del fondo). */
 .historial .actual::before {
   background: var(--relleno-primario);
   border-color: transparent;

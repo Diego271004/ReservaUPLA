@@ -1,6 +1,3 @@
-/* Login a pantalla partida: a la izquierda el campus con un velo marino y hexágonos de la marca; el panel termina en punta de
-   hexágono (como el logo) y a la derecha va la tarjeta blanca con el formulario. El movimiento es decorativo (entrada escalonada,
-   la foto que se asienta y capas que siguen al puntero) y se apaga con prefers-reduced-motion. */
 .pagina {
   display: grid;
   grid-template-columns: minmax(0, 58fr) minmax(400px, 42fr);
@@ -8,7 +5,6 @@
   background: var(--fondo-login);
 }
 
-/* Panel marino. Las capas decorativas solo existen en pantallas anchas (más abajo). */
 .panel {
   position: relative;
   display: flex;
@@ -56,7 +52,6 @@
   font-size: 1.25rem;
 }
 
-/* Los tipos de espacio que se pueden reservar, como etiquetas: oscurecen el fondo (no lo aclaran) para mantener el contraste. */
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -115,7 +110,6 @@
   }
 }
 
-/* Los textos y los campos del formulario entran uno tras otro. */
 @keyframes subir {
   from {
     opacity: 0;
@@ -138,7 +132,6 @@
   }
 }
 
-/* La foto empieza un poco más cerca y se asienta. */
 @keyframes asentar {
   from {
     scale: 1.1;
@@ -200,7 +193,6 @@
   animation-delay: 360ms;
 }
 
-/* Logo en la cabecera de la tarjeta (sobre blanco). */
 .logo {
   display: flex;
   justify-content: center;
@@ -216,7 +208,6 @@
   height: var(--alto-logo-login);
 }
 
-/* Campos y botón de 48 px en el login: más cómodos para tocar y para escribir. */
 .formulario {
   --alto-control: var(--alto-control-login);
 
@@ -244,10 +235,6 @@
   margin-top: var(--espacio-1);
 }
 
-/* Pantallas anchas: la foto del campus (decorativa) anclada abajo, sin estirarla más de 1,5 veces (--alto-foto-maximo); lo que
-   sobra arriba queda marino y el difuminado superior lo funde con la foto. El velo oscurece la zona del texto (marino a 72 % o más,
-   que da 4,5:1 o más al texto blanco sobre lo más claro de la foto) y deja ver la foto hacia la derecha. La foto se mueve hasta
-   12 px y los hexágonos hasta 14 px según el puntero (--mx y --my). Móvil no descarga la foto. */
 @media (min-width: 768px) {
   .panel {
     padding-right: calc(5vw + var(--punta-hexagono));
@@ -323,7 +310,6 @@
   }
 }
 
-/* Móvil: una sola columna, una franja superior con el nombre (sin foto ni adornos); el logo queda en la tarjeta. */
 @media (max-width: 767px) {
   .pagina {
     grid-template-columns: minmax(0, 1fr);

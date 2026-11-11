@@ -24,7 +24,6 @@ export function horasPosterioresA(horaInicio) {
   return HORAS.filter((hora) => hora > horaInicio)
 }
 
-/** Convierte HH:mm a minutos, o null si no es una hora válida. */
 export function minutosDeHora(texto) {
   const coincidencia = FORMATO_HORA.exec(texto ?? '')
   if (!coincidencia) return null
@@ -33,7 +32,6 @@ export function minutosDeHora(texto) {
   return horas > 23 || minutos > 59 ? null : horas * 60 + minutos
 }
 
-/** Convierte dd/mm/aaaa en { dia, mes, anio } si es una fecha real del calendario; si no, null. */
 export function parsearFecha(texto) {
   const coincidencia = FORMATO_FECHA.exec(texto ?? '')
   if (!coincidencia) return null
@@ -46,20 +44,17 @@ export function parsearFecha(texto) {
   return esReal ? { dia, mes, anio } : null
 }
 
-/** dd/mm/aaaa → aaaa-mm-dd, o null si la fecha no es válida. */
 export function fechaAIso(texto) {
   const fecha = parsearFecha(texto)
   if (!fecha) return null
   return `${fecha.anio}-${dosDigitos(fecha.mes)}-${dosDigitos(fecha.dia)}`
 }
 
-/** aaaa-mm-dd → dd/mm/aaaa. */
 export function isoAFecha(iso) {
   const [anio, mes, dia] = String(iso ?? '').split('-')
   return anio && mes && dia ? `${dia}/${mes}/${anio}` : ''
 }
 
-/** La fecha de hoy (hora local) como dd/mm/aaaa. */
 export function hoy(ahora = new Date()) {
   return `${dosDigitos(ahora.getDate())}/${dosDigitos(ahora.getMonth() + 1)}/${ahora.getFullYear()}`
 }
@@ -72,7 +67,6 @@ export function esAnteriorAHoy(texto, ahora = new Date()) {
   return comparable(fecha) < comparable(parsearFecha(hoy(ahora)))
 }
 
-/** Mientras se escribe: deja solo dígitos (máximo 8) y agrega las barras: 05112026 → 05/11/2026. */
 export function aplicarMascaraFecha(entrada) {
   const digitos = String(entrada ?? '')
     .replace(/\D/g, '')
@@ -82,7 +76,6 @@ export function aplicarMascaraFecha(entrada) {
   return `${digitos.slice(0, 2)}/${digitos.slice(2, 4)}/${digitos.slice(4)}`
 }
 
-// La universidad está en Lima (UTC-5, sin horario de verano): «hoy» y el saludo no dependen de la zona del equipo.
 const partesEnLima = (ahora) =>
   Object.fromEntries(
     new Intl.DateTimeFormat('en-GB', {
@@ -97,16 +90,13 @@ const partesEnLima = (ahora) =>
       .map(({ type, value }) => [type, value]),
   )
 
-/** La fecha de hoy en Lima como dd/mm/aaaa. */
 export function hoyEnLima(ahora = new Date()) {
   const { day, month, year } = partesEnLima(ahora)
   return `${day}/${month}/${year}`
 }
 
-/** La hora actual en Lima (0 a 23). */
 export const horaEnLima = (ahora = new Date()) => Number(partesEnLima(ahora).hour)
 
-/** Formato de tiempo relativo en español: «hace un momento», «hace 2 horas», «hace 3 días». */
 export function tiempoRelativo(iso, ahora = new Date()) {
   if (!iso) return ''
   const fecha = new Date(iso)

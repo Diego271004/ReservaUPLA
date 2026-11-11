@@ -19,7 +19,6 @@ export default function FiltrosDeReservas({ aplicados, ambientes, alAplicar, alL
     hasta: aplicados.hasta,
   })
   const [errores, setErrores] = useState({ desde: null, hasta: null })
-  // En móvil los filtros se pliegan detrás de un botón; en escritorio siempre están a la vista (lo decide el CSS).
   const [abierto, setAbierto] = useState(false)
   const idPanel = useId()
   const activos = ['ambienteId', 'desde', 'hasta'].filter((clave) => aplicados[clave]).length

@@ -97,7 +97,6 @@
   color: var(--color-aviso);
   font-size: 0.875rem;
 }
-/* Las acciones de cada tarjeta pasan a otra línea si no caben (con varias tarjetas en fila cada una es angosta); el texto de un botón no se parte. */
 .acciones {
   display: flex;
   flex-wrap: wrap;
@@ -365,7 +364,6 @@
     flex-wrap: wrap;
     align-items: flex-start;
   }
-  /* Con 1fr a secas la tarjeta no baja de su contenido y se sale de la pantalla a 188 px. */
   .tarjetasDecision {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -414,14 +412,12 @@
   gap: var(--espacio-2);
 }
 
-/* Con muy poco ancho (zoom del 200 % en un teléfono) el eje muestra solo 07:00 y 15:00 para que las etiquetas no se pisen. */
 @media (max-width: 480px) {
   .etiquetaHora:not(:nth-child(1), :nth-child(5)) {
     display: none;
   }
 }
 
-/* Con muy poco ancho (188 px) cada barra se apila: nombre y número arriba, la barra debajo (la rejilla de tres columnas no cabía). */
 @media (max-width: 480px) {
   .filaBarra {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -433,7 +429,6 @@
   }
 }
 
-/* Esqueleto del Inicio del Administrador: la forma de lo que va a llegar, para que no haya saltos al cargar. */
 .esqueletoInicio {
   display: flex;
   flex-direction: column;
@@ -470,7 +465,6 @@
   }
 }
 
-/* Actividad reciente junto al uso por ambiente: dos columnas en escritorio, una debajo de otra en pantallas angostas. */
 .dosColumnas {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

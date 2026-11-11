@@ -1,4 +1,3 @@
-/* Tokens de diseño: paleta de la identidad visual de la UPLA. No se usan colores sueltos fuera de este archivo. */
 :root {
   --color-primario: #0063a8;
   --color-marino: #1f365c;
@@ -19,7 +18,6 @@
   /* Límite de un campo o control: 3:1 sobre blanco y sobre el fondo de la página (WCAG 1.4.11). --color-borde queda para divisores. */
   --color-borde-control: #7b818c;
   --color-sobre-oscuro: #ffffff;
-  /* Texto y relleno de un mismo color se separan: en el modo oscuro el texto se aclara y el relleno conserva el contraste con el texto blanco. */
   --texto-marino: #1f365c;
   --relleno-primario: #0063a8;
   --relleno-exito: #166534;
@@ -31,7 +29,6 @@
   --color-aviso: #92400e;
   --color-info: #1e3a8a;
 
-  /* Poppins (títulos) y Montserrat (texto) se alojan en el propio sistema con @fontsource: sin CDN. */
   --fuente-base: 'Montserrat', system-ui, sans-serif;
   --fuente-titulo: 'Poppins', 'Montserrat', system-ui, sans-serif;
   --tamano-texto: 1rem;
@@ -41,7 +38,6 @@
   --tipo-cuerpo: 1rem;
 
   --alto-control: 44px;
-  /* Formas sobrias: esquinas de 4 a 6 px; 999px solo para el interruptor y el indicador de carga, que son círculos. */
   --radio: 6px;
   --radio-pequeno: 4px;
   --radio-completo: 999px;
@@ -55,7 +51,6 @@
   --alto-logo-login: 80px;
   --alto-logo-login-movil: 40px;
   --relleno-logo: 4px;
-  /* Foto del login: 1024 x 512 px; con 520 px de alto se muestra a 1,1 veces su tamaño (antes a 1,5 y salía borrosa). */
   --alto-foto-maximo: 520px; /* la foto mide 1024 x 512: a 520 px de alto se muestra casi a su tamaño (1,1 veces) y no borrosa */
   --grosor-linea-dorada: 2px;
 
@@ -65,7 +60,6 @@
   --espacio-4: 2rem;
 }
 
-/* Fondos de los estados (avisos e insignias). El color del texto es siempre el color de estado. */
 :root {
   --fondo-error: #fdf2f2;
   --fondo-exito: #effaf3;
@@ -78,12 +72,9 @@
   --fondo-neutro: #eceef1;
   --fondo-franja-pasada: rgba(148, 163, 184, 0.22);
   --fondo-encabezado-tabla: #e6ecf5;
-  /* Capas planas (sin degradado): la del login deja el texto blanco a 4,5:1 o más sobre la parte más clara de la foto. */
   --fondo-login: #f4f6fa;
-  /* Sistema de tarjetas: radio de 12 px y una elevación de dos capas muy suaves (1 px de contorno y 4 px de aire). */
   --radio-tarjeta: 12px;
   --elevacion-tarjeta: 0 1px 2px rgb(31 54 92 / 10%), 0 4px 12px rgb(31 54 92 / 6%);
-  /* Portada del Inicio: del marino al azul institucional; el texto blanco va a 6,3:1 o más sobre toda la franja. */
   --degradado-portada: linear-gradient(120deg, #1f365c 0%, #164a7e 55%, #0063a8 100%);
   --trazo-marca: rgb(255 255 255 / 22%);
   --alto-control-login: 48px;
@@ -94,8 +85,6 @@
   --fondo-chip-login: rgb(31 54 92 / 55%);
   --borde-chip-login: rgb(255 255 255 / 28%);
   --punta-hexagono: 44px;
-  /* Foto del login: el marino cubre la zona del texto con 72 % o más (texto blanco a 4,5:1 o más sobre lo más claro de la foto) y se
-     aclara hacia la derecha para que la foto se vea. El difuminado superior funde el marino plano con la foto (sin escalón). */
   --degradado-lateral-foto: linear-gradient(
     100deg,
     rgb(31 54 92 / 88%) 0%,
@@ -109,7 +98,6 @@
     rgb(31 54 92 / 0%) 28%
   );
   --capa-modal: rgb(31 54 92 / 55%);
-  /* Elevación sutil, solo en elementos flotantes (avisos, menús desplegables) y en hover: de 1 a 2 px. */
   --elevacion-flotante: 0 1px 2px rgb(31 54 92 / 24%);
   --separador-sobre-oscuro: rgb(255 255 255 / 20%);
   --color-neutro: #4f4f4f;

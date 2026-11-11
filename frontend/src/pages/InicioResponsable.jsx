@@ -23,7 +23,6 @@ const textoHoy = (cantidad) =>
       ? '1 reserva programada para hoy en tus ambientes.'
       : `${cantidad} reservas programadas para hoy en tus ambientes.`
 
-/** Una fila de reserva: lo que cambia entre «Hoy» y «Próximas» es solo el primer dato (`destacado`). */
 function FilaDeReserva({ reserva, destacado, alVerDetalle }) {
   return (
     <li>
@@ -44,7 +43,6 @@ function FilaDeReserva({ reserva, destacado, alVerDetalle }) {
   )
 }
 
-/** Una sección con su título y el contador, y la lista (u otro contenido) de las reservas. */
 function SeccionDeReservas({ id, titulo, cantidad, children }) {
   return (
     <section className={estilos.seccion} aria-labelledby={id}>

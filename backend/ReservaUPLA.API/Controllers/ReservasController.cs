@@ -25,10 +25,6 @@ public sealed class ReservasController : ControllerBase
         _consultas = consultas;
     }
 
-    /// <summary>
-    /// Lista de Reservas con filtros (estado, ambiente, fecha desde y hasta en aaaa-mm-dd), ordenada por fecha y paginada
-    /// (10 por página; devuelve el total). Cada rol ve lo suyo: lo ajeno no aparece.
-    /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(PaginaDeReservasDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest, "application/problem+json")]
@@ -43,7 +39,6 @@ public sealed class ReservasController : ControllerBase
             await _consultas.ListarAsync(User.ObtenerActor(), new ConsultaReservasDto(estado, ambienteId, desde, hasta, pagina), cancellationToken),
             Ok);
 
-    /// <summary>Disponibilidad diaria. Cada rol mantiene su alcance; el Solicitante no recibe motivo ni nombre ajeno.</summary>
     [HttpGet("disponibilidad-dia")]
     [Authorize(Roles = Roles.Administrador + "," + Roles.Solicitante + "," + Roles.Responsable)]
     [ProducesResponseType(typeof(DisponibilidadDiaDto), StatusCodes.Status200OK)]
@@ -60,7 +55,6 @@ public sealed class ReservasController : ControllerBase
     public async Task<IActionResult> Obtener(int id, CancellationToken cancellationToken) =>
         this.Traducir(await _reservas.ObtenerAsync(id, User.ObtenerActor(), cancellationToken), Ok);
 
-    /// <summary>Aviso inmediato de disponibilidad (verde u ocupado) para la pantalla Nueva reserva.</summary>
     [HttpGet("disponibilidad")]
     [Authorize(Roles = Roles.AdministradorOSolicitante)]
     [ProducesResponseType(typeof(DisponibilidadDto), StatusCodes.Status200OK)]

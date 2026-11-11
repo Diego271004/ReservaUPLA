@@ -1,6 +1,5 @@
 import { RESULTADO, llamarApi } from './llamarApi.js'
 
-/** POST /api/auth/login. Un 401 aquí significa credenciales inválidas (no hay sesión que expirar). */
 export async function login(correo, contrasena, { signal } = {}) {
   const resultado = await llamarApi('/auth/login', {
     method: 'POST',

@@ -40,19 +40,16 @@ public interface IReservaService
     /// <summary>RN-05: solo el Administrador.</summary>
     Task<ResultadoOperacion<ReservaDetalleDto>> RechazarAsync(int id, ActorDto actor, CancellationToken cancellationToken);
 
-    /// <summary>El solicitante dueño o el Administrador; solo Pendiente o Aprobada.</summary>
     Task<ResultadoOperacion<ReservaDetalleDto>> CancelarAsync(int id, ActorDto actor, CancellationToken cancellationToken);
 }
 
 /// <summary>Salida de datos: lista de Reservas, Dashboard y Mi ambiente.</summary>
 public interface IConsultaService
 {
-    /// <summary>Lista según el rol (Administrador todas, Solicitante las suyas, Responsable las de sus ambientes), con filtros y página.</summary>
     Task<ResultadoOperacion<PaginaDeReservasDto>> ListarAsync(ActorDto actor, ConsultaReservasDto consulta, CancellationToken cancellationToken);
 
     Task<DashboardDto> ObtenerDashboardAsync(ActorDto actor, CancellationToken cancellationToken);
 
-    /// <summary>Mi ambiente: NoEncontrado si el ambiente pedido no está a cargo del responsable.</summary>
     Task<ResultadoOperacion<MiAmbienteDto>> ObtenerMiAmbienteAsync(
         int responsableId, int? ambienteId, int? pagina, CancellationToken cancellationToken);
 

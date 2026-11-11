@@ -17,26 +17,22 @@ const string PoliticaCors = "Frontend";
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Capas: Program.cs solo compone.
 builder.Services.AgregarAplicacion();
 builder.Services.AgregarInfraestructura(builder.Configuration);
 
-// Un dominio vacío dejaría pasar cualquier correo ("@" como sufijo): la API no arranca así.
+// Un dominio vacío dejaría pasar cualquier correo: la API no arranca así.
 builder.Services.AddOptions<OpcionesAutenticacion>()
     .Bind(builder.Configuration.GetSection(OpcionesAutenticacion.Seccion))
     .Validate(opciones => !string.IsNullOrWhiteSpace(opciones.DominioInstitucional?.Trim().TrimStart('@')),
         $"Falta {OpcionesAutenticacion.Seccion}:DominioInstitucional en la configuración.")
     .ValidateOnStart();
 
-// JSON legible con tildes y ñ (sin escapar a \uXXXX).
 var codificadorJson = JavaScriptEncoder.Create(UnicodeRanges.All);
 builder.Services.AddControllers()
     .AddJsonOptions(opciones => opciones.JsonSerializerOptions.Encoder = codificadorJson)
-    // Cada controlador decide qué hacer con un cuerpo inválido para responder con los mensajes propios.
     .ConfigureApiBehaviorOptions(opciones => opciones.SuppressModelStateInvalidFilter = true);
 builder.Services.ConfigureHttpJsonOptions(opciones => opciones.SerializerOptions.Encoder = codificadorJson);
 
-// 401, 403 y 404 sin cuerpo se responden como ProblemDetails.
 builder.Services.AddProblemDetails();
 
 // CORS restringido a los orígenes configurados (nunca AllowAnyOrigin).
@@ -52,7 +48,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
     .Configure<IOptions<JwtOptions>>((bearer, jwt) =>
     {
-        // Claims con su nombre corto (sub, email, name, rol), sin mapearlos a los URI de Microsoft.
         bearer.MapInboundClaims = false;
         // El 401 no explica por qué falló el token (expirado, firma, emisor...).
         bearer.IncludeErrorDetails = false;
@@ -104,7 +99,7 @@ if (builder.Environment.IsDevelopment())
 
 var app = builder.Build();
 
-// Primero: cualquier excepción no controlada termina en ProblemDetails 500 sin detalles internos.
+// Primero: cualquier excepción no controlada termina en un 500 sin detalles internos.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseStatusCodePages();
 
@@ -123,5 +118,5 @@ app.MapControllers();
 
 app.Run();
 
-// Expone Program para que ReservaUPLA.API.Tests levante la API en memoria con WebApplicationFactory.
+// Expone Program para que las pruebas de la API la levanten en memoria.
 public partial class Program;

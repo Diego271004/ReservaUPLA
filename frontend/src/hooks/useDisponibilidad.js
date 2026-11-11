@@ -17,12 +17,6 @@ export const ESTADOS_DISPONIBILIDAD = Object.freeze({
 
 const ESPERA_MS = 300
 
-/**
- * Aviso inmediato de disponibilidad (pantallas 04 y 04e): cuando ya están el ambiente, la fecha y las dos horas
- * (y son válidos) consulta al servidor, con una pequeña espera para no preguntar en cada tecla.
- * Devuelve null (sin aviso), { estado: 'consultando' } o { estado: 'disponible' | 'ocupado', mensaje }.
- * Si la consulta falla no hay aviso: registrar sigue permitido y el servidor decide.
- */
 export function useDisponibilidad({ ambienteId, fecha, horaInicio, horaFin }, activo = true) {
   const [respuesta, setRespuesta] = useState(null) // { clave, aviso }
 

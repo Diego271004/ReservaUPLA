@@ -44,7 +44,6 @@ export default function MiAmbientePage() {
   const { datos, cargando, error, recargar } = useCarga(cargar, PANEL_VACIO)
   const { ambiente, ambientes, indicadores, reservas } = datos
 
-  // «Ver detalle» recuerda esta pantalla (ambiente y página) para que el detalle vuelva a ella.
   const columnas = columnasDeReservas(['fecha', 'horario', 'solicitante', 'estado'], (reserva) => (
     <Button
       variante="secundario"

@@ -10,7 +10,6 @@ namespace ReservaUPLA.Application.Common;
 /// </summary>
 public static class MensajesValidacion
 {
-    // Login
     public const string CorreoVacio = "Ingresa tu correo institucional.";
     public const string CorreoFormatoInvalido =
         "El correo no tiene un formato válido. Ejemplo: nombre.apellido@upla.edu.pe";
@@ -22,7 +21,6 @@ public static class MensajesValidacion
     public const string DemasiadosIntentos =
         "Has realizado demasiados intentos. Espera 1 minuto y vuelve a intentarlo.";
 
-    // Errores generales
     public const string ErrorConexion =
         "No pudimos conectar con ReservaUPLA. Revisa tu conexión e inténtalo nuevamente.";
     public const string ErrorServidor =
@@ -30,7 +28,6 @@ public static class MensajesValidacion
     public const string SinPermiso = "No tienes permiso para realizar esta acción.";
     public const string SesionTerminada = "Tu sesión terminó. Inicia sesión de nuevo.";
 
-    // Usuarios
     public const string NombreCompletoVacio = "Ingresa el nombre completo.";
     public const string NombreCompletoDemasiadoLargo = "El nombre no puede superar los 120 caracteres.";
     public const string CorreoUsuarioVacio = "Ingresa el correo institucional.";
@@ -43,7 +40,6 @@ public static class MensajesValidacion
         "La contraseña debe tener entre 8 y 72 caracteres, con al menos una letra y un número.";
     public const string UsuarioRegistrado = "Usuario registrado.";
 
-    // Ambientes
     public const string NombreAmbienteVacio = "Ingresa el nombre del ambiente.";
     public const string NombreAmbienteDemasiadoLargo = "El nombre no puede superar los 120 caracteres.";
     public const string NombreAmbienteDuplicado = "Ya existe un ambiente con ese nombre.";
@@ -70,7 +66,6 @@ public static class MensajesValidacion
     public const string HoraFinNoPosterior = "La hora de fin debe ser posterior a la hora de inicio.";
     public const string MotivoVacio = "Ingresa el motivo de la reserva.";
     public const string MotivoDemasiadoLargo = "El motivo no puede superar los 300 caracteres.";
-    // Reservas: filtros del listado
     public const string EstadoFiltroInvalido = "Elige un estado de la lista.";
     public const string RangoDeFechasInvalido = "La fecha final no puede ser anterior a la inicial.";
     public const string PaginaInvalida = "La página debe ser 1 o mayor.";
@@ -88,7 +83,6 @@ public static class MensajesValidacion
     public const string ReservaCanceladaNoSeModifica = MensajesDominio.ReservaCanceladaNoSeModifica;
     public const string SoloPendienteSeApruebaORechaza = MensajesDominio.SoloPendienteSeApruebaORechaza;
 
-    /// <summary>El dominio es configurable, por eso este mensaje se construye.</summary>
     public static string CorreoDominioNoInstitucional(string dominio) =>
         $"Usa tu correo institucional (termina en @{dominio}).";
 

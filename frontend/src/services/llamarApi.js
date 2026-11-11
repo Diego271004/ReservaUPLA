@@ -1,7 +1,6 @@
 import { ApiError, request } from './apiClient.js'
 import { obtenerToken } from './sesionStorage.js'
 
-/** Tipos de resultado de cualquier llamada a la API. Las pantallas no conocen códigos HTTP. */
 export const RESULTADO = Object.freeze({
   exito: 'exito',
   datosInvalidos: 'datosInvalidos', // 400: errores por campo
@@ -19,7 +18,6 @@ function primerMensaje(lista) {
   return Array.isArray(lista) && typeof lista[0] === 'string' ? lista[0] : null
 }
 
-/** { campo: [mensajes] } → { campo: primerMensaje }. */
 function erroresPorCampo(errors) {
   const resultado = {}
   for (const [campo, mensajes] of Object.entries(errors ?? {})) {
@@ -49,7 +47,6 @@ function traducir({ ok, status, data }) {
   return { tipo: RESULTADO.errorServidor }
 }
 
-/** Hace la petición (con el token de la sesión) y devuelve un resultado discriminado. */
 export async function llamarApi(ruta, { conSesion = true, ...opciones } = {}) {
   try {
     const respuesta = await request(ruta, {

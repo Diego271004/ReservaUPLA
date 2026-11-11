@@ -2,10 +2,6 @@ import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFormulario } from './useFormulario.js'
 
-/**
- * Formulario de registro de Usuarios y Ambientes: lo común de los dos (al guardar, volver al listado con el mensaje de
- * éxito; "Cancelar" vuelve al listado) vive aquí. Cada pantalla solo aporta sus campos, su validación y su llamada.
- */
 export function useFormularioDeRegistro({
   valoresIniciales,
   validar,

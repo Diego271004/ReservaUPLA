@@ -4,10 +4,6 @@ import { borrarSesion, guardarSesion, leerSesion } from '../services/sesionStora
 
 const AuthContext = createContext(null)
 
-/**
- * Sesión del usuario. El token vive en sessionStorage. Si la API responde 401 a una petición con token
- * (expiró o dejó de ser válido), se cierra la sesión y se recuerda el motivo para mostrarlo en el login.
- */
 export function AuthProvider({ children }) {
   const [sesion, setSesion] = useState(() => leerSesion())
   const [sesionTerminada, setSesionTerminada] = useState(false)

@@ -54,13 +54,11 @@
   border-bottom: 1px solid var(--color-borde);
 }
 
-/* Una fecha o un horario («08:00 – 10:00») no se parten en dos líneas: son datos cortos que se leen de un vistazo. */
 .tabla td[data-etiqueta='Fecha'],
 .tabla td[data-etiqueta='Horario'] {
   white-space: nowrap;
 }
 
-/* El texto de un botón de la fila («Ver detalle») no se parte en dos líneas. */
 .tabla td button {
   white-space: nowrap;
 }
@@ -90,7 +88,6 @@
     width: 100%;
   }
 
-  /* Cada registro es una tarjeta: la banda del color de la página lo separa del siguiente (una línea de 1 px no bastaba). */
   .tabla tr {
     border-bottom: 8px solid var(--color-fondo);
   }

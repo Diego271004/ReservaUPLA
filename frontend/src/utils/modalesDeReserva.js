@@ -1,7 +1,6 @@
 import { TEXTOS } from '../constants/messages.js'
 import { isoAFecha } from './fechas.js'
 
-/** Qué pide cada modal de confirmación de una reserva (el Detalle y el Dashboard usan los mismos). */
 export const MODALES = Object.freeze({
   aprobar: {
     titulo: TEXTOS.tituloModalAprobar,
@@ -22,7 +21,6 @@ export const MODALES = Object.freeze({
   },
 })
 
-/** El resumen que se muestra dentro del modal: de qué reserva se trata. */
 export function resumenDe(reserva) {
   return [
     `Ambiente: ${reserva.ambienteNombre}`,

@@ -36,8 +36,6 @@ h3 {
   outline-offset: 2px;
 }
 
-/* Con la preferencia de movimiento reducido no hay animaciones ni transiciones: acortarlas a 0,01 ms dejaría girando el spinner
-   (animación infinita) a miles de vueltas por segundo. El texto "Verificando credenciales…" sigue indicando la espera. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

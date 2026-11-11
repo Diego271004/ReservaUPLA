@@ -1,5 +1,3 @@
-// Funciones puras de validación: devuelven el mensaje del primer error o null. Reflejan las reglas
-// del backend (Application/Validators); el frontend ayuda al usuario y el backend decide.
 import {
   DOMINIO_INSTITUCIONAL,
   MENSAJES,
@@ -46,15 +44,12 @@ export function validarCorreo(
   return null
 }
 
-// La contraseña no se recorta: los espacios forman parte de ella.
 export function validarContrasenaLogin(valor) {
   if ((valor ?? '') === '') return MENSAJES.contrasenaVacia
   if (valor.length > LIMITES.contrasenaLogin) return MENSAJES.contrasenaDemasiadoLarga
   return null
 }
 
-// Política de la contraseña inicial (cierra el hallazgo U2): de 8 a 72 caracteres, con al menos una letra y un número.
-// Igual que CrearUsuarioValidator del backend.
 export function validarContrasenaInicial(valor) {
   if ((valor ?? '') === '') return MENSAJES.contrasenaInicialVacia
   if (valor.length > LIMITES.contrasenaInicial) return MENSAJES.contrasenaInicialDemasiadoLarga
@@ -128,7 +123,6 @@ export function validarHoraFin(valor, horaInicio) {
   if (vacio(valor) || minutosDeHora(valor) === null) return MENSAJES.horaFinVacia
   if (!dentroDelHorario(valor) || !HORAS.includes(valor)) return MENSAJES.horaFueraDeHorario
   const inicio = minutosDeHora(horaInicio)
-  // Si el inicio no es válido, su error ya se muestra en su propio campo.
   return inicio !== null && minutosDeHora(valor) <= inicio ? MENSAJES.horaFinNoPosterior : null
 }
 

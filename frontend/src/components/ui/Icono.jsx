@@ -44,7 +44,6 @@ const TRAZOS = {
   mas: <path d="M12 5v14M5 12h14" />,
   lista: <path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" />,
   punto: <circle cx="12" cy="12" r="4" fill="currentColor" />,
-  // Menú y barra superior
   dashboard: (
     <>
       <rect x="3" y="3" width="7" height="9" rx="1" />

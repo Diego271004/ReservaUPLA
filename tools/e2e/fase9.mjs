@@ -27,7 +27,6 @@ const destino = carpeta('docs', 'evidencias', 'fase9')
 const navegador = await abrirNavegador()
 let falloGeneral = false
 
-/** El número de una tarjeta del Dashboard o de Mi ambiente, por su descripción («Reservas pendientes»). */
 async function indicador(pagina, descripcion) {
   const texto = await pagina.getByRole('region', { name: 'Indicadores' }).getByRole('article').filter({ hasText: new RegExp(String.raw`^\d+\s*${descripcion}`) }).innerText()
   return Number.parseInt(texto, 10)
@@ -84,12 +83,10 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   paso(`Aparece Aprobada en Reservas con el filtro Estado${sufijo}`)
   await carla.goto(`${BASE}/reservas`)
   await carla.getByRole('table').waitFor()
-  // El estado se elige con las pestañas (cada una con su número), no con un selector.
   await carla.getByRole('tab', { name: /Aprobadas/ }).click()
   await carla.waitForURL('**/reservas?estado=Aprobada')
   const aprobada = carla.locator('tr', { hasText: fecha.texto }).filter({ hasText: 'Aprobada' })
   await aprobada.waitFor()
-  // La lista anterior sigue en pantalla hasta que responde la API con el filtro: se espera a que se cambie (carrera del guion, no de la app).
   const sinPendientes = await carla
     .waitForFunction(() => ![...document.querySelectorAll('tbody tr')].some((fila) => fila.textContent.includes('Pendiente')), null, { timeout: 5000 })
     .then(() => true, () => false)
@@ -108,7 +105,6 @@ async function flujo(ancho, diasAdelante, sesiones, tokenCarla) {
   const mario = await nuevaPagina(navegador, ancho, sesiones.mario)
   await mario.goto(`${BASE}/mi-ambiente`)
   await mario.getByRole('table').waitFor()
-  // Mario está a cargo de varios ambientes: Mi ambiente abre el primero por nombre y él elige el Laboratorio.
   await mario.getByLabel('Ambiente', { exact: true }).selectOption({ label: 'Laboratorio de Cómputo 2' })
   await mario.getByRole('heading', { name: 'Laboratorio de Cómputo 2' }).waitFor()
   await mario.locator('tr', { hasText: fecha.texto }).filter({ hasText: 'Aprobada' }).waitFor()
@@ -129,12 +125,10 @@ try {
   await flujo('escritorio', 30, sesiones, tokenCarla)
   await flujo('movil', 31, sesiones, tokenCarla)
 
-  // Con los dos flujos ya hechos, seis pendientes más (por la API) para ver «Mostrando 5 de N» y «Ver todas».
   const laboratorio = (await api('/api/ambientes', { token: tokenAna })).data.find((a) => a.nombre === 'Laboratorio de Cómputo 2').id
   for (let i = 0; i < 6; i++) {
     await crearReservaApi(tokenAna, laboratorio, fechaRelativa(40 + i).iso, '09:00', '10:00', `Reserva de relleno ${i + 1}`)
   }
-
 
   paso('«Mostrando 5 de N» y «Ver todas» llevan a Reservas con el filtro Pendiente')
   const carla = await nuevaPagina(navegador, 'escritorio', sesiones.carla)
@@ -161,7 +155,6 @@ try {
   await capturar(carla, destino, '08-reservas-paginacion', 'escritorio')
   await carla.getByRole('button', { name: 'Siguiente' }).click()
   await carla.waitForURL('**/reservas?pagina=2')
-  // La lista anterior sigue en pantalla hasta que responde la API con la página 2: se espera a que «Anterior» esté habilitado.
   await carla.locator('button:enabled', { hasText: 'Anterior' }).waitFor()
   esperar(await carla.getByRole('button', { name: 'Anterior' }).isEnabled(), 'la página 2 permite volver con «Anterior»')
 

@@ -19,7 +19,6 @@ public sealed class ResultadoAutenticacion
     public LoginResponseDto? Respuesta { get; }
     public string? Mensaje { get; }
 
-    /// <summary>Errores por campo (clave: <see cref="CamposFormulario"/>). Vacío salvo en DatosInvalidos.</summary>
     public IReadOnlyDictionary<string, string[]> Errores { get; }
 
     private ResultadoAutenticacion(
@@ -37,7 +36,6 @@ public sealed class ResultadoAutenticacion
     public static ResultadoAutenticacion Exitoso(LoginResponseDto respuesta) =>
         new(EstadoAutenticacion.Exitoso, respuesta, null, SinErrores);
 
-    /// <summary>Mismo resultado para usuario inexistente, inactivo o contraseña errónea.</summary>
     public static ResultadoAutenticacion CredencialesInvalidas() =>
         new(EstadoAutenticacion.CredencialesInvalidas, null, MensajesValidacion.CredencialesInvalidas, SinErrores);
 
@@ -81,7 +79,6 @@ public sealed class ResultadoOperacion<T>
     public static ResultadoOperacion<T> DatosInvalidos(string campo, string mensaje) =>
         DatosInvalidos(new Dictionary<string, string[]> { [campo] = [mensaje] });
 
-    /// <summary>El resultado 400 con los errores por campo si la validación falló; null si los datos son válidos.</summary>
     public static ResultadoOperacion<T>? SiNoEsValido(ValidationResult validacion) =>
         validacion.IsValid ? null : DatosInvalidos(validacion.Errors.AgruparPorCampo());
 

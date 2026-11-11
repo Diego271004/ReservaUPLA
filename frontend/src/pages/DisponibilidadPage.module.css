@@ -35,7 +35,6 @@
   padding: 0 var(--espacio-2);
 }
 .fechas > div {
-  /* El campo lleva margen inferior de formulario: se anula para que los botones queden a la altura de la caja. */
   margin-bottom: 0;
 }
 .fechas label {

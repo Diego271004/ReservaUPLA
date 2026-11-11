@@ -6,7 +6,6 @@ import Insignia from '../ui/Insignia.jsx'
 import { TIPO_INSIGNIA_DE_ESTADO } from '../../utils/reservas.js'
 import estilos from './PanelReserva.module.css'
 
-/** Una fila «Etiqueta: valor» del panel. */
 function Dato({ etiqueta, children }) {
   return (
     <div className={estilos.fila}>

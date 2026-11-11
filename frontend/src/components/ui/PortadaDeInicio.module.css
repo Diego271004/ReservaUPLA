@@ -18,7 +18,6 @@
   z-index: 1;
 }
 
-/* Marca decorativa: tres hexágonos (el del logo) en trazo claro; no lleva texto ni significado. */
 .marca {
   position: absolute;
   top: 0;

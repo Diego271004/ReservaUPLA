@@ -43,7 +43,6 @@ export default function TableList({
                 onClick={
                   alActivarFila
                     ? (evento) => {
-                        // Un clic en un botón o enlace de la fila hace lo suyo; el resto de la fila abre el registro.
                         if (!evento.target.closest('button, a, input, select')) alActivarFila(fila)
                       }
                     : undefined

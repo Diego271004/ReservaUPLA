@@ -1,15 +1,13 @@
-// La sesión (token, nombre y rol) vive en sessionStorage: se borra al cerrar la pestaña.
 export const SESION_STORAGE_KEY = 'reservaupla.sesion'
 
 export function guardarSesion(sesion) {
   try {
     sessionStorage.setItem(SESION_STORAGE_KEY, JSON.stringify(sesion))
   } catch {
-    // Almacenamiento no disponible (modo privado estricto): la sesión no persistirá al recargar.
+    // Sin almacenamiento de sesión la pantalla sigue funcionando
   }
 }
 
-/** Devuelve la sesión guardada si tiene el formato esperado y no ha expirado; si no, null. */
 export function leerSesion(ahora = Date.now()) {
   try {
     const texto = sessionStorage.getItem(SESION_STORAGE_KEY)
@@ -31,7 +29,7 @@ export function borrarSesion() {
   try {
     sessionStorage.removeItem(SESION_STORAGE_KEY)
   } catch {
-    // Nada que borrar si el almacenamiento no está disponible.
+    // Sin almacenamiento de sesión la pantalla sigue funcionando
   }
 }
 

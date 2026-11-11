@@ -16,7 +16,6 @@ const VARIANTE_DE_BOTON = { cancelar: 'destructivo', rechazar: 'rechazar', aprob
 export default function DetalleReservaPage() {
   const { id } = useParams()
   const { sesion } = useAuth()
-  // El enlace de regreso lleva a la lista o al panel de donde se vino, con sus filtros y su página.
   const { state } = useLocation()
   const volverA = rutaDeRegreso(sesion.rol, state?.volverA)
   const vm = useDetalleReserva(id)

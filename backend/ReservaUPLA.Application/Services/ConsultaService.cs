@@ -15,7 +15,6 @@ public sealed class ConsultaService : IConsultaService
 {
     public const int TamanoDePagina = 10;
     public const int PendientesDelDashboard = 5;
-    /// <summary>Cuántos cambios de estado recientes muestra el dashboard del Administrador.</summary>
     public const int ActividadRecienteDelDashboard = 6;
 
     private readonly IValidator<ConsultaReservasDto> _validador;
@@ -52,7 +51,6 @@ public sealed class ConsultaService : IConsultaService
         return ResultadoOperacion<PaginaDeReservasDto>.Exitoso(await _reservas.ListarAsync(filtro, cancellationToken));
     }
 
-    /// <summary>Las reservas que siguen vigentes (aprobadas o pendientes); una cancelada o rechazada ya no ocupa el ambiente.</summary>
     private static List<ReservaDto> Vigentes(IEnumerable<ReservaDto> reservas) =>
         reservas.Where(r => r.Estado is "Aprobada" or "Pendiente").ToList();
 
@@ -73,8 +71,6 @@ public sealed class ConsultaService : IConsultaService
                     cancellationToken);
                 resumen.Add(new IndicadorEstadoDto(estado.ToString(), pagina.Total));
             }
-            // La «próxima reserva» es la más cercana que sigue vigente: primero la aprobada, y si no hay, la pendiente.
-            // Una cancelada o rechazada no es una reserva próxima.
             var proxima = solicitudes.Elementos.FirstOrDefault(r => r.Estado == "Aprobada")
                 ?? solicitudes.Elementos.FirstOrDefault(r => r.Estado == "Pendiente");
             var inicioSolicitante = new InicioSolicitanteDto(proxima, solicitudes.Elementos.ToList(), resumen);
@@ -149,7 +145,6 @@ public sealed class ConsultaService : IConsultaService
         var propios = await _ambientes.ListarPorResponsableAsync(responsableId, cancellationToken);
         var resumenes = propios.Select(ADto).ToList();
 
-        // Sin ambientes a cargo: la pantalla lo dice, no es un error.
         if (propios.Count == 0)
         {
             return ResultadoOperacion<MiAmbienteDto>.Exitoso(new MiAmbienteDto(

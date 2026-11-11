@@ -5,7 +5,6 @@ import { RUTA_INICIAL_POR_ROL } from '../constants/navegacion.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import estilos from './ErrorRutaPage.module.css'
 
-/** Estructura común de las páginas de error de ruta: título, texto opcional y el enlace de regreso. */
 function PaginaDeError({ titulo, texto }) {
   const { sesion } = useAuth()
   const inicio = sesion ? (RUTA_INICIAL_POR_ROL[sesion.rol] ?? '/dashboard') : '/login'
@@ -21,12 +20,10 @@ function PaginaDeError({ titulo, texto }) {
   )
 }
 
-/** Una ruta a la que el rol no tiene acceso (el menú ya no la ofrece). */
 export const SinPermisoPage = () => (
   <PaginaDeError titulo={TEXTOS.sinPermisoTitulo} texto={MENSAJES.sinPermiso} />
 )
 
-/** Una ruta que no existe. */
 export const NoEncontradaPage = () => (
   <PaginaDeError titulo={TEXTOS.paginaNoEncontrada} texto={TEXTOS.paginaNoEncontradaDetalle} />
 )

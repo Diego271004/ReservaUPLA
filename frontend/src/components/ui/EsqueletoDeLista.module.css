@@ -1,4 +1,3 @@
-/* Esqueleto de lista: un recuadro como el de las tablas, con una cabecera y filas de barras grises que laten despacio. */
 .esqueleto {
   overflow: hidden;
   background: var(--color-superficie);

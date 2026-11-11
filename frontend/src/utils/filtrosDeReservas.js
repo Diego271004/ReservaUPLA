@@ -1,13 +1,11 @@
 import { MENSAJES, TEXTOS } from '../constants/messages.js'
 import { fechaAIso, isoAFecha, parsearFecha } from './fechas.js'
 
-/** Los filtros de la lista de Reservas. Las fechas se escriben dd/mm/aaaa; en la dirección y en la API van aaaa-mm-dd. */
 export const FILTROS_VACIOS = Object.freeze({ estado: '', ambienteId: '', desde: '', hasta: '' })
 
 export const hayFiltros = (filtros) =>
   Boolean(filtros.estado || filtros.ambienteId || filtros.desde || filtros.hasta)
 
-/** Los filtros y la página que dice la dirección (?estado=&ambienteId=&desde=&hasta=&pagina=). */
 export function filtrosDeBusqueda(buscar) {
   const pagina = Number.parseInt(buscar.get('pagina') ?? '', 10)
   return {
@@ -19,7 +17,6 @@ export function filtrosDeBusqueda(buscar) {
   }
 }
 
-/** La dirección (y la consulta a la API) de unos filtros: solo lo que tiene valor; la página 1 no se escribe. */
 export function consultaDeFiltros({ estado, ambienteId, desde, hasta, pagina = 1 }) {
   const consulta = new URLSearchParams()
   if (estado) consulta.set('estado', estado)
@@ -33,10 +30,6 @@ export function consultaDeFiltros({ estado, ambienteId, desde, hasta, pagina = 1
 const errorDeFecha = (valor) =>
   valor && !parsearFecha(valor) ? MENSAJES.fechaFormatoInvalido : null
 
-/**
- * Valida las dos fechas del filtro. Pueden estar vacías y pueden ser pasadas (se consulta lo que ya pasó);
- * la final no puede ser anterior a la inicial.
- */
 export function validarFiltros({ desde, hasta }) {
   const errores = { desde: errorDeFecha(desde), hasta: errorDeFecha(hasta) }
   if (!errores.desde && !errores.hasta && desde && hasta && fechaAIso(hasta) < fechaAIso(desde)) {
@@ -45,7 +38,6 @@ export function validarFiltros({ desde, hasta }) {
   return errores
 }
 
-/** Lo que muestra la tarjeta «Ambiente más utilizado»: el nombre (o los nombres en chips, si empatan) y cuántas reservas aprobadas. */
 export function ambienteMasUtilizado(ambientes) {
   if (!ambientes || ambientes.length === 0) {
     return {
@@ -74,6 +66,5 @@ export function ambienteMasUtilizado(ambientes) {
   }
 }
 
-/** La clave de los demás filtros (sin estado ni página): lo que hace cambiar los números de las pestañas. */
 export const claveDeConteo = (filtros) =>
   consultaDeFiltros({ ...filtros, estado: '', pagina: 1 }).toString()

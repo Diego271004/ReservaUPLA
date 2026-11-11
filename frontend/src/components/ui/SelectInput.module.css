@@ -1,4 +1,3 @@
-/* El icono es decorativo y no intercepta clics: el <select> ocupa toda la caja. */
 .icono {
   position: absolute;
   right: var(--espacio-2);

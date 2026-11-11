@@ -47,7 +47,6 @@ public sealed class AuthController : ControllerBase
     [ProducesResponseType(typeof(PerfilDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public ActionResult<PerfilDto> Me() =>
-        // Datos tomados del token (claims con nombre corto); sin consultar la base.
         Ok(new PerfilDto(
             User.ObtenerUsuarioId(),
             User.FindFirst(JwtRegisteredClaimNames.Name)?.Value ?? string.Empty,

@@ -1,4 +1,3 @@
-/** Las iniciales del avatar: la primera letra de las dos primeras palabras del nombre. */
 export const iniciales = (nombreCompleto) =>
   String(nombreCompleto ?? '')
     .trim()
