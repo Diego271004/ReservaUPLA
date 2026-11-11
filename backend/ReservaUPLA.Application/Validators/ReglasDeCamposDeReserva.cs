@@ -46,7 +46,6 @@ internal static class ReglasDeCamposDeReserva
     private static bool EstaDentroDelHorario(string? texto) =>
         HorarioReserva.TryHora(texto, out var hora) && HorarioReserva.EstaDentroDelHorario(hora);
 
-    // Si el inicio no es una hora válida el error ya está en su propio campo: aquí no se duplica.
     private static bool EsPosteriorAlInicio(string? horaInicio, string? horaFin) =>
         !HorarioReserva.TryHora(horaInicio, out var inicio)
         || !HorarioReserva.TryHora(horaFin, out var fin)

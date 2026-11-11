@@ -1,13 +1,6 @@
-/**
- * Única fuente de los textos de la interfaz. Los mensajes de validación copian carácter por
- * carácter backend/ReservaUPLA.Application/Common/MensajesValidacion.cs (la prueba
- * messages.test.js lo comprueba). Si cambia uno, cambia el otro.
- */
-
 export const DOMINIO_INSTITUCIONAL = import.meta.env?.VITE_DOMINIO_INSTITUCIONAL ?? 'upla.edu.pe'
 
 export const MENSAJES = Object.freeze({
-  // Login
   correoVacio: 'Ingresa tu correo institucional.',
   correoFormatoInvalido:
     'El correo no tiene un formato válido. Ejemplo: nombre.apellido@upla.edu.pe',
@@ -18,14 +11,12 @@ export const MENSAJES = Object.freeze({
     'El correo o la contraseña no son correctos. Revisa ambos datos e inténtalo de nuevo.',
   demasiadosIntentos: 'Has realizado demasiados intentos. Espera 1 minuto y vuelve a intentarlo.',
 
-  // Errores generales
   errorConexion: 'No pudimos conectar con ReservaUPLA. Revisa tu conexión e inténtalo nuevamente.',
   errorServidor:
     'ReservaUPLA no está disponible en este momento. Inténtalo de nuevo en unos minutos.',
   sinPermiso: 'No tienes permiso para realizar esta acción.',
   sesionTerminada: 'Tu sesión terminó. Inicia sesión de nuevo.',
 
-  // Usuarios
   nombreCompletoVacio: 'Ingresa el nombre completo.',
   nombreCompletoDemasiadoLargo: 'El nombre no puede superar los 120 caracteres.',
   correoUsuarioVacio: 'Ingresa el correo institucional.',
@@ -38,7 +29,6 @@ export const MENSAJES = Object.freeze({
     'La contraseña debe tener entre 8 y 72 caracteres, con al menos una letra y un número.',
   usuarioRegistrado: 'Usuario registrado.',
 
-  // Ambientes
   nombreAmbienteVacio: 'Ingresa el nombre del ambiente.',
   nombreAmbienteDemasiadoLargo: 'El nombre no puede superar los 120 caracteres.',
   nombreAmbienteDuplicado: 'Ya existe un ambiente con ese nombre.',
@@ -53,7 +43,6 @@ export const MENSAJES = Object.freeze({
   responsableInvalido: 'Selecciona un responsable de la lista.',
   ambienteRegistrado: 'Ambiente registrado.',
 
-  // Reservas
   ambienteVacio: 'Selecciona un ambiente.',
   ambienteInexistente: 'Selecciona un ambiente de la lista.',
   fechaVacia: 'Ingresa la fecha de la reserva.',
@@ -83,8 +72,6 @@ export const MENSAJES = Object.freeze({
   soloPendienteSeApruebaORechaza: 'Solo una reserva Pendiente se puede aprobar o rechazar.',
 })
 
-/** Mensajes que se construyen con un dato (no viajan por la API). */
-/** «Mostrando 5 de 7» (el pie de la tabla de pendientes del Dashboard). */
 export const textoMostrando = (mostradas, total) => `Mostrando ${mostradas} de ${total}`
 
 export const textoPagina = (numero) => `Página ${numero}`
@@ -92,14 +79,12 @@ export const textoPagina = (numero) => `Página ${numero}`
 export const mensajeDominioNoInstitucional = (dominio) =>
   `Usa tu correo institucional (termina en @${dominio}).`
 
-/** El contador junto a «Reservas» en el menú del Administrador: «1 pendiente», «6 pendientes». */
 export const textoPendientes = (cantidad) =>
   cantidad === 1 ? '1 pendiente' : `${cantidad} pendientes`
 
 export const textoSinUsuariosCoincidentes = (termino) =>
   `No se encontraron usuarios que coincidan con «${termino}».`
 
-/** Textos propios de la interfaz. */
 export const TEXTOS = Object.freeze({
   nombreProducto: 'ReservaUPLA',
   lemaLogin: 'Reserva laboratorios, auditorios y salas de la UPLA',
@@ -135,7 +120,6 @@ export const TEXTOS = Object.freeze({
   cerrarAviso: 'Cerrar aviso',
   hoyEs: 'Hoy',
 
-  // Usuarios
   tituloUsuarios: 'Usuarios',
   nuevoUsuario: 'Nuevo usuario',
   tituloRegistrarUsuario: 'Registrar usuario',
@@ -150,7 +134,6 @@ export const TEXTOS = Object.freeze({
   inactivo: 'Inactivo',
   ayudaContrasenaInicial: 'Entre 8 y 72 caracteres, con al menos una letra y un número.',
 
-  // Ambientes
   tituloAmbientes: 'Ambientes',
   nuevoAmbiente: 'Nuevo ambiente',
   tituloRegistrarAmbiente: 'Registrar ambiente',
@@ -162,7 +145,6 @@ export const TEXTOS = Object.freeze({
   etiquetaEstado: 'Estado',
   etiquetaResponsable: 'Responsable',
 
-  // Reservas
   tituloNuevaReserva: 'Nueva reserva',
   etiquetaAmbiente: 'Ambiente',
   etiquetaFecha: 'Fecha',
@@ -180,7 +162,6 @@ export const TEXTOS = Object.freeze({
   limpiarFormulario: 'Limpiar formulario',
   ayudaFecha: 'Formato dd/mm/aaaa (por ejemplo, 05/11/2026).',
 
-  // Detalle de la reserva y sus acciones
   cargandoReserva: 'Cargando la reserva…',
   reservaNoEncontrada: 'No encontramos esa reserva.',
   reintentar: 'Reintentar',
@@ -196,7 +177,6 @@ export const TEXTOS = Object.freeze({
   confirmarCancelar: 'Sí, cancelar reserva',
   advertenciaIrreversible: 'Esta acción no se puede deshacer.',
 
-  // Salida de datos: Reservas, Dashboard y Mi ambiente
   tituloReservas: 'Reservas',
   reservarUnAmbiente: 'Reservar un ambiente',
   pestanaTodas: 'Todas',
@@ -268,7 +248,6 @@ export const TEXTOS = Object.freeze({
   columnaEstado: 'Estado',
   columnaAcciones: 'Acciones',
 
-  // Pantallas y errores de ruta
   sinPermisoTitulo: 'Sin permiso',
   paginaNoEncontrada: 'No encontramos esa página.',
   paginaNoEncontradaDetalle: 'Esta página no existe o cambió de dirección.',

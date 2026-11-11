@@ -38,7 +38,6 @@ const ESTADO_DE_INDICADOR = {
 const claveOrden = (item) =>
   `${item.reserva?.fecha ?? item.fecha ?? ''}T${item.reserva?.horaInicio ?? item.horaInicio ?? ''}`
 
-/** Las solicitudes que requieren decisión, de la más próxima a la más lejana (con lo que dé la API o las pendientes más antiguas). */
 function solicitudesPorAtender(datos) {
   const lista = datos.solicitudesRequierenDecision?.length
     ? datos.solicitudesRequierenDecision

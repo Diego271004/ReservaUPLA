@@ -41,7 +41,6 @@ public static class ControllerBaseExtensions
     public static RolUsuario ObtenerRol(this ClaimsPrincipal usuario) =>
         Enum.Parse<RolUsuario>(usuario.FindFirst(JwtTokenGenerator.ClaimRol)!.Value);
 
-    /// <summary>400 con ValidationProblemDetails: un arreglo de mensajes por campo (camelCase).</summary>
     public static BadRequestObjectResult DatosInvalidos(IReadOnlyDictionary<string, string[]> errores)
     {
         var problema = new ValidationProblemDetails(errores.ToDictionary(error => error.Key, error => error.Value))
@@ -55,10 +54,6 @@ public static class ControllerBaseExtensions
 
     public static ActorDto ObtenerActor(this ClaimsPrincipal usuario) => new(usuario.ObtenerUsuarioId(), usuario.ObtenerRol());
 
-    /// <summary>
-    /// Traduce el resultado de un caso de uso: éxito según <paramref name="exito"/>, 400 con los errores por campo,
-    /// 403, 404 (ProblemDetails sin cuerpo propio) o 409 con el mensaje de la regla de negocio.
-    /// </summary>
     public static IActionResult Traducir<T>(
         this ControllerBase controlador, ResultadoOperacion<T> resultado, Func<T, IActionResult> exito) =>
         resultado.Estado switch
@@ -71,16 +66,13 @@ public static class ControllerBaseExtensions
             _ => throw new InvalidOperationException($"Estado de operación no contemplado: {resultado.Estado}"),
         };
 
-
     /// <summary>El cuerpo recibido, o <paramref name="vacio"/> (todos los campos ausentes) si no llegó o tenía un JSON mal formado.</summary>
     public static T CuerpoOVacio<T>(this ControllerBase controlador, T? dto, T vacio) where T : class =>
         controlador.ModelState.IsValid && dto is not null ? dto : vacio;
 
-    /// <summary>201 con el recurso creado, o el 400 / 403 / 404 / 409 que corresponda.</summary>
     public static IActionResult Creado<T>(this ControllerBase controlador, ResultadoOperacion<T> resultado) =>
         controlador.Traducir(resultado, valor => controlador.StatusCode(StatusCodes.Status201Created, valor));
 
-    /// <summary>Traduce el resultado del login: 200 con el token, 400 con errores por campo o 401 con el mensaje genérico.</summary>
     public static IActionResult Traducir(this ControllerBase controlador, ResultadoAutenticacion resultado) =>
         resultado.Estado switch
         {

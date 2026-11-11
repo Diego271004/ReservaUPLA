@@ -67,7 +67,6 @@ export default function ReservasPage() {
       ...(sesion.rol === ROLES.solicitante ? [] : ['solicitante']),
       'estado',
     ],
-    // La Solicitante solo ve las suyas: su propio nombre en cada fila sería ruido (por eso no lleva la columna Solicitante).
     (reserva) => (
       <Button
         variante="enlace"

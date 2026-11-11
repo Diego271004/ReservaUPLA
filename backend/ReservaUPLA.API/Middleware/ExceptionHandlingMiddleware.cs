@@ -28,7 +28,6 @@ public sealed class ExceptionHandlingMiddleware
         }
         catch (OperationCanceledException) when (contexto.RequestAborted.IsCancellationRequested)
         {
-            // El cliente cerró la conexión: no hay a quién responder ni es un error del servidor.
         }
         catch (Exception ex)
         {

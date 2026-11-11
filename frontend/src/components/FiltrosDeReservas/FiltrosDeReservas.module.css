@@ -7,7 +7,6 @@
   box-shadow: var(--elevacion-tarjeta);
 }
 
-/* En escritorio los filtros forman una sola barra: los campos y, a su derecha, «Limpiar» y «Aplicar filtros». */
 .panel {
   display: flex;
   flex-wrap: wrap;
@@ -29,7 +28,6 @@
   margin-bottom: var(--espacio-3);
 }
 
-/* El botón «Filtros» solo existe en móvil: en escritorio los filtros siempre están a la vista. */
 .alternar {
   display: none;
 }

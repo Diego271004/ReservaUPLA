@@ -5,10 +5,8 @@ namespace ReservaUPLA.Application.Interfaces;
 
 public interface IReservaRepository
 {
-    /// <summary>La reserva con su historial, lista para cambiar de estado y guardarse (seguimiento activo).</summary>
     Task<Reserva?> ObtenerConHistorialAsync(int id, CancellationToken cancellationToken);
 
-    /// <summary>Una página de reservas con el alcance y los filtros pedidos, y el total que cumple esos filtros.</summary>
     Task<PaginaDeReservasDto> ListarAsync(FiltroReservas filtro, CancellationToken cancellationToken);
 
     /// <summary>Cuántas reservas hay por estado (de un ambiente, o de todos si es null).</summary>
@@ -17,7 +15,6 @@ public interface IReservaRepository
     /// <summary>El ambiente con más reservas Aprobadas; si hay empate, todos los empatados. Vacío si no hay ninguna Aprobada.</summary>
     Task<IReadOnlyList<AmbienteUsoDto>> AmbientesMasUtilizadosAsync(CancellationToken cancellationToken);
 
-    /// <summary>Los últimos cambios de estado de cualquier reserva (los más recientes primero), con quién los hizo. Es la trazabilidad del dashboard.</summary>
     Task<IReadOnlyList<ActividadRecienteDto>> ActividadRecienteAsync(int cantidad, CancellationToken cancellationToken);
 
     /// <summary>Todos los ambientes con su cantidad de reservas Aprobadas, para gráficos y tablas alternativas.</summary>

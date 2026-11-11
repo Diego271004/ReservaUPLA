@@ -6,10 +6,6 @@ const AvisosContext = createContext({ avisar: () => {} })
 
 let siguienteId = 0
 
-/**
- * Avisos no bloqueantes (toasts) para el éxito de las acciones. Los errores que la persona debe corregir NO pasan por
- * aquí: siguen en un AlertMessage en el lugar donde ocurren.
- */
 export function AvisosProvider({ children }) {
   const [avisos, setAvisos] = useState([])
 

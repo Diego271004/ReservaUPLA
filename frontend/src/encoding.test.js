@@ -20,5 +20,4 @@ describe('codificación UTF-8', () => {
       .filter((ruta) => SEC.test(readFileSync(ruta, 'utf8')))
     expect(fallos, `Mojibake encontrado en: ${fallos.join(', ')}`).toEqual([])
   })
-
 })

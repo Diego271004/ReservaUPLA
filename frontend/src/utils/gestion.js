@@ -2,16 +2,11 @@ import { TEXTOS } from '../constants/messages.js'
 import { INICIO_DIA, FIN_DIA } from './disponibilidad.js'
 import { minutosDeHora } from './fechas.js'
 
-/** «3 h» o «2,5 h»: las horas con una coma decimal solo si hace falta. */
 const textoDeHoras = (minutos) => {
   const horas = minutos / 60
   return `${Number.isInteger(horas) ? horas : horas.toFixed(1).replace('.', ',')} h`
 }
 
-/**
- * La tasa de aprobación: de las solicitudes que ya se decidieron (aprobadas más rechazadas), cuántas se aprobaron. Las pendientes
- * y las canceladas no cuentan: todavía no se decidieron o las anuló quien las pidió.
- */
 export function tasaDeAprobacion({ aprobadas = 0, rechazadas = 0 } = {}) {
   const decididas = aprobadas + rechazadas
   if (decididas === 0) return { valor: '—', detalle: TEXTOS.tasaSinDecididas }
@@ -21,10 +16,6 @@ export function tasaDeAprobacion({ aprobadas = 0, rechazadas = 0 } = {}) {
   }
 }
 
-/**
- * La ocupación de hoy: las horas con reserva aprobada sobre las horas disponibles (de 07:00 a 22:00) de los ambientes que hoy no
- * están en mantenimiento. `hoyEnLosAmbientes` es la agenda de hoy del dashboard: [{ estado, reservas: [{ horaInicio, horaFin }] }].
- */
 export function ocupacionDeHoy(hoyEnLosAmbientes = []) {
   const disponibles = hoyEnLosAmbientes.filter((ambiente) => ambiente.estado === 'Disponible')
   if (disponibles.length === 0) return { valor: '—', detalle: TEXTOS.ocupacionSinAmbientes }
@@ -45,7 +36,6 @@ export function ocupacionDeHoy(hoyEnLosAmbientes = []) {
   }
 }
 
-/** La frase de un cambio de estado: «Carla Rojas aprobó la reserva de Ana Torres», «Ana Torres registró una solicitud». */
 export function fraseDeActividad({ usuarioNombre, solicitanteNombre, estadoNuevo }) {
   const propia = usuarioNombre === solicitanteNombre
   switch (estadoNuevo) {

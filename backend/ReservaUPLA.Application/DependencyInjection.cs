@@ -11,10 +11,6 @@ namespace ReservaUPLA.Application;
 
 public static class DependencyInjection
 {
-    /// <summary>
-    /// Registra validadores y servicios. El dominio institucional se configura desde la API con la
-    /// sección "Autenticacion"; las reglas de negocio de la Fase 6 se agregan registrando <see cref="IReglaReserva"/>.
-    /// </summary>
     public static IServiceCollection AgregarAplicacion(this IServiceCollection servicios)
     {
         servicios.AddOptions<Common.OpcionesAutenticacion>();

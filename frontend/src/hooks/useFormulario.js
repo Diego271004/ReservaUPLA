@@ -29,7 +29,6 @@ export function useFormulario({
 }) {
   const [valores, setValores] = useState(valoresIniciales)
   const [errores, setErrores] = useState({})
-  // Estado ejecutando / alerta compartido con el resto de acciones de la aplicación.
   const { ejecutando: enviando, alerta, setAlerta, enCurso, iniciar, terminar } = useAccion()
   const [solicitudFoco, setSolicitudFoco] = useState(null)
 
@@ -49,7 +48,6 @@ export function useFormulario({
     }
   }, [])
 
-  // El foco se mueve después del render, cuando los errores ya están en el DOM.
   useEffect(() => {
     if (solicitudFoco) refs.current[solicitudFoco.campo]?.focus()
   }, [solicitudFoco])
@@ -58,7 +56,6 @@ export function useFormulario({
     setSolicitudFoco((previa) => ({ campo, id: (previa?.id ?? 0) + 1 }))
   }, [])
 
-  /** Ref callback para registrar el elemento de un campo y poder enfocarlo. */
   const refDe = useCallback(
     (campo) => (elemento) => {
       refs.current[campo] = elemento
@@ -80,7 +77,6 @@ export function useFormulario({
       }
       valoresRef.current = siguientes
       setValores(siguientes)
-      // Un error ya visible se actualiza (o desaparece) apenas se corrige; uno nuevo aparece al salir del campo o al enviar.
       setErrores((previos) => {
         const actualizados = { ...previos }
         const nuevosErrores = validar(siguientes)
@@ -125,7 +121,6 @@ export function useFormulario({
           return
         }
         default:
-          // 403, 409, 429, 5xx y sin red: un solo lugar los traduce a su mensaje (mensajesDeResultado.js).
           terminar(alertaDeResultado(resultado))
       }
     },

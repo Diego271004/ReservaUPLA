@@ -16,7 +16,6 @@ const VALORES_INICIALES = {
   responsableId: '',
 }
 
-// Función estable para useCarga: solo los usuarios con rol Responsable pueden asignarse a un ambiente.
 const cargarResponsables = () => listarUsuarios(ROLES.responsable)
 
 export function useAmbienteForm() {

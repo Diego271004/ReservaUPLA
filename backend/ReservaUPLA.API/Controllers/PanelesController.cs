@@ -27,7 +27,6 @@ public sealed class PanelesController : ControllerBase
     public async Task<ActionResult<DashboardDto>> Dashboard(CancellationToken cancellationToken) =>
         Ok(await _consultas.ObtenerDashboardAsync(User.ObtenerActor(), cancellationToken));
 
-    /// <summary>El ambiente del Responsable (o el que elija entre los suyos), con indicadores acotados a él y sus reservas.</summary>
     [HttpGet("api/mi-ambiente")]
     [Authorize(Roles = Roles.Responsable)]
     [ProducesResponseType(typeof(MiAmbienteDto), StatusCodes.Status200OK)]

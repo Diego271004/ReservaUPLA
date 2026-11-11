@@ -21,7 +21,6 @@ export class ApiError extends Error {
 
 let alExpirarSesion = null
 
-/** La sesión (AuthContext) registra qué hacer cuando el token deja de servir. */
 export function registrarSesionExpirada(manejador) {
   alExpirarSesion = manejador
 }

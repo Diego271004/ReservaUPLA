@@ -11,8 +11,6 @@
   box-shadow: var(--elevacion-tarjeta);
 }
 
-/* El botón primario va al extremo derecho en escritorio; en móvil se apilan a ancho completo con el primario arriba.
-   El orden del DOM (Cancelar, Guardar) coincide con el orden visual, así Tab sigue el orden en que se lee. */
 .acciones {
   display: flex;
   justify-content: flex-end;
@@ -35,7 +33,6 @@
   }
 }
 
-/* Formulario con un panel a la derecha (el resumen de Nueva reserva): dos columnas en escritorio, una en móvil. */
 .conLateral {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);

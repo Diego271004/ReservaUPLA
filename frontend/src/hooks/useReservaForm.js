@@ -16,7 +16,6 @@ const valoresIniciales = () => ({
   motivo: '',
 })
 
-// Si cambia la hora de inicio y la de fin ya no es posterior, se vacía para que no quede un valor imposible.
 function derivar(campo, valor, valores) {
   if (campo !== 'horaInicio' || valores.horaFin === '') return undefined
   return horasPosterioresA(valor).includes(valores.horaFin) ? undefined : { horaFin: '' }
@@ -28,7 +27,6 @@ export function etiquetaDeAmbiente(ambiente) {
     : `${ambiente.nombre} · ${ambiente.estado} (no disponible)`
 }
 
-/** Detalle del ambiente elegido, como ayuda bajo el campo: "30 personas · Pabellón A, piso 2". */
 export function detalleDeAmbiente(ambiente) {
   return `${ambiente.capacidad} ${TEXTOS.personas} · ${ambiente.ubicacion}`
 }
@@ -61,7 +59,6 @@ export function useReservaForm() {
       ambientes.datos.map((ambiente) => ({
         valor: String(ambiente.id),
         etiqueta: etiquetaDeAmbiente(ambiente),
-        // Prevención de errores: un ambiente que no está disponible no se puede elegir.
         deshabilitada: ambiente.estado !== 'Disponible',
       })),
     [ambientes.datos],

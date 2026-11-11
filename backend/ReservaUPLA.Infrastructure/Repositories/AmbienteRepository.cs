@@ -26,7 +26,6 @@ public sealed class AmbienteRepository : IAmbienteRepository
             .OrderBy(ambiente => ambiente.Nombre)
             .ToListAsync(cancellationToken);
 
-    // Sin distinguir mayúsculas: "Auditorio principal" y "Auditorio Principal" son el mismo ambiente para el usuario.
     public Task<bool> ExisteNombreAsync(string nombre, CancellationToken cancellationToken)
     {
         var nombreMinusculas = nombre.ToLower();

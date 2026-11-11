@@ -47,14 +47,12 @@ try {
     const sufijo = ancho === 'movil' ? ' (375 px)' : ' (1280 px)'
     const pagina = ancho === 'movil' ? await nuevaPagina(navegador, 'movil', sesionAna) : ana
 
-    // ------------------------------------------------------------ Corrección (a): ayuda del ambiente
     paso(`Nueva reserva · elección del ambiente con tarjetas seleccionables${sufijo}`)
     await pagina.goto(`${BASE}/reservas/nueva`)
     const radioLab = pagina.getByRole('radio', { name: /Laboratorio de Cómputo 2/ })
     await radioLab.waitFor({ state: 'attached' })
     await capturar(pagina, destino, '01-nueva-reserva-vacia', ancho)
     await radioLab.click()
-    // La ayuda/detalle aparece en la tarjeta y en el resumen de la solicitud: basta con la primera.
     await pagina.getByText(DETALLE_LABORATORIO).first().waitFor()
     ok(`al elegir el laboratorio aparece el detalle «${DETALLE_LABORATORIO}»`)
     await capturar(pagina, destino, '02-ambiente-elegido-con-ayuda', ancho)
@@ -81,7 +79,6 @@ try {
     esperar((await pagina.getByText(FECHA_PASADA).count()) === 0, `con la fecha de hoy (${hoy.texto}) el aviso desaparece`)
   }
 
-  // ------------------------------------------------------------ La API responde lo mismo
   paso('API · RN-07 con el mismo mensaje que la interfaz')
   const hoy = fechaDeHoy()
   const laboratorio = (await api('/api/ambientes', { token: tokenAna })).data.find((a) => a.nombre === 'Laboratorio de Cómputo 2')
@@ -99,7 +96,6 @@ try {
   })
   esperar(deHoy.status === 201, `POST con la fecha de hoy (${hoy.iso}) → HTTP ${deHoy.status}`)
 
-  // ------------------------------------------------------------ Resto de pantallas con el componente unificado
   paso('Capturas de las demás pantallas a 1280 px y 375 px')
   for (const ancho of ['escritorio', 'movil']) {
     const comoAdmin = await nuevaPagina(navegador, ancho, sesionCarla)

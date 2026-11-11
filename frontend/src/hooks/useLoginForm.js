@@ -9,7 +9,6 @@ import { useFormulario } from './useFormulario.js'
 
 const VALORES_INICIALES = { correo: '', contrasena: '' }
 
-/** Formulario de inicio de sesión: lo común viene de useFormulario; aquí solo lo propio del login. */
 export function useLoginForm() {
   const navigate = useNavigate()
   const { iniciarSesion } = useAuth()
@@ -31,7 +30,6 @@ export function useLoginForm() {
     [iniciarSesion, navigate],
   )
 
-  // Credenciales inválidas: mensaje genérico; se conserva el correo y se limpia la contraseña.
   const manejarResultado = useCallback(
     (resultado, { terminar, setAlerta, setValores, enfocar }) => {
       if (resultado.tipo !== 'credencialesInvalidas') return false
@@ -61,7 +59,6 @@ export function useLoginForm() {
     [handleBlur],
   )
 
-  // Bloq Mayús: se consulta en keydown/keyup y también al hacer clic (se puede entrar al campo con el bloqueo activo).
   const handleBloqMayus = useCallback((evento) => {
     if (typeof evento.getModifierState === 'function') {
       setBloqMayusActivo(evento.getModifierState('CapsLock'))

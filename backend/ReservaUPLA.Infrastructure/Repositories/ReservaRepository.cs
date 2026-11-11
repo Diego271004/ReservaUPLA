@@ -129,7 +129,6 @@ public sealed class ReservaRepository : IReservaRepository
             .ToList();
     }
 
-    // Cuántas reservas aprobadas tiene cada ambiente (la base común de «uso por ambiente» y «más utilizados»).
     private async Task<List<AprobadasDeAmbiente>> AprobadasPorAmbienteAsync(CancellationToken cancellationToken)
     {
         return await _contexto.Reservas.AsNoTracking()
@@ -162,7 +161,6 @@ public sealed class ReservaRepository : IReservaRepository
             return [];
         }
 
-        // Si dos ambientes empatan en el máximo, salen los dos.
         var maximo = aprobadas.Max(fila => fila.Cantidad);
         var empatados = aprobadas.Where(fila => fila.Cantidad == maximo).Select(fila => fila.AmbienteId).ToList();
 
@@ -173,7 +171,6 @@ public sealed class ReservaRepository : IReservaRepository
             .ToListAsync(cancellationToken);
     }
 
-    // Dos rangos se cruzan si cada uno empieza antes de que termine el otro (extremos que se tocan no cuentan).
     public Task<Reserva?> BuscarAprobadaQueSeCruzaAsync(
         int ambienteId, DateOnly fecha, TimeOnly horaInicio, TimeOnly horaFin, int? excluirReservaId, CancellationToken cancellationToken) =>
         _contexto.Reservas
@@ -212,7 +209,6 @@ public sealed class ReservaRepository : IReservaRepository
         }
     }
 
-    // EF puede envolver el error de PostgreSQL en DbUpdateException y esta en InvalidOperationException (fallo transitorio).
     private static bool EsConflictoDeHorario(Exception ex)
     {
         for (Exception? actual = ex; actual is not null; actual = actual.InnerException)

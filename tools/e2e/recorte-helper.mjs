@@ -1,8 +1,3 @@
-/**
- * Comprobación real en el navegador: verifica que ningún bloque de la línea de tiempo ni de la
- * agenda móvil presente texto recortado por CSS / elipsis (scrollWidth <= clientWidth).
- * Falla y lista los defectos con ambiente, horario, texto y medidas exactas.
- */
 export async function comprobarSinRecorteDisponibilidad(pagina, ancho) {
   const fallos = await pagina.evaluate(() => {
     const bloques = document.querySelectorAll('[class*="bloque"], [class*="itemMovil"]')
@@ -15,7 +10,6 @@ export async function comprobarSinRecorteDisponibilidad(pagina, ancho) {
         if (el.offsetWidth === 0 && el.offsetHeight === 0) continue
         const texto = el.textContent?.trim()
         if (!texto) continue
-        // Si scrollWidth > clientWidth (+1 px por subpíxeles), el texto se corta por CSS.
         if (el.scrollWidth > el.clientWidth + 1) {
           const fila = el.closest('[class*="filaAmbiente"], [class*="tarjetaAmbiente"]')
           const ambiente =
@@ -51,4 +45,3 @@ export async function comprobarSinRecorteDisponibilidad(pagina, ancho) {
   }
   return fallos
 }
-

@@ -2,7 +2,6 @@ import { useId, useRef } from 'react'
 import { TEXTOS } from '../../constants/messages.js'
 import estilos from './PestanasDeEstado.module.css'
 
-/** Las pestañas de la lista de Reservas: un estado por pestaña y, entre paréntesis, cuántas reservas tiene. '' = Todas. */
 export const PESTANAS = Object.freeze([
   { valor: '', texto: TEXTOS.pestanaTodas },
   { valor: 'Pendiente', texto: TEXTOS.pestanaPendientes },

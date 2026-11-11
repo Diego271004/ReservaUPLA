@@ -15,14 +15,12 @@ export function leftPorCentaje(hora) {
   return `${((minutosDeHora(hora) - INICIO_DIA) / (FIN_DIA - INICIO_DIA)) * 100}%`
 }
 
-/** Los bloques con hora de inicio y de fin, de la mañana a la noche. */
 function ordenadosPorInicio(bloques = []) {
   return [...bloques]
     .filter((bloque) => bloque?.horaInicio && bloque?.horaFin)
     .sort((a, b) => minutosDeHora(a.horaInicio) - minutosDeHora(b.horaInicio))
 }
 
-/** Un tramo libre entre dos instantes (en minutos desde las 00:00). */
 const tramoLibre = (desde, hasta) => ({
   tipo: 'libre',
   horaInicio: minutosAHora(desde),

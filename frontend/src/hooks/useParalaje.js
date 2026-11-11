@@ -1,9 +1,5 @@
 import { useEffect, useRef } from 'react'
 
-/**
- * Paralaje decorativo: publica la posición del puntero sobre el elemento como --mx y --my (de -1 a 1) para que el CSS mueva
- * capas a distinta profundidad. No hace nada con prefers-reduced-motion ni en pantallas táctiles.
- */
 export function useParalaje() {
   const ref = useRef(null)
 

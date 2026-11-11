@@ -1,4 +1,3 @@
-/* Atajos del Administrador: una fila de enlaces de 44 px que pasa a dos columnas en pantallas angostas. */
 .accesos {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
@@ -40,7 +39,6 @@
   outline-offset: 2px;
 }
 
-/* Móvil: los cuatro atajos en dos columnas (2 x 2) en vez de una fila por atajo. */
 @media (min-width: 340px) and (max-width: 767px) {
   .accesos {
     grid-template-columns: repeat(2, minmax(0, 1fr));

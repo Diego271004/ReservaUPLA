@@ -7,7 +7,6 @@ import Button from '../ui/Button.jsx'
 import { Icono } from '../ui/Icono.jsx'
 import estilos from './Layout.module.css'
 
-/** Lo que lleva cada opción: icono, texto y, junto a «Reservas», el contador de pendientes del Administrador. */
 function Contenido({ opcion, pendientes }) {
   const contador = opcion.ruta === '/reservas' ? pendientes : 0
   return (

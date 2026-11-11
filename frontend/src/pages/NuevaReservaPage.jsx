@@ -21,7 +21,6 @@ import estilos from './NuevaReservaPage.module.css'
 
 const LIMITE_MOTIVO = LIMITES.motivo
 
-// Aviso inmediato (pantallas 04 y 04e): verde si está libre, rojo con la hora ocupada si no.
 function AvisoDisponibilidad({ aviso }) {
   if (!aviso) return null
   if (aviso.estado === ESTADOS_DISPONIBILIDAD.consultando) {
@@ -36,7 +35,6 @@ export default function NuevaReservaPage() {
   const navigate = useNavigate()
   const { enviando, reservaCreada } = form
 
-  // Cierre del proceso (S4): confirma que se registró y propone el siguiente paso.
   if (reservaCreada) {
     return (
       <>

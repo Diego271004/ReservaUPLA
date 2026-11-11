@@ -24,7 +24,6 @@
   appearance: none;
 }
 
-/* El riel se dibuja aparte para que el área táctil mida 44 px sin engordar el interruptor (que sigue siendo de 44 × 24). */
 .interruptor::before {
   position: absolute;
   top: 10px;

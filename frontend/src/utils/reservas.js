@@ -11,7 +11,6 @@ export function fechaHoraLocal(iso) {
   return `${dia} ${dosDigitos(fecha.getHours())}:${dosDigitos(fecha.getMinutes())}`
 }
 
-/** Un evento del historial contado en una frase: quién, qué y cuándo. */
 export function textoDeEvento({ estadoAnterior, estadoNuevo, usuarioNombre, fecha }) {
   const cuando = fechaHoraLocal(fecha)
   if (estadoAnterior === null || estadoAnterior === undefined) {
@@ -20,7 +19,6 @@ export function textoDeEvento({ estadoAnterior, estadoNuevo, usuarioNombre, fech
   return `Reserva ${estadoNuevo.toLowerCase()} por ${usuarioNombre}, ${cuando}`
 }
 
-/** Objeto enriquecido para la línea de tiempo vertical con fecha relativa y absoluta. */
 export function eventoFormateado(evento) {
   const accion =
     evento.estadoAnterior === null || evento.estadoAnterior === undefined
@@ -41,7 +39,6 @@ const AVISO_POR_ESTADO_FINAL = {
   Cancelada: MENSAJES.reservaCanceladaNoSeModifica,
 }
 
-// Solo una reserva Pendiente es todavía una «solicitud»; una Aprobada (o ya cerrada) se cancela como «reserva», igual que el modal.
 const textoDeCancelar = (reserva) =>
   reserva.estado === 'Pendiente' ? TEXTOS.cancelarSolicitud : TEXTOS.cancelarReserva
 
@@ -79,7 +76,6 @@ export function accionesDeReserva(actor, reserva) {
   return { acciones: [], aviso: null }
 }
 
-/** El tipo de insignia de cada estado de una reserva (Reservas, Mi ambiente y el detalle la comparten). */
 export const TIPO_INSIGNIA_DE_ESTADO = Object.freeze({
   Pendiente: 'pendiente',
   Aprobada: 'aprobada',
@@ -87,7 +83,6 @@ export const TIPO_INSIGNIA_DE_ESTADO = Object.freeze({
   Cancelada: 'cancelada',
 })
 
-/** La línea bajo el título de Reservas: «6 reservas · 2 pendientes» (null mientras se cuentan o si falló). */
 export function resumenDeReservas(conteos) {
   if (!conteos) return null
   const total = Object.values(conteos).reduce((suma, cantidad) => suma + cantidad, 0)

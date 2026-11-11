@@ -50,14 +50,12 @@ public sealed class AuthService : IAuthService
         var contrasena = solicitud.Contrasena!;
         var usuario = await _usuarios.ObtenerPorCorreoAsync(solicitud.Correo!, cancellationToken);
 
-        // Inexistente o inactivo: se paga el mismo costo de verificación y se responde igual.
         if (usuario is null || !usuario.Activo)
         {
             _passwordHasher.Verificar(contrasena, HashFicticio);
             return ResultadoAutenticacion.CredencialesInvalidas();
         }
 
-        // Contraseña errónea: mismo resultado, sin distinción.
         if (!_passwordHasher.Verificar(contrasena, usuario.ContrasenaHash))
         {
             return ResultadoAutenticacion.CredencialesInvalidas();

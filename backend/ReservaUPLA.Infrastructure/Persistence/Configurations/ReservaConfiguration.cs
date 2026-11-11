@@ -21,7 +21,6 @@ public class ReservaConfiguration : IEntityTypeConfiguration<Reserva>
         builder.Property(reserva => reserva.FechaCreacion).HasColumnName("fecha_creacion").ValueGeneratedOnAdd();
         builder.HasOne<Usuario>().WithMany().HasForeignKey(reserva => reserva.UsuarioId);
         builder.HasOne<Ambiente>().WithMany().HasForeignKey(reserva => reserva.AmbienteId);
-        // Los eventos de historial se guardan junto con la reserva (misma transacción).
         builder.HasMany(reserva => reserva.Historial).WithOne().HasForeignKey(evento => evento.ReservaId);
     }
 }

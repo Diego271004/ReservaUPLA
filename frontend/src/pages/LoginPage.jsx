@@ -18,7 +18,6 @@ export default function LoginPage() {
   const form = useLoginForm()
   const panel = useParalaje()
 
-  // Quien ya tiene sesión no necesita volver a iniciarla.
   if (sesion) return <Navigate to={RUTA_INICIAL_POR_ROL[sesion.rol] ?? '/'} replace />
 
   const { enviando } = form
@@ -26,7 +25,6 @@ export default function LoginPage() {
   return (
     <div className={estilos.pagina}>
       <aside className={estilos.panel} ref={panel}>
-        {/* Capas decorativas (solo en pantallas anchas): la foto, el velo que la oscurece bajo el texto y los hexágonos de la marca. */}
         <div className={estilos.foto} aria-hidden="true">
           <div className={estilos.fotoImagen} />
         </div>
@@ -134,7 +132,6 @@ export default function LoginPage() {
             )}
           </form>
         </div>
-        {/* Al final del documento para no cambiar el orden de Tab (correo, contraseña…); se ve arriba a la derecha. */}
         <InterruptorDeTema className={estilos.interruptor} />
       </main>
     </div>

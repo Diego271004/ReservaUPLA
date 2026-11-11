@@ -3,7 +3,6 @@ import { TEXTOS } from '../constants/messages.js'
 import { isoAFecha } from '../utils/fechas.js'
 import { TIPO_INSIGNIA_DE_ESTADO } from '../utils/reservas.js'
 
-/** Las columnas de las tablas de reservas, definidas una sola vez (Reservas, Dashboard y Mi ambiente eligen cuáles usan). */
 const CATALOGO = {
   fecha: {
     clave: 'fecha',
@@ -26,7 +25,6 @@ const CATALOGO = {
   },
 }
 
-/** `claves`: las columnas que se quieren, en orden ('fecha', 'horario', 'ambiente', 'solicitante', 'estado'); `acciones` es la última, propia de cada pantalla. */
 export function columnasDeReservas(claves, acciones = null) {
   const columnas = claves.map((clave) => CATALOGO[clave])
   return acciones

@@ -9,7 +9,6 @@ const DURACION_MINUTOS = 900
 
 const posicion = (minutos) => `${((minutos - INICIO_MINUTOS) / DURACION_MINUTOS) * 100}%`
 const dosDigitos = (hora) => hora.toString().padStart(2, '0')
-/** Centra una etiqueta ancha (unos 5,5 rem) sobre `porcentaje` sin dejar que se salga del carril por ninguno de los dos lados. */
 const dentroDelCarril = (porcentaje) => `clamp(2.75rem, ${porcentaje}, calc(100% - 2.75rem))`
 
 /**

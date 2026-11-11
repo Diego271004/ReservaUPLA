@@ -16,10 +16,8 @@ public class Reserva
     public int AmbienteId { get; set; }
     public DateTimeOffset FechaCreacion { get; set; }
 
-    /// <summary>Eventos de cambio de estado. Cada transición agrega uno en la misma operación (se guardan juntos).</summary>
     public List<HistorialReserva> Historial { get; set; } = new();
 
-    /// <summary>Una reserva nueva nace Pendiente y deja su primer evento en el historial.</summary>
     public static Reserva Crear(
         DateOnly fecha, TimeOnly horaInicio, TimeOnly horaFin, string motivo, int usuarioId, int ambienteId, DateTimeOffset ahora)
     {
@@ -44,14 +42,12 @@ public class Reserva
         CambiarEstado(EstadoReserva.Aprobada, usuarioId, ahora);
     }
 
-    /// <summary>Pendiente → Rechazada.</summary>
     public void Rechazar(int usuarioId, DateTimeOffset ahora)
     {
         ExigirPendiente();
         CambiarEstado(EstadoReserva.Rechazada, usuarioId, ahora);
     }
 
-    /// <summary>Pendiente o Aprobada → Cancelada.</summary>
     public void Cancelar(int usuarioId, DateTimeOffset ahora)
     {
         ExigirNoFinal();

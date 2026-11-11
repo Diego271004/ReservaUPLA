@@ -41,8 +41,6 @@ public sealed class ReservaService : IReservaService
         _reloj = reloj;
     }
 
-    // ================================================================ Crear
-
     public async Task<ResultadoOperacion<ReservaDto>> CrearAsync(
         CrearReservaDto dto, int usuarioId, CancellationToken cancellationToken)
     {
@@ -86,8 +84,6 @@ public sealed class ReservaService : IReservaService
             reserva.ADto(ambiente.Nombre, solicitante?.NombreCompleto ?? string.Empty));
     }
 
-    // ================================================================ Consultar
-
     public async Task<ResultadoOperacion<ReservaDetalleDto>> ObtenerAsync(
         int id, ActorDto actor, CancellationToken cancellationToken)
     {
@@ -121,7 +117,6 @@ public sealed class ReservaService : IReservaService
                 CamposFormulario.AmbienteId, MensajesValidacion.AmbienteInexistente);
         }
 
-        // Una reserva solo para evaluar las mismas reglas que al registrar; no se guarda.
         var prueba = ConstruirReserva(dto.Fecha, dto.HoraInicio, dto.HoraFin, string.Empty, 0, ambiente.Id);
         var violacion = await PrimeraViolacionAsync(prueba, ambiente, cancellationToken);
 
@@ -130,8 +125,6 @@ public sealed class ReservaService : IReservaService
                 ? new DisponibilidadDto(true, MensajesValidacion.Disponible)
                 : new DisponibilidadDto(false, violacion.Mensaje));
     }
-
-    // ================================================================ Cambiar de estado
 
     public Task<ResultadoOperacion<ReservaDetalleDto>> AprobarAsync(int id, ActorDto actor, CancellationToken cancellationToken) =>
         TransicionarAsync(
@@ -153,15 +146,12 @@ public sealed class ReservaService : IReservaService
         TransicionarAsync(
             id,
             permitido: actor.Rol != RolUsuario.Responsable,
-            // Cancela el solicitante dueño de la reserva o el Administrador.
             comprobaciones: (reserva, _) => Task.FromResult(
                 actor.Rol == RolUsuario.Solicitante && reserva.UsuarioId != actor.UsuarioId
                     ? ResultadoOperacion<ReservaDetalleDto>.SinPermiso()
                     : null),
             transicion: reserva => reserva.Cancelar(actor.UsuarioId, _reloj.GetUtcNow()),
             cancellationToken);
-
-    // ================================================================ Apoyo
 
     private static readonly Task<ResultadoOperacion<ReservaDetalleDto>?> SinObjeciones =
         Task.FromResult<ResultadoOperacion<ReservaDetalleDto>?>(null);

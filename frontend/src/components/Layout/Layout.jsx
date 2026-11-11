@@ -18,7 +18,6 @@ const ANCHO_MOVIL = '(max-width: 767px)'
  */
 export default function Layout() {
   const { sesion } = useAuth()
-  // Al cerrar la sesión (o si vence) el layout se vuelve a pintar un instante sin sesión antes de que el router redirija.
   if (!sesion) return null
   return (
     <PendientesProvider activo={sesion.rol === ROLES.administrador}>
@@ -37,7 +36,6 @@ function Estructura({ sesion }) {
 
   const cerrarPanel = useCallback(() => setPanelAbierto(false), [])
 
-  // Si se agranda la ventana con el panel abierto, deja de ser un panel: se cierra.
   useEffect(() => {
     const consulta = window.matchMedia?.(ANCHO_MOVIL)
     if (!consulta) return undefined
@@ -46,7 +44,6 @@ function Estructura({ sesion }) {
     return () => consulta.removeEventListener('change', alCambiar)
   }, [])
 
-  // En el detalle de una reserva el menú marca la sección de origen.
   const esDetalle = matchPath('/reservas/:id', pathname) && pathname !== '/reservas/nueva'
   const origen = esDetalle ? rutaDeRegreso(sesion.rol, state?.volverA).split('?')[0] : null
 

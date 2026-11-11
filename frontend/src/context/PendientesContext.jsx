@@ -5,10 +5,6 @@ import { obtenerDashboard } from '../services/recursosService.js'
 const SIN_PROVEEDOR = Object.freeze({ pendientes: 0, refrescar: () => {} })
 const PendientesContext = createContext(SIN_PROVEEDOR)
 
-/**
- * Cuántas solicitudes esperan una decisión (el contador junto a «Reservas» para el Administrador). Usa el mismo endpoint
- * del Dashboard. Quien aprueba o rechaza llama a `refrescar()` y el contador se actualiza. Si la consulta falla conserva el último valor.
- */
 export function PendientesProvider({ activo, children }) {
   const [pendientes, setPendientes] = useState(0)
 

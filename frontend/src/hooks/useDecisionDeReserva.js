@@ -5,10 +5,6 @@ import { RESULTADO } from '../services/llamarApi.js'
 import { ACCIONES } from './accionesDeReserva.js'
 import { useAccion } from './useAccion.js'
 
-/**
- * Aprobar o rechazar una reserva desde una lista (el Dashboard): qué decisión está abierta en el modal y lo que deja al
- * confirmarla. Al terminar bien llama a `alTerminar` (la lista se vuelve a pedir). Sin JSX.
- */
 export function useDecisionDeReserva(alTerminar) {
   const [decision, setDecision] = useState(null) // { accion: 'aprobar' | 'rechazar', reserva } | null
   const { ejecutando, alerta, ejecutar } = useAccion()
@@ -27,7 +23,6 @@ export function useDecisionDeReserva(alTerminar) {
     if (resultado === null) return // ya había una acción en curso
     setDecision(null)
     if (resultado.tipo === RESULTADO.exito) refrescarPendientes() // el contador del menú
-    // Se vuelve a pedir la lista con éxito o sin él: tras un conflicto (409) o un «ya no existe» el estado real cambió.
     if (resultado.tipo === RESULTADO.exito || resultado.tipo === RESULTADO.conflicto) alTerminar()
   }, [decision, ejecutar, alTerminar, refrescarPendientes])
 

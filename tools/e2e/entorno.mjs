@@ -44,7 +44,6 @@ function detener(hijo) {
   else hijo.kill("SIGTERM");
 }
 
-/** Compila la API y arranca el frontend. Falla si los puertos ya están ocupados. */
 export async function iniciarEntorno() {
   if (!process.env.PGPASSWORD)
     throw new Error("Falta la variable PGPASSWORD (clave de postgres).");
@@ -74,7 +73,6 @@ export async function iniciarEntorno() {
   await esperarA(BASE, "El frontend");
 }
 
-/** Recrea la base con los scripts de database/ y reinicia la API (también reinicia el límite de intentos de login). */
 export async function reiniciarBaseYApi() {
   detener(api);
   await esperar(1500);

@@ -30,7 +30,6 @@ public sealed class JwtTokenGenerator : ITokenGenerator
     {
         ArgumentNullException.ThrowIfNull(usuario);
 
-        // El claim exp tiene precisión de segundos: se trunca para que expiraEn coincida.
         var ahora = TruncarASegundos(_reloj.GetUtcNow().UtcDateTime);
         var expiraEn = ahora.AddMinutes(_opciones.MinutosExpiracion);
 

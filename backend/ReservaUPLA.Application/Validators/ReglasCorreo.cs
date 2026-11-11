@@ -9,7 +9,6 @@ public static class ReglasCorreo
 {
     public const int LongitudMaximaCorreo = 254;
 
-    // Misma expresión que validators.js del frontend.
     private static readonly Regex FormatoCorreo = new(
         @"^[^\s@]+@[^\s@]+\.[^\s@]{2,}$",
         RegexOptions.CultureInvariant,

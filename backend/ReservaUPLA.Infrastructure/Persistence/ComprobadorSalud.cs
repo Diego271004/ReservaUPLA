@@ -16,7 +16,6 @@ public class ComprobadorSalud : IComprobadorSalud
     {
         try
         {
-            // Consulta real a una tabla: comprueba conexión, esquema y permisos del rol.
             await _contexto.Ambientes.AsNoTracking().AnyAsync(cancellationToken);
             return true;
         }

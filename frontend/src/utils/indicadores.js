@@ -1,8 +1,6 @@
 import { TEXTOS } from '../constants/messages.js'
 
-/** Las cuatro tarjetas por estado del Dashboard y de Mi ambiente: el total, pendientes, aprobadas y rechazadas. */
 export const indicadoresDeEstado = ({ total, pendientes, aprobadas, rechazadas }) => [
-  // El total cuenta todas las reservas, también las Canceladas (no tienen tarjeta): la tarjeta lo dice.
   {
     clave: 'total',
     valor: total,

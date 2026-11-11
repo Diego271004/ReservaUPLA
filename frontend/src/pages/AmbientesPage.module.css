@@ -7,7 +7,6 @@
   margin-bottom: var(--espacio-2);
 }
 
-/* Control segmentado: las dos vistas dentro de una misma pastilla; la elegida va en blanco con borde azul. */
 .alternadorVista {
   display: inline-flex;
   gap: 2px;

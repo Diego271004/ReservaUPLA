@@ -48,7 +48,6 @@
 }
 
 @media (max-width: 767px) {
-  /* minmax(0, 1fr): con 1fr a secas las columnas no bajan de su contenido y la página se ensancha a 188 px (zoom del 200 %). */
   .horas,
   .resumen {
     grid-template-columns: minmax(0, 1fr);

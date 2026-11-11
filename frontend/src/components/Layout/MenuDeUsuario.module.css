@@ -49,7 +49,6 @@
   animation: abrir var(--duracion-transicion) ease-out;
 }
 
-/* Nombre y rol de quien tiene la sesión, con el acento dorado como línea fina debajo del nombre. */
 .persona {
   padding: var(--espacio-1);
   margin-bottom: var(--espacio-1);

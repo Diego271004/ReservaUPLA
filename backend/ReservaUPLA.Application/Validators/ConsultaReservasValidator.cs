@@ -36,11 +36,9 @@ public sealed class ConsultaReservasValidator : AbstractValidator<ConsultaReserv
             .OverridePropertyName(CamposFormulario.Pagina);
     }
 
-    // Se compara con el texto exacto del enumerado: "pendiente " o "Vencida" no son estados.
     private static bool EsUnEstadoDeLaLista(string? texto) =>
         texto is not null && Enum.GetNames<EstadoReserva>().Contains(texto, StringComparer.Ordinal);
 
-    // Si la fecha inicial no es válida el error ya está en su campo: aquí no se duplica.
     private static bool NoEsAnteriorALaInicial(string? desde, string? hasta) =>
         !HorarioReserva.TryFecha(desde, out var inicio)
         || !HorarioReserva.TryFecha(hasta, out var fin)

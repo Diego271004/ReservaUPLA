@@ -212,10 +212,7 @@ describe('login: la foto es decorativa y solo se pide en pantallas anchas', () =
   it('solo los tokens declaran degradados (tres) y solo el login y la portada del Inicio los usan', () => {
     expect(leer('styles/tokens.css').match(/linear-gradient\(/g)).toHaveLength(3)
     const usan = TODOS_LOS_CSS.filter((ruta) => /var\(--degradado-/.test(leer(ruta)))
-    expect(usan).toEqual([
-      'components/ui/PortadaDeInicio.module.css',
-      'pages/LoginPage.module.css',
-    ])
+    expect(usan).toEqual(['components/ui/PortadaDeInicio.module.css', 'pages/LoginPage.module.css'])
   })
 
   it('la portada del Inicio deja el texto blanco a 4,5:1 o más sobre cada color de su degradado', () => {

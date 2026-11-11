@@ -15,11 +15,6 @@ export const ESTADOS_PAGINA = Object.freeze({
   error: 'error',
 })
 
-/**
- * Estado del detalle de una reserva: la carga, el modal de confirmación abierto y lo que deja cada acción. El estado
- * "ejecutando / éxito / error" de aprobar, rechazar y cancelar lo lleva useAccion, igual que los formularios.
- * Sin JSX; DetalleReservaPage solo pinta lo que devuelve.
- */
 export function useDetalleReserva(id) {
   const [pagina, setPagina] = useState({
     estado: ESTADOS_PAGINA.cargando,

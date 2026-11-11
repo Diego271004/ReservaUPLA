@@ -10,7 +10,6 @@
   min-width: 0;
 }
 
-/* Columna lateral marina continua: en capturas de página completa (fullPage) cubre el 100% de la altura sin cortes. */
 .lateral {
   display: flex;
   flex-direction: column;
@@ -29,7 +28,6 @@
   flex: 0 0 var(--ancho-menu-colapsado);
 }
 
-/* Menú marino plano. En escritorio queda fijo a la altura de la ventana; en móvil es un panel (más abajo). */
 .menu {
   position: sticky;
   top: 0;
@@ -96,7 +94,6 @@
   min-width: 0;
 }
 
-/* El logo es azul: sobre el marino plano no se vería, va en un recuadro blanco de esquinas pequeñas. */
 .logo {
   display: inline-flex;
   padding: var(--relleno-logo);
@@ -116,7 +113,6 @@
   font-weight: 600;
 }
 
-/* El botón de cerrar el panel solo existe en móvil. */
 .cerrarPanel {
   display: none;
 }
@@ -186,7 +182,6 @@
   background: var(--separador-sobre-oscuro);
 }
 
-/* Ítem activo: fondo azul sólido y texto blanco, sin franjas ni transparencias. */
 .activa,
 .activa:hover {
   font-weight: 700;
@@ -203,7 +198,6 @@
   min-width: 0;
 }
 
-/* Cantidad de solicitudes pendientes: número blanco sobre marino, con el texto «6 pendientes» para el lector de pantalla. */
 .contador {
   display: inline-flex;
   align-items: center;
@@ -231,10 +225,7 @@
   padding: var(--espacio-4);
 }
 
-/* Menú contraído (solo escritorio): iconos con el texto oculto a la vista pero disponible para el lector de pantalla. */
 @media (min-width: 768px) {
-  /* Sin «flex»: el menú está dentro de una columna (.lateral) y un flex-basis de 72 px se aplicaría al ALTO, dejándolo de 80 px con los
-     iconos recortados y una barra de desplazamiento. El ancho lo dan width, min-width y max-width. */
   .menu[data-colapsado='true'] {
     width: var(--ancho-menu-colapsado);
     min-width: var(--ancho-menu-colapsado);
@@ -298,7 +289,6 @@
   }
 }
 
-/* Móvil: el menú es un panel que se desliza desde la izquierda sobre un fondo que lo cierra al tocarlo. */
 @media (max-width: 767px) {
   .contenedor {
     flex-direction: column;
@@ -326,13 +316,11 @@
     height: auto;
     visibility: hidden;
     transform: translateX(-100%);
-    /* Al cerrar, se oculta cuando termina de deslizarse. */
     transition:
       transform var(--duracion-transicion) ease-out,
       visibility 0s linear var(--duracion-transicion);
   }
 
-  /* Al abrir, es visible desde el primer instante: si no, el foco no puede entrar al panel. */
   .menu[data-abierto='true'] {
     visibility: visible;
     transform: none;

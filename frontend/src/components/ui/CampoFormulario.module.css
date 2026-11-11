@@ -37,7 +37,6 @@
 .control {
   flex: 1;
   min-width: 0;
-  /* El control llena la caja de 44 px, borde incluido: no queda una franja de 1 px que no responde al toque. */
   min-height: var(--alto-control);
   margin: -1px;
   padding: 0 var(--espacio-2);
